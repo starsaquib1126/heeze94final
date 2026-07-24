@@ -41,8 +41,6 @@ h1,h2,h3,h4{font-family:'Marcellus',serif;font-weight:400;color:var(--cream)}
 .tlink:hover{border-color:var(--gold)}
 
 /* Canvas */
-#vCanvas{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;pointer-events:none}
-body>*:not(#vCanvas){position:relative;z-index:1}
 
 /* ── NAV ── */
 .nav-bar{position:fixed;top:0;left:0;right:0;z-index:200;
@@ -427,11 +425,15 @@ body.cart-open .drawer{transform:none}
   .rv{opacity:1;transform:none}
   *{animation:none!important;transition:none!important}
 }
+
+.ic.bump{animation:cartBump .45s cubic-bezier(.34,1.56,.64,1)}
+@keyframes cartBump{0%{transform:scale(1)}35%{transform:scale(1.3) rotate(-6deg)}60%{transform:scale(.95)}100%{transform:scale(1) rotate(0)}}
+.bag-ct.pop{animation:bagPop .45s ease}
+@keyframes bagPop{0%{transform:scale(1)}40%{transform:scale(1.6)}100%{transform:scale(1)}}
 </style>
 
 </head>
 <body>
-<canvas id="vCanvas" aria-hidden="true"></canvas>
 <nav class="nav-bar">
   <div class="nav-inner">
     <a class="nav-logo" href="index.html"><img src="assets/brand/logo-new.png" alt="HEEZE 94"/></a>
@@ -553,8 +555,10 @@ const minPrice=p=>Math.min(...p.sizes.map(s=>s.price));
 const lineInfo=key=>{const[id,ml]=key.split('|');const p=cat().find(x=>x.id===id);const s=p&&p.sizes.find(x=>x.ml===+ml);return{p,s};};
 
 function addToCart(id,ml,qty=1){
-  const key=id+'|'+ml;cart[key]=(cart[key]||0)+qty;saveCart();renderCart();showToast('Added to your bag');
+  const key=id+'|'+ml;cart[key]=(cart[key]||0)+qty;saveCart();renderCart();showToast('Added to your bag');bumpCartIcon();
 }
+function bumpCartIcon(){const ic=document.querySelector('[data-oc], [data-open-cart]');const bc=document.querySelector('[data-bc], [data-cart-count]');if(ic){ic.classList.remove('bump');void ic.offsetWidth;ic.classList.add('bump');}if(bc){bc.classList.remove('pop');void bc.offsetWidth;bc.classList.add('pop');}}
+
 function changeQty(key,d){
   cart[key]=(cart[key]||0)+d;if(cart[key]<=0)delete cart[key];saveCart();renderCart();
 }
@@ -646,65 +650,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   renderCart();
 });
 return{addToCart,cq:changeQty,openCart,closeCart,cat,saveCat,fmt,showToast,renderGrid};
-})();
-</script><script>
-(()=>{
-const cv=document.getElementById('vCanvas');if(!cv)return;
-const ctx=cv.getContext('2d');
-const rm=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-let W,H;
-function resize(){const d=Math.min(devicePixelRatio||1,2);W=cv.width=innerWidth*d;H=cv.height=innerHeight*d;cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';ctx.setTransform(d,0,0,d,0,0);}
-resize();addEventListener('resize',resize);
-// Black velvet folds with purple-indigo iridescence
-const folds=[
-  {y:.12,a:.032,k:.0026,sp:.000125,ph:0,   c:'22,14,40'},
-  {y:.28,a:.028,k:.0021,sp:.000095,ph:1.7, c:'16,10,32'},
-  {y:.44,a:.030,k:.0031,sp:.000140,ph:3.3, c:'26,16,46'},
-  {y:.60,a:.027,k:.0019,sp:.000085,ph:0.8, c:'14,9,28'},
-  {y:.76,a:.029,k:.0024,sp:.000110,ph:4.8, c:'20,12,38'},
-  {y:.91,a:.026,k:.0028,sp:.000130,ph:2.1, c:'18,11,34'},
-];
-const dust=Array.from({length:26},()=>({x:Math.random(),y:Math.random(),r:Math.random()*1.0+.35,vy:Math.random()*.000075+.000028,tw:Math.random()*6.28,ts:Math.random()*.0012+.0004}));
-// Gold streaks (like light on velvet fabric)
-const streaks=Array.from({length:5},()=>({x:Math.random(),y:Math.random()*.75,w:Math.random()*.18+.07,sp:Math.random()*.00005+.00002,a:Math.random()*.055+.018}));
-function drawFold(f,t){
-  const by=f.y*innerHeight;
-  ctx.beginPath();ctx.moveTo(-10,by);
-  for(let x=-10;x<=innerWidth+10;x+=14){
-    const y=by+Math.sin(x*f.k+t*f.sp+f.ph)*(innerHeight*.04)+Math.sin(x*f.k*1.6-t*f.sp*.9+f.ph*1.3)*(innerHeight*.015);
-    ctx.lineTo(x,y);
-  }
-  ctx.lineTo(innerWidth+10,innerHeight+10);ctx.lineTo(-10,innerHeight+10);ctx.closePath();
-  const g=ctx.createLinearGradient(0,by-innerHeight*.04,0,by+innerHeight*.06);
-  g.addColorStop(0,`rgba(${f.c},0)`);g.addColorStop(.5,`rgba(${f.c},${f.a})`);g.addColorStop(1,`rgba(${f.c},0)`);
-  ctx.fillStyle=g;ctx.fill();
-}
-function drawStreaks(t){
-  streaks.forEach(s=>{
-    const x=(s.x+t*s.sp)%1.25-.12;
-    const g=ctx.createLinearGradient(x*innerWidth,s.y*innerHeight,(x+s.w)*innerWidth,(s.y+.04)*innerHeight);
-    g.addColorStop(0,'rgba(233,190,90,0)');g.addColorStop(.5,`rgba(233,190,90,${s.a})`);g.addColorStop(1,'rgba(233,190,90,0)');
-    ctx.fillStyle=g;ctx.beginPath();
-    ctx.ellipse((x+s.w/2)*innerWidth,(s.y+.02)*innerHeight,s.w*innerWidth*.5,14,-.08,0,Math.PI*2);
-    ctx.fill();
-  });
-}
-function frame(t){
-  ctx.clearRect(0,0,innerWidth,innerHeight);
-  ctx.fillStyle='#050403';ctx.fillRect(0,0,innerWidth,innerHeight);
-  ctx.globalCompositeOperation='screen';
-  folds.forEach(f=>drawFold(f,t));
-  drawStreaks(t);
-  dust.forEach(d=>{
-    d.y-=d.vy;if(d.y<-.02){d.y=1.02;d.x=Math.random();}
-    d.tw+=d.ts;
-    const al=.04+Math.sin(d.tw)*.038;
-    ctx.beginPath();ctx.arc(d.x*innerWidth,d.y*innerHeight,d.r,0,6.283);
-    ctx.fillStyle=`rgba(233,190,90,${Math.max(0,al)})`;ctx.fill();
-  });
-  ctx.globalCompositeOperation='source-over';
-}
-if(rm)frame(0);else(function loop(t){frame(t);requestAnimationFrame(loop);})(0);
 })();
 </script><script>
 (()=>{

@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     .from('products')
     .select(`
       id, slug, name, category, description, status, image_url,
-      product_variants ( size_ml, price, stock )
+      product_variants ( id, size_ml, price, stock )
     `)
     .neq('status', 'hidden')
     .order('created_at', { ascending: true });
@@ -36,7 +36,7 @@ export default async function handler(req, res) {
     desc: p.description,
     img: p.image_url,
     sizes: p.product_variants
-      .map(v => ({ ml: v.size_ml, price: Number(v.price), stock: v.stock }))
+      .map(v => ({ variantId: v.id, ml: v.size_ml, price: Number(v.price), stock: v.stock }))
       .sort((a, b) => a.ml - b.ml)
   }));
 
