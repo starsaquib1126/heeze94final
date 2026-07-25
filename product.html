@@ -582,7 +582,17 @@ const cat=()=>{try{const s=localStorage.getItem('h94c');return s?JSON.parse(s):D
 const saveCat=c=>localStorage.setItem('h94c',JSON.stringify(c));
 let cart={};try{cart=JSON.parse(localStorage.getItem('h94_cart')||'{}');}catch(e){}
 const saveCart=()=>localStorage.setItem('h94_cart',JSON.stringify(cart));
-const fmt=n=>'₹'+Number(n).toLocaleString('en-IN');
+let CURR={code:'INR',symbol:'₹',rate:1};
+async function initGeoCurrency(){
+  try{
+    const g=await fetch('/api/geo').then(r=>r.json());
+    if(g&&g.rate) CURR=g;
+  }catch(e){ /* keep INR default on any failure */ }
+}
+const fmt=n=>{
+  const v=Number(n)*CURR.rate;
+  return CURR.code==='INR' ? CURR.symbol+Math.round(v).toLocaleString('en-IN') : CURR.symbol+v.toFixed(2);
+};
 const minPrice=p=>Math.min(...p.sizes.map(s=>s.price));
 const lineInfo=key=>{const[id,ml]=key.split('|');const p=cat().find(x=>x.id===id);const s=p&&p.sizes.find(x=>x.ml===+ml);return{p,s};};
 
@@ -667,7 +677,8 @@ function initVideo(){
   const st=btn.querySelector('[data-vs]');
   btn.addEventListener('click',()=>{if(v.paused){v.play();if(st)st.textContent='Pause film';}else{v.pause();if(st)st.textContent='Play film';}});
 }
-document.addEventListener('DOMContentLoaded',()=>{
+document.addEventListener('DOMContentLoaded',async()=>{
+  await initGeoCurrency();
   initYear();initReveals();initMenu();initTicker();initFilters();initNav();initVideo();
   document.querySelectorAll('[data-pg]').forEach(el=>{
     renderGrid(el,{featured:el.dataset.feat==='1',limit:el.dataset.lim,cat:el.dataset.cat});

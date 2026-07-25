@@ -668,7 +668,17 @@ function saveCat(c){ /* no-op */ }
 let cart={};
 try{ cart=JSON.parse(localStorage.getItem('h94_cart')||'{}'); }catch(e){}
 const saveCart=()=>localStorage.setItem('h94_cart',JSON.stringify(cart));
-const fmt=n=>'₹'+Number(n).toLocaleString('en-IN');
+let CURR={code:'INR',symbol:'₹',rate:1};
+async function initGeoCurrency(){
+  try{
+    const g=await fetch('/api/geo').then(r=>r.json());
+    if(g&&g.rate) CURR=g;
+  }catch(e){ /* keep INR default on any failure */ }
+}
+const fmt=n=>{
+  const v=Number(n)*CURR.rate;
+  return CURR.code==='INR' ? CURR.symbol+Math.round(v).toLocaleString('en-IN') : CURR.symbol+v.toFixed(2);
+};
 
 function addToCart(id,ml,qty=1){
   const key=id+'|'+ml;
@@ -810,7 +820,8 @@ function initFilters(){
 }
 
 /* ── DOMContentLoaded init ── */
-document.addEventListener('DOMContentLoaded',()=>{
+document.addEventListener('DOMContentLoaded',async()=>{
+  await initGeoCurrency();
   initYear();initReveals();initMenu();initTicker();initFilters();initVideos();
   document.querySelectorAll('[data-product-grid]').forEach(el=>{
     renderGrid(el,{
