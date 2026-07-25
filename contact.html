@@ -460,6 +460,24 @@ body.cart-open .cart-drawer{transform:none}
 @keyframes cartBump{0%{transform:scale(1)}35%{transform:scale(1.3) rotate(-6deg)}60%{transform:scale(.95)}100%{transform:scale(1) rotate(0)}}
 .bag-ct.pop{animation:bagPop .45s ease}
 @keyframes bagPop{0%{transform:scale(1)}40%{transform:scale(1.6)}100%{transform:scale(1)}}
+/* ── Checkout Modal ── */
+.checkout-veil{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:220;
+  opacity:0;pointer-events:none;transition:.4s}
+body.checkout-open .checkout-veil{opacity:1;pointer-events:auto}
+.checkout-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-48%);
+  width:min(440px,92vw);max-height:88vh;overflow-y:auto;
+  background:#0E0B07;border:1px solid var(--hairline);z-index:230;
+  opacity:0;pointer-events:none;transition:.4s}
+body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:translate(-50%,-50%)}
+.checkout-modal-head{padding:22px 24px;border-bottom:1px solid var(--hairline);
+  display:flex;justify-content:space-between;align-items:center}
+.checkout-modal-head h2{letter-spacing:.18em;font-size:.9rem;text-transform:uppercase}
+.checkout-modal form{padding:22px 24px;display:flex;flex-direction:column;gap:14px}
+.checkout-modal label{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.checkout-modal input{display:block;width:100%;margin-top:6px;padding:11px 12px;
+  background:rgba(255,255,255,.03);border:1px solid var(--hairline);color:var(--ivory);
+  font-family:inherit;font-size:.9rem}
+.checkout-modal input:focus{outline:none;border-color:var(--gold)}
 </style></head><body class=""><header class="site-header"><div class="container"><nav class="nav">
 <a class="brand" href="index.html"><img src="assets/brand/logo-new.png" alt="HEEZE 94" height="52"/></a>
 <div class="nav-links"><a href="index.html">Home</a><a href="house.html">The House</a><a href="collection.html">Attar</a><a href="parfums.html">Parfum</a><a href="craftsmanship.html">Craftsmanship</a><a href="bespoke.html">Build Your Own</a><a href="journal.html">Journal</a><a href="contact.html" class='active'>Contact</a></div>
@@ -502,7 +520,21 @@ body.cart-open .cart-drawer{transform:none}
       <p class="form-ok" id="formOk"></p>
     </form>
   </div>
-</div></section></main><div class="cart-veil"></div><aside class="cart-drawer" aria-label="Shopping bag"><div class="cart-head"><h2>Your Bag</h2><button class="cart-close" data-close-cart>×</button></div><div class="cart-items" data-cart-items></div><div class="cart-foot"><div class="cart-total"><span>Subtotal</span><strong data-cart-total>₹0</strong></div><button class="btn btn-gold" data-checkout style="width:100%">Continue to secure checkout</button><p class="cart-note">Razorpay · UPI · Cards · Netbanking</p></div></aside><div class="toast" role="status"></div><footer class="footer"><div class="container"><div class="footer-top"><div class="footer-brand"><img src="assets/brand/logo-primary.png" alt="HEEZE 94"/><p>Premium attars — intimate, enduring, composed to become part of the wearer.</p></div><div class="footer-col"><h3>Explore</h3><a href="collection.html">Collection</a><a href="parfums.html">Parfums</a><a href="films.html">Films</a><a href="journal.html">Journal</a></div><div class="footer-col"><h3>The House</h3><a href="house.html">Our Story</a><a href="contact.html">Private Client</a><a href="contact.html">Wholesale</a></div><div class="footer-col"><h3>Client Care</h3><a href="contact.html">Contact</a><a href="privacy.html">Privacy Policy</a></div></div><div class="footer-bottom"><span>© <span data-year></span> HEEZE 94</span><span>Fragrance in its most intimate form</span></div></div></footer><script>/* ═══ HEEZE 94 · catalogue.js · v4 · Real Assets ════════════════════════════ */
+</div></section></main><div class="cart-veil"></div><aside class="cart-drawer" aria-label="Shopping bag"><div class="cart-head"><h2>Your Bag</h2><button class="cart-close" data-close-cart>×</button></div><div class="cart-items" data-cart-items></div><div class="cart-foot"><div class="cart-total"><span>Subtotal</span><strong data-cart-total>₹0</strong></div><button class="btn btn-gold" data-checkout style="width:100%">Continue to secure checkout</button><p class="cart-note">Razorpay · UPI · Cards · Netbanking</p></div></aside><div class="checkout-veil" data-checkout-veil></div>
+<div class="checkout-modal" data-checkout-modal aria-label="Checkout details">
+  <div class="checkout-modal-head"><h2>Your Details</h2><button class="cart-close" data-checkout-close>×</button></div>
+  <form data-checkout-form>
+    <label>Full Name<input type="text" name="name" required></label>
+    <label>Email<input type="email" name="email" required></label>
+    <label>Phone<input type="tel" name="phone" required></label>
+    <label>Address Line 1<input type="text" name="line1" required></label>
+    <label>City<input type="text" name="city" required></label>
+    <label>State<input type="text" name="state" required></label>
+    <label>Pincode<input type="text" name="pincode" required></label>
+    <button type="submit" class="btn btn-gold" style="width:100%;margin-top:18px">Pay Now</button>
+  </form>
+</div>
+<div class="toast" role="status"></div><footer class="footer"><div class="container"><div class="footer-top"><div class="footer-brand"><img src="assets/brand/logo-primary.png" alt="HEEZE 94"/><p>Premium attars — intimate, enduring, composed to become part of the wearer.</p></div><div class="footer-col"><h3>Explore</h3><a href="collection.html">Collection</a><a href="parfums.html">Parfums</a><a href="films.html">Films</a><a href="journal.html">Journal</a></div><div class="footer-col"><h3>The House</h3><a href="house.html">Our Story</a><a href="contact.html">Private Client</a><a href="contact.html">Wholesale</a></div><div class="footer-col"><h3>Client Care</h3><a href="contact.html">Contact</a><a href="privacy.html">Privacy Policy</a></div></div><div class="footer-bottom"><span>© <span data-year></span> HEEZE 94</span><span>Fragrance in its most intimate form</span></div></div></footer><script>/* ═══ HEEZE 94 · catalogue.js · v4 · Real Assets ════════════════════════════ */
 const H94 = (() => {
 
 const DEFAULT = [
@@ -689,7 +721,67 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.querySelector('[data-checkout]')?.addEventListener('click',()=>{
     const count=Object.values(cart).reduce((s,q)=>s+q,0);
     if(!count){showToast('Your bag is empty');return;}
-    showToast('Razorpay checkout connects here once your account is live');
+    document.body.classList.remove('cart-open');
+    document.body.classList.add('checkout-open');
+  });
+  document.querySelector('[data-checkout-close]')?.addEventListener('click',()=>document.body.classList.remove('checkout-open'));
+  document.querySelector('[data-checkout-veil]')?.addEventListener('click',()=>document.body.classList.remove('checkout-open'));
+
+  document.querySelector('[data-checkout-form]')?.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const form=e.target;
+    const submitBtn=form.querySelector('button[type="submit"]');
+    submitBtn.disabled=true; submitBtn.textContent='Processing…';
+    try{
+      // 1. Get live product data so we can map cart keys (slug|ml) to real variant IDs
+      const products=await fetch('/api/products').then(r=>r.json());
+      const items=[];
+      for(const key in cart){
+        const [slug,ml]=key.split('|');
+        const product=products.find(p=>p.id===slug);
+        const size=product?.sizes.find(s=>String(s.ml)===ml);
+        if(!size) throw new Error(`Could not find ${slug} ${ml}ml`);
+        items.push({ variantId: size.variantId, quantity: cart[key] });
+      }
+
+      const fd=new FormData(form);
+      const customer={
+        name: fd.get('name'), email: fd.get('email'), phone: fd.get('phone'),
+        address:{ line1: fd.get('line1'), city: fd.get('city'), state: fd.get('state'), pincode: fd.get('pincode'), country:'India' }
+      };
+
+      // 2. Create the order server-side
+      const order=await fetch('/api/create-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items,customer})}).then(r=>r.json());
+      if(order.error) throw new Error(order.error);
+
+      // 3. Launch Razorpay's checkout widget
+      const rzp=new Razorpay({
+        key: order.keyId,
+        amount: order.amount,
+        currency: order.currency,
+        order_id: order.razorpayOrderId,
+        name: 'HEEZE 94',
+        description: 'Fragrance order',
+        prefill:{ name: customer.name, email: customer.email, contact: customer.phone },
+        theme:{ color:'#E9BE5A' },
+        handler: async (response)=>{
+          const verify=await fetch('/api/verify-payment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(response)}).then(r=>r.json());
+          if(verify.success){
+            cart={}; saveCart(); renderCart();
+            document.body.classList.remove('checkout-open');
+            showToast('Payment successful — thank you!');
+          }else{
+            showToast('Payment could not be verified. Please contact us.');
+          }
+        },
+        modal:{ ondismiss: ()=>{ submitBtn.disabled=false; submitBtn.textContent='Pay Now'; } }
+      });
+      rzp.open();
+    }catch(err){
+      showToast(err.message || 'Something went wrong');
+    }finally{
+      submitBtn.disabled=false; submitBtn.textContent='Pay Now';
+    }
   });
   renderCart();
   // Mark active nav link
@@ -808,4 +900,4 @@ Help customers find their perfect attar. Ask about their preferences, lifestyle,
 
   window._h94chat={toggle,send};
 })();
-</script></body></html>
+</script><script src="https://checkout.razorpay.com/v1/checkout.js"></script></body></html>
