@@ -589,6 +589,7 @@ async function initGeoCurrency(){
     if(g&&g.rate) CURR=g;
   }catch(e){ /* keep INR default on any failure */ }
 }
+window.__geoReady=initGeoCurrency();
 const fmt=n=>{
   const v=Number(n)*CURR.rate;
   return CURR.code==='INR' ? CURR.symbol+Math.round(v).toLocaleString('en-IN') : CURR.symbol+v.toFixed(2);
@@ -678,7 +679,7 @@ function initVideo(){
   btn.addEventListener('click',()=>{if(v.paused){v.play();if(st)st.textContent='Pause film';}else{v.pause();if(st)st.textContent='Play film';}});
 }
 document.addEventListener('DOMContentLoaded',async()=>{
-  await initGeoCurrency();
+  await window.__geoReady;
   initYear();initReveals();initMenu();initTicker();initFilters();initNav();initVideo();
   document.querySelectorAll('[data-pg]').forEach(el=>{
     renderGrid(el,{featured:el.dataset.feat==='1',limit:el.dataset.lim,cat:el.dataset.cat});
@@ -801,7 +802,8 @@ function selSize(ml){
   document.getElementById('pdPrice').textContent=s?H94.fmt(s.price):'';
   document.querySelectorAll('.sz-opt').forEach(b=>b.classList.toggle('on',+b.dataset.ml===ml));
 }
-document.addEventListener('DOMContentLoaded',()=>{
+document.addEventListener('DOMContentLoaded',async()=>{
+  await window.__geoReady;
   const id=new URLSearchParams(location.search).get('id');
   curId=id;
   const p=H94.cat().find(x=>x.id===id);
