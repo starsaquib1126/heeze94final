@@ -662,7 +662,17 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
     <div class="promo-msg" data-auth-msg></div>
     <label>Email<input type="email" data-auth-email required></label>
     <label>Password<input type="password" data-auth-password required></label>
-    <button class="btn btn-gold" style="width:100%;margin-top:14px" data-auth-submit>Sign In</button>
+    <label data-signup-field style="display:none">Full Name<input type="text" data-auth-name required></label>
+    <label data-signup-field style="display:none">Phone<input type="tel" data-auth-phone required></label>
+    <label data-signup-field style="display:none">Confirm Password<input type="password" data-auth-confirm-pw required></label>
+    <div class="auth-divider" style="display:flex;align-items:center;gap:12px;margin:18px 0 14px"><hr style="flex:1;border:none;border-top:1px solid var(--dim,.25)">
+    <span style="font-size:.78rem;color:var(--muted,#999);letter-spacing:.06em">OR</span>
+    <hr style="flex:1;border:none;border-top:1px solid var(--dim,.25)"></div>
+    <button type="button" class="btn btn-line" style="width:100%;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px" data-google-signin>
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 010-9.18l-7.98-6.19a24.0 24.0 0 000 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Continue with Google
+    </button>
+    <button class="btn btn-gold" style="width:100%;margin-top:4px" data-auth-submit>Sign In</button>
     <button class="text-link" style="margin-top:14px;display:block" data-auth-back>← Back</button>
   </div>
 
@@ -901,10 +911,12 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const formEl=document.querySelector('[data-checkout-form]');
   const titleEl=document.querySelector('[data-checkout-title]');
 
-  function showDetailsForm(prefillEmail){
+  function showDetailsForm(prefillEmail, prefillName, prefillPhone){
     gateEl.style.display='none'; authEl.style.display='none'; formEl.style.display='';
     titleEl.textContent='Your Details';
     if(prefillEmail){ const emailInput=formEl.querySelector('[name="email"]'); if(emailInput) emailInput.value=prefillEmail; }
+    if(prefillName){ const nameInput=formEl.querySelector('[name="name"]'); if(nameInput) nameInput.value=prefillName; }
+    if(prefillPhone){ const phoneInput=formEl.querySelector('[name="phone"]'); if(phoneInput) phoneInput.value=prefillPhone; }
     const countrySelect=formEl.querySelector('[data-country-select]');
     if(countrySelect && CURR.country && [...countrySelect.options].some(o=>o.value===CURR.country)){
       countrySelect.value=CURR.country;
@@ -928,6 +940,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
       document.querySelectorAll('[data-auth-tab]').forEach(t=>t.classList.toggle('on',t===tab));
       authSubmitBtn.textContent=authMode==='signin'?'Sign In':'Create Account';
       document.querySelector('[data-auth-msg]').textContent='';
+      document.querySelectorAll('[data-signup-field]').forEach(f=>f.style.display=authMode==='signup'?'':'none');
     });
   });
 
@@ -937,9 +950,10 @@ document.addEventListener('DOMContentLoaded',async()=>{
     const password=document.querySelector('[data-auth-password]').value;
     const msgEl=document.querySelector('[data-auth-msg]');
     if(!email||!password){msgEl.textContent='Enter both email and password';msgEl.className='promo-msg err';return;}
+    if(authMode==='signup'){const n=document.querySelector('[data-auth-name]').value.trim(),p=document.querySelector('[data-auth-phone]').value.trim(),cpw=document.querySelector('[data-auth-confirm-pw]').value;if(!n||!p){msgEl.textContent='Please fill in your name and phone number';msgEl.className='promo-msg err';return;}if(password!==cpw){msgEl.textContent='Passwords do not match';msgEl.className='promo-msg err';return;}}
     msgEl.textContent='Please wait…';msgEl.className='promo-msg';
     const { data, error } = authMode==='signup'
-      ? await supa.auth.signUp({ email, password })
+      ? await supa.auth.signUp({ email, password, options:{ data:{ full_name: document.querySelector('[data-auth-name]').value.trim(), phone: document.querySelector('[data-auth-phone]').value.trim() } } })
       : await supa.auth.signInWithPassword({ email, password });
     if(error){
       // Graceful handling: if trying to register with an email that already has an
@@ -959,9 +973,36 @@ document.addEventListener('DOMContentLoaded',async()=>{
       return;
     }
     msgEl.textContent='';
-    showDetailsForm(email);
+    const meta=data?.user?.user_metadata||{};
+    showDetailsForm(email, meta.full_name||'', meta.phone||'');
   }
   authSubmitBtn?.addEventListener('click',doAuth);
+
+  /* Google OAuth sign-in */
+  document.querySelector('[data-google-signin]')?.addEventListener('click', async ()=>{
+    if(!supa){document.querySelector('[data-auth-msg]').textContent='Auth service unavailable — try guest checkout.';document.querySelector('[data-auth-msg]').className='promo-msg err';return;}
+    const {data,error}=await supa.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});
+    if(error){document.querySelector('[data-auth-msg]').textContent=error.message;document.querySelector('[data-auth-msg]').className='promo-msg err';}
+  });
+
+  /* On page load, check if user just returned from Google OAuth redirect */
+  (async()=>{
+    if(!supa) return;
+    const {data:{session}}=await supa.auth.getSession();
+    if(session?.user){
+      const u=session.user;
+      const meta=u.user_metadata||{};
+      const email=u.email||'';
+      const name=meta.full_name||meta.name||'';
+      const phone=meta.phone||u.phone||'';
+      /* If cart has items and we just came back from OAuth, auto-open checkout */
+      const cart=JSON.parse(localStorage.getItem('h94_cart')||'{}');
+      if(Object.keys(cart).length>0){
+        document.body.classList.add('checkout-open');
+        showDetailsForm(email,name,phone);
+      }
+    }
+  })();
 
   document.querySelector('[data-checkout-veil]')?.addEventListener('click',()=>document.body.classList.remove('checkout-open'));
   document.querySelector('[data-promo-apply]')?.addEventListener('click', async ()=>{
