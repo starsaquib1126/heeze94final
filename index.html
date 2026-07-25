@@ -356,6 +356,9 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
   background:rgba(255,255,255,.03);border:1px solid var(--hairline);color:var(--ivory);
   font-family:inherit;font-size:.9rem}
 .checkout-modal input:focus{outline:none;border-color:var(--gold)}
+.auth-tabs{display:flex;margin-bottom:18px;border-bottom:1px solid var(--hairline)}
+.auth-tab{flex:1;padding:10px 0;background:none;border:none;color:var(--muted);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;transition:.25s}
+.auth-tab.on{color:var(--gold);border-bottom-color:var(--gold)}
 .cart-head{padding:22px 24px;border-bottom:1px solid var(--hairline);
   display:flex;justify-content:space-between;align-items:center}
 .cart-head h2{letter-spacing:.22em;font-size:.95rem;text-transform:uppercase}
@@ -459,6 +462,14 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
 @keyframes cartBump{0%{transform:scale(1)}35%{transform:scale(1.3) rotate(-6deg)}60%{transform:scale(.95)}100%{transform:scale(1) rotate(0)}}
 .bag-ct.pop{animation:bagPop .45s ease}
 @keyframes bagPop{0%{transform:scale(1)}40%{transform:scale(1.6)}100%{transform:scale(1)}}
+.promo-row{display:flex;gap:8px;margin-bottom:14px}
+.promo-row input{flex:1;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid var(--hairline);color:var(--ivory);font-family:inherit;font-size:.85rem}
+.promo-row input:focus{outline:none;border-color:var(--gold)}
+.promo-apply{padding:10px 16px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:.3s}
+.promo-apply:hover{background:var(--gold);color:#000}
+.promo-msg{font-size:.78rem;margin-bottom:14px;min-height:1em}
+.promo-msg.ok{color:#8FD19E}
+.promo-msg.err{color:#E08585}
 </style></head><body><header class="site-header"><div class="container"><nav class="nav">
 <a class="brand" href="index.html"><img src="assets/brand/logo-new.png" alt="HEEZE 94" height="52"/></a>
 <div class="nav-links"><a href="index.html">Home</a><a href="house.html">The House</a><a href="collection.html">Attar</a><a href="parfums.html">Parfum</a><a href="craftsmanship.html">Craftsmanship</a><a href="bespoke.html">Build Your Own</a><a href="journal.html">Journal</a><a href="contact.html">Contact</a></div>
@@ -550,11 +561,30 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
 
 <script>
 
-</script></main><div class="cart-veil"></div><aside class="cart-drawer" aria-label="Shopping bag"><div class="cart-head"><h2>Your Bag</h2><button class="cart-close" data-close-cart>×</button></div><div class="cart-items" data-cart-items></div><div class="cart-foot"><div class="cart-total"><span>Subtotal</span><strong data-cart-total>₹0</strong></div><button class="btn btn-gold" data-checkout style="width:100%">Continue to secure checkout</button><p class="cart-note">Razorpay · UPI · Cards · Netbanking</p></div></aside>
+</script></main><div class="cart-veil"></div><aside class="cart-drawer" aria-label="Shopping bag"><div class="cart-head"><h2>Your Bag</h2><button class="cart-close" data-close-cart>×</button></div><div class="cart-items" data-cart-items></div><div class="cart-foot"><div class="promo-row"><input type="text" placeholder="Promo code" data-promo-input><button class="promo-apply" data-promo-apply>Apply</button></div><div class="promo-msg" data-promo-msg></div><div class="cart-total"><span>Subtotal</span><strong data-cart-total>₹0</strong></div><button class="btn btn-gold" data-checkout style="width:100%">Continue to secure checkout</button><p class="cart-note">Razorpay · UPI · Cards · Netbanking</p></div></aside>
 <div class="checkout-veil" data-checkout-veil></div>
 <div class="checkout-modal" data-checkout-modal aria-label="Checkout details">
-  <div class="checkout-modal-head"><h2>Your Details</h2><button class="cart-close" data-checkout-close>×</button></div>
-  <form data-checkout-form>
+  <div class="checkout-modal-head"><h2 data-checkout-title>Checkout</h2><button class="cart-close" data-checkout-close>×</button></div>
+
+  <div data-checkout-gate style="padding:22px 24px">
+    <p style="color:var(--muted);font-size:.88rem;line-height:1.7;margin-bottom:20px">Sign in to unlock member offers like <strong style="color:var(--gold)">WELCOME10</strong> — 10% off your first order. Or continue without an account.</p>
+    <button class="btn btn-gold" style="width:100%;margin-bottom:10px" data-show-signin>Sign In — Enjoy Offers</button>
+    <button class="btn btn-line" style="width:100%" data-guest-continue>Continue as Guest</button>
+  </div>
+
+  <div data-auth-form style="display:none;padding:22px 24px">
+    <div class="auth-tabs">
+      <button type="button" class="auth-tab on" data-auth-tab="signin">Sign In</button>
+      <button type="button" class="auth-tab" data-auth-tab="signup">Register</button>
+    </div>
+    <div class="promo-msg" data-auth-msg></div>
+    <label>Email<input type="email" data-auth-email required></label>
+    <label>Password<input type="password" data-auth-password required></label>
+    <button class="btn btn-gold" style="width:100%;margin-top:14px" data-auth-submit>Sign In</button>
+    <button class="text-link" style="margin-top:14px;display:block" data-auth-back>← Back</button>
+  </div>
+
+  <form data-checkout-form style="display:none">
     <label>Full Name<input type="text" name="name" required></label>
     <label>Email<input type="email" name="email" required></label>
     <label>Phone<input type="tel" name="phone" required></label>
@@ -562,6 +592,12 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
     <label>City<input type="text" name="city" required></label>
     <label>State<input type="text" name="state" required></label>
     <label>Pincode<input type="text" name="pincode" required></label>
+    <label>Country<select name="country" data-country-select required>
+      <option value="IN">India</option>
+      <option value="AE">United Arab Emirates</option>
+      <option value="US">United States</option>
+    </select></label>
+    <p class="promo-msg" style="margin-top:4px">Charged in Indian Rupees (INR) regardless of the currency shown while browsing.</p>
     <button type="submit" class="btn btn-gold" style="width:100%;margin-top:18px">Pay Now</button>
   </form>
 </div>
@@ -599,7 +635,7 @@ function getCat(){
 function saveCat(c){ /* no-op: catalogue is file-driven, not cached */ }
 
 /* ── Cart ── */
-let cart={};
+let cart={};let appliedPromo=null;
 try{ cart=JSON.parse(localStorage.getItem('h94_cart')||'{}'); }catch(e){}
 const saveCart=()=>localStorage.setItem('h94_cart',JSON.stringify(cart));
 let CURR={code:'INR',symbol:'₹',rate:1};
@@ -656,7 +692,7 @@ function renderCart(){
       </div>`;
     }).join('');
   }
-  const total=items.reduce((s,[key,q])=>{const{s:sz}=lineInfo(key);return s+(sz?sz.price*q:0);},0);
+  const rawTotal=items.reduce((s,[key,q])=>{const{s:sz}=lineInfo(key);return s+(sz?sz.price*q:0);},0);const total=appliedPromo?Math.max(rawTotal-appliedPromo.discountAmount,0):rawTotal;
   const el=document.querySelector('[data-cart-total]');
   if(el)el.textContent=fmt(total);
 }
@@ -772,9 +808,110 @@ document.addEventListener('DOMContentLoaded',async()=>{
     if(!count){showToast('Your bag is empty');return;}
     document.body.classList.remove('cart-open');
     document.body.classList.add('checkout-open');
+    const gateEl2=document.querySelector('[data-checkout-gate]'), authEl2=document.querySelector('[data-auth-form]'), formEl2=document.querySelector('[data-checkout-form]'), titleEl2=document.querySelector('[data-checkout-title]');
+    gateEl2.style.display=''; authEl2.style.display='none'; formEl2.style.display='none'; titleEl2.textContent='Checkout';
   });
   document.querySelector('[data-checkout-close]')?.addEventListener('click',()=>document.body.classList.remove('checkout-open'));
+
+  let supa=null;
+  try{
+    if(window.supabase) supa=window.supabase.createClient('https://amxrksxppagiqqzfjzyh.supabase.co', 'sb_publishable_ztVqFR3XkpOQk9usO_TQUA_PaAixVgi');
+  }catch(e){ /* sign-in unavailable, guest checkout still works fine */ }
+  if(!supa){
+    const signinBtn=document.querySelector('[data-show-signin]');
+    if(signinBtn) signinBtn.style.display='none';
+  }
+  const gateEl=document.querySelector('[data-checkout-gate]');
+  const authEl=document.querySelector('[data-auth-form]');
+  const formEl=document.querySelector('[data-checkout-form]');
+  const titleEl=document.querySelector('[data-checkout-title]');
+
+  function showDetailsForm(prefillEmail){
+    gateEl.style.display='none'; authEl.style.display='none'; formEl.style.display='';
+    titleEl.textContent='Your Details';
+    if(prefillEmail){ const emailInput=formEl.querySelector('[name="email"]'); if(emailInput) emailInput.value=prefillEmail; }
+    const countrySelect=formEl.querySelector('[data-country-select]');
+    if(countrySelect && CURR.country && [...countrySelect.options].some(o=>o.value===CURR.country)){
+      countrySelect.value=CURR.country;
+    }
+  }
+
+  document.querySelector('[data-guest-continue]')?.addEventListener('click',()=>showDetailsForm());
+
+  document.querySelector('[data-show-signin]')?.addEventListener('click',()=>{
+    gateEl.style.display='none'; authEl.style.display=''; titleEl.textContent='Sign In';
+  });
+  document.querySelector('[data-auth-back]')?.addEventListener('click',()=>{
+    authEl.style.display='none'; gateEl.style.display=''; titleEl.textContent='Checkout';
+  });
+
+  let authMode='signin';
+  const authSubmitBtn=document.querySelector('[data-auth-submit]');
+  document.querySelectorAll('[data-auth-tab]').forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      authMode=tab.dataset.authTab;
+      document.querySelectorAll('[data-auth-tab]').forEach(t=>t.classList.toggle('on',t===tab));
+      authSubmitBtn.textContent=authMode==='signin'?'Sign In':'Create Account';
+      document.querySelector('[data-auth-msg]').textContent='';
+    });
+  });
+
+  async function doAuth(){
+    if(!supa){return;}
+    const email=document.querySelector('[data-auth-email]').value.trim();
+    const password=document.querySelector('[data-auth-password]').value;
+    const msgEl=document.querySelector('[data-auth-msg]');
+    if(!email||!password){msgEl.textContent='Enter both email and password';msgEl.className='promo-msg err';return;}
+    msgEl.textContent='Please wait…';msgEl.className='promo-msg';
+    const { data, error } = authMode==='signup'
+      ? await supa.auth.signUp({ email, password })
+      : await supa.auth.signInWithPassword({ email, password });
+    if(error){
+      // Graceful handling: if trying to register with an email that already has an
+      // account, switch to Sign In automatically instead of just showing a raw error.
+      if(authMode==='signup' && /already registered|already exists/i.test(error.message)){
+        document.querySelector('[data-auth-tab="signin"]').click();
+        msgEl.textContent='That email already has an account — sign in instead.';
+        msgEl.className='promo-msg err';
+        return;
+      }
+      msgEl.textContent=error.message;msgEl.className='promo-msg err';return;
+    }
+    if(authMode==='signup' && data?.user && !data?.session){
+      msgEl.textContent='Check your email to confirm your account, then sign in.';
+      msgEl.className='promo-msg ok';
+      document.querySelector('[data-auth-tab="signin"]').click();
+      return;
+    }
+    msgEl.textContent='';
+    showDetailsForm(email);
+  }
+  authSubmitBtn?.addEventListener('click',doAuth);
+
   document.querySelector('[data-checkout-veil]')?.addEventListener('click',()=>document.body.classList.remove('checkout-open'));
+  document.querySelector('[data-promo-apply]')?.addEventListener('click', async ()=>{
+    const input=document.querySelector('[data-promo-input]');
+    const msgEl=document.querySelector('[data-promo-msg]');
+    const code=input.value.trim();
+    if(!code){return;}
+    const rawTotal=Object.entries(cart).reduce((s,[key,q])=>{const{s:sz}=lineInfo(key);return s+(sz?sz.price*q:0);},0);
+    try{
+      const result=await fetch('/api/validate-promo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,subtotal:rawTotal})}).then(r=>r.json());
+      if(result.valid){
+        appliedPromo=result;
+        msgEl.textContent=`Code applied — ${fmt(result.discountAmount)} off`;
+        msgEl.className='promo-msg ok';
+      }else{
+        appliedPromo=null;
+        msgEl.textContent=result.error||'That code isn\'t valid';
+        msgEl.className='promo-msg err';
+      }
+    }catch(e){
+      msgEl.textContent='Could not check that code — try again';
+      msgEl.className='promo-msg err';
+    }
+    renderCart();
+  });
 
   document.querySelector('[data-checkout-form]')?.addEventListener('submit', async (e)=>{
     e.preventDefault();
@@ -796,11 +933,11 @@ document.addEventListener('DOMContentLoaded',async()=>{
       const fd=new FormData(form);
       const customer={
         name: fd.get('name'), email: fd.get('email'), phone: fd.get('phone'),
-        address:{ line1: fd.get('line1'), city: fd.get('city'), state: fd.get('state'), pincode: fd.get('pincode'), country:'India' }
+        address:{ line1: fd.get('line1'), city: fd.get('city'), state: fd.get('state'), pincode: fd.get('pincode'), country: fd.get('country') }
       };
 
       // 2. Create the order server-side
-      const order=await fetch('/api/create-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items,customer})}).then(r=>r.json());
+      const order=await fetch('/api/create-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items,customer,promoCode:appliedPromo?.code})}).then(r=>r.json());
       if(order.error) throw new Error(order.error);
 
       // 3. Launch Razorpay's checkout widget
@@ -949,4 +1086,4 @@ Help customers find their perfect attar. Ask about their preferences, lifestyle,
 
   window._h94chat={toggle,send};
 })();
-</script><script src="https://checkout.razorpay.com/v1/checkout.js"></script><script>window.addEventListener('scroll',function(){var h=document.querySelector('.site-header');if(h)h.classList.toggle('scrolled',window.scrollY>40);},{passive:true});</script></body></html>
+</script><script src="https://checkout.razorpay.com/v1/checkout.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>window.addEventListener('scroll',function(){var h=document.querySelector('.site-header');if(h)h.classList.toggle('scrolled',window.scrollY>40);},{passive:true});</script></body></html>

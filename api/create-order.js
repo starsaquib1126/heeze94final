@@ -17,9 +17,22 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { items, customer } = req.body;
+  try {
+
+  const { items, customer, promoCode } = req.body;
   if (!items || !items.length) {
     return res.status(400).json({ error: 'No items in order' });
+  }
+
+  // Check we actually deliver to this address's country before going any further
+  const shipCountry = (customer?.address?.country || '').toUpperCase();
+  const { data: deliveryCheck } = await supabase
+    .from('delivery_countries')
+    .select('active')
+    .eq('country_code', shipCountry)
+    .maybeSingle();
+  if (!deliveryCheck || !deliveryCheck.active) {
+    return res.status(400).json({ error: 'We currently don\'t deliver to this location.' });
   }
 
   // Look up real prices from Supabase — never trust prices sent from the browser
@@ -49,10 +62,42 @@ export default async function handler(req, res) {
 
   if (customerError) return res.status(500).json({ error: customerError.message });
 
+  // Re-validate the promo code server-side — never trust a discount amount
+  // sent from the browser, always recompute it here from the real code.
+  let discountAmount = 0;
+  let appliedPromo = null;
+  if (promoCode) {
+    const { data: promo } = await supabase
+      .from('promo_codes')
+      .select('*')
+      .eq('code', promoCode.trim().toUpperCase())
+      .eq('active', true)
+      .maybeSingle();
+
+    const validPromo = promo
+      && (!promo.expires_at || new Date(promo.expires_at) > new Date())
+      && (promo.max_uses === null || promo.times_used < promo.max_uses)
+      && subtotal >= promo.min_order_value;
+
+    let firstOrderOk = true;
+    if (validPromo && promo.first_order_only) {
+      const { data: priorOrder } = await supabase.from('orders').select('id').eq('customer_id', customerRow.id).eq('status', 'paid').limit(1).maybeSingle();
+      firstOrderOk = !priorOrder;
+    }
+
+    if (validPromo && firstOrderOk) {
+      appliedPromo = promo;
+      discountAmount = promo.discount_type === 'percent'
+        ? Math.round(subtotal * (promo.discount_value / 100))
+        : Math.min(promo.discount_value, subtotal);
+    }
+  }
+  const total = Math.max(subtotal - discountAmount, 0);
+
   // Create the order in Supabase (status: pending)
   const { data: order, error: orderError } = await supabase
     .from('orders')
-    .insert({ customer_id: customerRow.id, status: 'pending', subtotal, total: subtotal, shipping_address: customer.address })
+    .insert({ customer_id: customerRow.id, status: 'pending', subtotal, total, shipping_address: customer.address, promo_code: appliedPromo?.code || null, discount_amount: discountAmount })
     .select()
     .single();
 
@@ -62,9 +107,13 @@ export default async function handler(req, res) {
     orderItems.map(i => ({ ...i, order_id: order.id }))
   );
 
-  // Create the actual Razorpay order (amount is in paise, hence *100)
+  if (appliedPromo) {
+    await supabase.from('promo_codes').update({ times_used: appliedPromo.times_used + 1 }).eq('id', appliedPromo.id);
+  }
+
+  // Create the actual Razorpay order (amount is in paise, hence *100) — charges the DISCOUNTED total
   const razorpayOrder = await razorpay.orders.create({
-    amount: Math.round(subtotal * 100),
+    amount: Math.round(total * 100),
     currency: 'INR',
     receipt: order.id
   });
@@ -79,4 +128,8 @@ export default async function handler(req, res) {
     currency: razorpayOrder.currency,
     keyId: process.env.RAZORPAY_KEY_ID   // safe to expose — it's the public key, used by Razorpay's checkout widget
   });
+
+  } catch (err) {
+    return res.status(400).json({ error: err.message || 'Could not complete this order' });
+  }
 }
