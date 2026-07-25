@@ -580,8 +580,8 @@ const DEF=[
 ];
 const cat=()=>{try{const s=localStorage.getItem('h94c');return s?JSON.parse(s):DEF;}catch(e){return DEF;}};
 const saveCat=c=>localStorage.setItem('h94c',JSON.stringify(c));
-let cart={};try{cart=JSON.parse(localStorage.getItem('h94t')||'{}');}catch(e){}
-const saveCart=()=>localStorage.setItem('h94t',JSON.stringify(cart));
+let cart={};try{cart=JSON.parse(localStorage.getItem('h94_cart')||'{}');}catch(e){}
+const saveCart=()=>localStorage.setItem('h94_cart',JSON.stringify(cart));
 const fmt=n=>'₹'+Number(n).toLocaleString('en-IN');
 const minPrice=p=>Math.min(...p.sizes.map(s=>s.price));
 const lineInfo=key=>{const[id,ml]=key.split('|');const p=cat().find(x=>x.id===id);const s=p&&p.sizes.find(x=>x.ml===+ml);return{p,s};};
