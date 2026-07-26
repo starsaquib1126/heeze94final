@@ -97,7 +97,7 @@ export default async function handler(req, res) {
   // Create the order in Supabase (status: pending)
   const { data: order, error: orderError } = await supabase
     .from('orders')
-    .insert({ customer_id: customerRow.id, status: 'pending', subtotal, total, shipping_address: customer.address, promo_code: appliedPromo?.code || null, discount_amount: discountAmount })
+    .insert({ customer_id: customerRow.id, email: customer.email, status: 'pending', subtotal, total, shipping_address: customer.address, promo_code: appliedPromo?.code || null, discount_amount: discountAmount })
     .select()
     .single();
 

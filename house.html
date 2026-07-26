@@ -73,11 +73,29 @@ body.gate-active .site-header{transform:translateY(-100%)}
 .mobile-menu{position:fixed;inset:0;z-index:90;
   background:rgba(6,5,4,.97);backdrop-filter:blur(24px);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;
-  transform:translateX(100%);transition:.5s cubic-bezier(.19,1,.22,1)}
+  transform:translateX(100%);transition:.5s cubic-bezier(.19,1,.22,1);
+  overflow-y:auto;-webkit-overflow-scrolling:touch;padding:60px 20px}
 .mobile-menu.open{transform:none}
 .mobile-menu a{font-family:'Marcellus',serif;font-size:2rem;letter-spacing:.18em}
 .mobile-menu a:hover{color:var(--gold)}
 .mobile-meta{font-size:.65rem;letter-spacing:.4em;text-transform:uppercase;color:var(--dim);margin-top:20px}
+.account-veil{position:fixed;inset:0;z-index:98;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:.35s}
+body.account-open .account-veil{opacity:1;pointer-events:auto}
+.account-panel{position:fixed;top:0;right:0;bottom:0;width:min(400px,90vw);z-index:99;background:var(--bg,#0a0908);
+  border-left:1px solid rgba(255,255,255,.06);transform:translateX(100%);transition:.4s cubic-bezier(.19,1,.22,1);
+  display:flex;flex-direction:column;overflow-y:auto}
+body.account-open .account-panel{transform:none}
+.account-section{margin-bottom:16px}
+.order-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:14px;margin-bottom:10px}
+.order-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.order-id{font-size:.78rem;font-family:'Marcellus',serif;color:var(--gold)}
+.order-status{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:3px}
+.order-status.paid{background:rgba(34,197,94,.12);color:#22c55e}
+.order-status.processing{background:rgba(234,179,8,.12);color:#eab308}
+.order-status.shipped{background:rgba(59,130,246,.12);color:#3b82f6}
+.order-status.delivered{background:rgba(34,197,94,.12);color:#22c55e}
+.order-status.created{background:rgba(255,255,255,.06);color:var(--muted)}
+.order-details{font-size:.82rem;color:var(--muted);line-height:1.6}
 
 /* ══════════════════════════════════════════════════════════
    GATEWAY — full screen, black velvet, two doors
@@ -507,13 +525,16 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
 <a class="brand" href="index.html"><img src="assets/brand/logo-new.png" alt="HEEZE 94" height="52"/></a>
 <div class="nav-links"><a href="index.html">Home</a><a href="house.html" class='active'>The House</a><a href="collection.html">Attar</a><a href="parfums.html">Parfum</a><a href="craftsmanship.html">Craftsmanship</a><a href="bespoke.html">Build Your Own</a><a href="journal.html">Journal</a><a href="contact.html">Contact</a></div>
 <div class="nav-actions">
+  <button class="icon-btn" data-account-btn aria-label="My Account">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 12 0v1" transform="translate(1,0)"/></svg>
+  </button>
   <button class="icon-btn" data-open-cart aria-label="Open bag">
     <svg viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
     <span class="bag-pill" data-bag-count>0</span>
   </button>
   <button class="icon-btn menu-toggle" aria-label="Open menu"><svg viewBox="0 0 24 24"><path d="M4 8h16M4 16h16"/></svg></button>
 </div></nav></div></header>
-<div class="mobile-menu"><a href="index.html">Home</a><a href="house.html">The House</a><a href="collection.html">Attar</a><a href="parfums.html">Parfum</a><a href="craftsmanship.html">Craftsmanship</a><a href="bespoke.html">Build Your Own</a><a href="journal.html">Journal</a><a href="contact.html">Contact</a><div class="mobile-meta">A Luxury Fragrance House · Crafted in Dubai</div></div><main>
+<div class="mobile-menu"><a href="index.html">Home</a><a href="house.html">The House</a><a href="collection.html">Attar</a><a href="parfums.html">Parfum</a><a href="craftsmanship.html">Craftsmanship</a><a href="bespoke.html">Build Your Own</a><a href="journal.html">Journal</a><a href="contact.html">Contact</a><a href="#" data-mobile-account>My Account</a><div class="mobile-meta">A Luxury Fragrance House · Crafted in Dubai</div></div><main>
 <section class="page-hero">
   <img src="assets/house/heritage-hero-bottles.jpg" alt="HEEZE 94" fetchpriority="high"/>
   <div class="container page-hero-content reveal">
@@ -597,6 +618,26 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
     <p class="promo-msg" style="margin-top:4px">Charged in Indian Rupees (INR) regardless of the currency shown while browsing.</p>
     <button type="submit" class="btn btn-gold" style="width:100%;margin-top:18px">Pay Now</button>
   </form>
+</div>
+<div class="account-veil" data-account-veil></div>
+<div class="account-panel" data-account-panel>
+  <div class="checkout-modal-head"><h2 data-account-title>My Account</h2><button class="cart-close" data-account-close>×</button></div>
+  <div data-account-logged-out style="padding:22px 24px">
+    <p style="color:var(--muted);font-size:.88rem;line-height:1.7;margin-bottom:16px">Sign in to view your orders, track shipments, and manage your account.</p>
+    <button class="btn btn-gold" style="width:100%;margin-bottom:10px" data-account-signin>Sign In / Register</button>
+  </div>
+  <div data-account-logged-in style="display:none;padding:22px 24px">
+    <div style="margin-bottom:22px">
+      <p style="font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:4px">Welcome back</p>
+      <p style="font-family:'Marcellus',serif;font-size:1.2rem;color:var(--gold)" data-account-name></p>
+      <p style="font-size:.85rem;color:var(--muted)" data-account-email></p>
+    </div>
+    <div class="account-section">
+      <h3 style="font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:8px">Order History</h3>
+      <div data-order-history><p style="font-size:.85rem;color:var(--muted)">Loading orders…</p></div>
+    </div>
+    <button class="btn btn-line" style="width:100%;margin-top:22px" data-account-signout>Sign Out</button>
+  </div>
 </div>
 <div class="toast" role="status"></div><footer class="footer"><div class="container"><div class="footer-top"><div class="footer-brand"><img src="assets/brand/logo-primary.png" alt="HEEZE 94"/><p>Premium attars — intimate, enduring, composed to become part of the wearer.</p></div><div class="footer-col"><h3>Explore</h3><a href="collection.html">Collection</a><a href="parfums.html">Parfums</a><a href="films.html">Films</a><a href="journal.html">Journal</a></div><div class="footer-col"><h3>The House</h3><a href="house.html">Our Story</a><a href="contact.html">Private Client</a><a href="contact.html">Wholesale</a></div><div class="footer-col"><h3>Client Care</h3><a href="contact.html">Contact</a><a href="privacy.html">Privacy Policy</a></div></div><div class="footer-bottom"><span>© <span data-year></span> HEEZE 94</span><span>Fragrance in its most intimate form</span></div></div></footer><script>/* ═══ HEEZE 94 · catalogue.js · v4 · Real Assets ════════════════════════════ */
 const H94 = (() => {
@@ -882,6 +923,56 @@ document.addEventListener('DOMContentLoaded',async()=>{
     showDetailsForm(email, meta.full_name||'', meta.phone||'');
   }
   authSubmitBtn?.addEventListener('click',doAuth);
+
+  /* ── Account Panel ── */
+  const acctPanel=document.querySelector('[data-account-panel]');
+  function openAccount(){document.body.classList.add('account-open');checkAccountState();}
+  function closeAccount(){document.body.classList.remove('account-open');}
+  document.querySelector('[data-account-btn]')?.addEventListener('click',openAccount);
+  document.querySelector('[data-mobile-account]')?.addEventListener('click',(e)=>{e.preventDefault();document.querySelector('.mobile-menu')?.classList.remove('open');openAccount();});
+  document.querySelector('[data-account-close]')?.addEventListener('click',closeAccount);
+  document.querySelector('[data-account-veil]')?.addEventListener('click',closeAccount);
+  document.querySelector('[data-account-signin]')?.addEventListener('click',()=>{
+    closeAccount();
+    document.body.classList.add('checkout-open');
+    gateEl.style.display='none'; authEl.style.display=''; titleEl.textContent='Sign In';
+  });
+  document.querySelector('[data-account-signout]')?.addEventListener('click',async()=>{
+    if(supa){await supa.auth.signOut();}
+    checkAccountState();
+  });
+  async function checkAccountState(){
+    if(!supa){document.querySelector('[data-account-logged-out]').style.display='';document.querySelector('[data-account-logged-in]').style.display='none';return;}
+    const {data:{session}}=await supa.auth.getSession();
+    if(session?.user){
+      const u=session.user, meta=u.user_metadata||{};
+      document.querySelector('[data-account-logged-out]').style.display='none';
+      document.querySelector('[data-account-logged-in]').style.display='';
+      document.querySelector('[data-account-name]').textContent=meta.full_name||meta.name||'Customer';
+      document.querySelector('[data-account-email]').textContent=u.email||'';
+      loadOrders(u.email);
+    } else {
+      document.querySelector('[data-account-logged-out]').style.display='';
+      document.querySelector('[data-account-logged-in]').style.display='none';
+    }
+  }
+  async function loadOrders(email){
+    const el=document.querySelector('[data-order-history]');
+    if(!el) return;
+    try{
+      const {data,error}=await supa.from('orders').select('id,created_at,total,status,promo_code,discount_amount').eq('email',email).order('created_at',{ascending:false}).limit(20);
+      if(error||!data||data.length===0){el.innerHTML='<p style="font-size:.85rem;color:var(--muted)">No orders yet. Start shopping!</p>';return;}
+      el.innerHTML=data.map(o=>{
+        const d=new Date(o.created_at);
+        const dateStr=d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+        const status=(o.status||'created').toLowerCase();
+        const statusLabel=status.charAt(0).toUpperCase()+status.slice(1);
+        let totalStr='\u20b9'+Number(o.total||0).toLocaleString('en-IN');
+        if(o.discount_amount>0) totalStr+=' <span style="font-size:.75rem;color:var(--gold)">('+o.promo_code+' -\u20b9'+o.discount_amount+')</span>';
+        return '<div class="order-card"><div class="order-card-head"><span class="order-id">Order #'+o.id.slice(0,8).toUpperCase()+'</span><span class="order-status '+status+'">'+statusLabel+'</span></div><div class="order-details">'+dateStr+' &middot; '+totalStr+'</div></div>';
+      }).join('');
+    }catch(e){el.innerHTML='<p style="font-size:.85rem;color:var(--muted)">Could not load orders.</p>';}
+  }
 
   /* Google OAuth sign-in */
   document.querySelector('[data-google-signin]')?.addEventListener('click', async ()=>{

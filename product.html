@@ -598,6 +598,26 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
     <button type="submit" class="btn btn-g" style="width:100%;margin-top:18px">Pay Now</button>
   </form>
 </div>
+<div class="account-veil" data-account-veil></div>
+<div class="account-panel" data-account-panel>
+  <div class="checkout-modal-head"><h2 data-account-title>My Account</h2><button class="cart-close" data-account-close>×</button></div>
+  <div data-account-logged-out style="padding:22px 24px">
+    <p style="color:var(--muted);font-size:.88rem;line-height:1.7;margin-bottom:16px">Sign in to view your orders, track shipments, and manage your account.</p>
+    <button class="btn btn-gold" style="width:100%;margin-bottom:10px" data-account-signin>Sign In / Register</button>
+  </div>
+  <div data-account-logged-in style="display:none;padding:22px 24px">
+    <div style="margin-bottom:22px">
+      <p style="font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:4px">Welcome back</p>
+      <p style="font-family:'Marcellus',serif;font-size:1.2rem;color:var(--gold)" data-account-name></p>
+      <p style="font-size:.85rem;color:var(--muted)" data-account-email></p>
+    </div>
+    <div class="account-section">
+      <h3 style="font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:8px">Order History</h3>
+      <div data-order-history><p style="font-size:.85rem;color:var(--muted)">Loading orders…</p></div>
+    </div>
+    <button class="btn btn-line" style="width:100%;margin-top:22px" data-account-signout>Sign Out</button>
+  </div>
+</div>
 <div class="toast" role="status"></div><script>
 const H94 = (()=>{
 const DEF=[
@@ -815,6 +835,56 @@ document.addEventListener('DOMContentLoaded',async()=>{
     showDetailsForm(email, meta.full_name||'', meta.phone||'');
   }
   authSubmitBtn?.addEventListener('click',doAuth);
+
+  /* ── Account Panel ── */
+  const acctPanel=document.querySelector('[data-account-panel]');
+  function openAccount(){document.body.classList.add('account-open');checkAccountState();}
+  function closeAccount(){document.body.classList.remove('account-open');}
+  document.querySelector('[data-account-btn]')?.addEventListener('click',openAccount);
+  document.querySelector('[data-mobile-account]')?.addEventListener('click',(e)=>{e.preventDefault();document.querySelector('.mobile-menu')?.classList.remove('open');openAccount();});
+  document.querySelector('[data-account-close]')?.addEventListener('click',closeAccount);
+  document.querySelector('[data-account-veil]')?.addEventListener('click',closeAccount);
+  document.querySelector('[data-account-signin]')?.addEventListener('click',()=>{
+    closeAccount();
+    document.body.classList.add('checkout-open');
+    gateEl.style.display='none'; authEl.style.display=''; titleEl.textContent='Sign In';
+  });
+  document.querySelector('[data-account-signout]')?.addEventListener('click',async()=>{
+    if(supa){await supa.auth.signOut();}
+    checkAccountState();
+  });
+  async function checkAccountState(){
+    if(!supa){document.querySelector('[data-account-logged-out]').style.display='';document.querySelector('[data-account-logged-in]').style.display='none';return;}
+    const {data:{session}}=await supa.auth.getSession();
+    if(session?.user){
+      const u=session.user, meta=u.user_metadata||{};
+      document.querySelector('[data-account-logged-out]').style.display='none';
+      document.querySelector('[data-account-logged-in]').style.display='';
+      document.querySelector('[data-account-name]').textContent=meta.full_name||meta.name||'Customer';
+      document.querySelector('[data-account-email]').textContent=u.email||'';
+      loadOrders(u.email);
+    } else {
+      document.querySelector('[data-account-logged-out]').style.display='';
+      document.querySelector('[data-account-logged-in]').style.display='none';
+    }
+  }
+  async function loadOrders(email){
+    const el=document.querySelector('[data-order-history]');
+    if(!el) return;
+    try{
+      const {data,error}=await supa.from('orders').select('id,created_at,total,status,promo_code,discount_amount').eq('email',email).order('created_at',{ascending:false}).limit(20);
+      if(error||!data||data.length===0){el.innerHTML='<p style="font-size:.85rem;color:var(--muted)">No orders yet. Start shopping!</p>';return;}
+      el.innerHTML=data.map(o=>{
+        const d=new Date(o.created_at);
+        const dateStr=d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+        const status=(o.status||'created').toLowerCase();
+        const statusLabel=status.charAt(0).toUpperCase()+status.slice(1);
+        let totalStr='\u20b9'+Number(o.total||0).toLocaleString('en-IN');
+        if(o.discount_amount>0) totalStr+=' <span style="font-size:.75rem;color:var(--gold)">('+o.promo_code+' -\u20b9'+o.discount_amount+')</span>';
+        return '<div class="order-card"><div class="order-card-head"><span class="order-id">Order #'+o.id.slice(0,8).toUpperCase()+'</span><span class="order-status '+status+'">'+statusLabel+'</span></div><div class="order-details">'+dateStr+' &middot; '+totalStr+'</div></div>';
+      }).join('');
+    }catch(e){el.innerHTML='<p style="font-size:.85rem;color:var(--muted)">Could not load orders.</p>';}
+  }
 
   /* Google OAuth sign-in */
   document.querySelector('[data-google-signin]')?.addEventListener('click', async ()=>{
