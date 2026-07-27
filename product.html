@@ -1096,7 +1096,7 @@ w.innerHTML=`<button class="ai-fab" aria-label="Open fragrance advisor" id="aiFa
 </div>`;
 document.body.appendChild(w);
 let open=false,hist=[];
-const KEY='AIzaSyCT_aCpnWLq7Xu67QC4m7H3VTSSrI_HNQ4'; // Replace with your Gemini API key
+const KEY='AQ.Ab8RN6Kq4nf_TEU1jBzKzKPKTc_-aytJeSiqMdtgxvgpdtX2bg'; // Gemini API key
 document.getElementById('aiFab').onclick=toggle;
 document.getElementById('aiX').onclick=toggle;
 document.getElementById('aiSend').onclick=send;
@@ -1106,8 +1106,8 @@ function greet(){addMsg('bot','Welcome to HEEZE 94. I am your personal fragrance
 function addMsg(r,t){const m=document.getElementById('aiMsgs');const d=document.createElement('div');d.className='ai-m '+r;d.textContent=t;m.appendChild(d);m.scrollTop=m.scrollHeight;}
 function addTyp(){const m=document.getElementById('aiMsgs');const d=document.createElement('div');d.className='ai-m bot typ';d.id='aiTyp';d.textContent='…';m.appendChild(d);m.scrollTop=m.scrollHeight;return d;}
 async function send(){const i=document.getElementById('aiIn');const t=i.value.trim();if(!t)return;i.value='';addMsg('usr',t);hist.push({role:'user',parts:[{text:t}]});const ty=addTyp();
-try{const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${KEY}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:SYS}]},contents:hist,generationConfig:{maxOutputTokens:200,temperature:.78}})});
-if(!res.ok)throw 0;const d=await res.json();const r=d.candidates?.[0]?.content?.parts?.[0]?.text||fallback(t);ty.remove();addMsg('bot',r);hist.push({role:'model',parts:[{text:r}]});}
+try{const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`,{method:'POST',headers:{'Content-Type':'application/json','X-goog-api-key':KEY},body:JSON.stringify({system_instruction:{parts:[{text:SYS}]},contents:hist,generationConfig:{maxOutputTokens:200,temperature:.78}})});
+if(!res.ok){const et=await res.text();console.error('Gemini API error:',res.status,et);throw 0;}const d=await res.json();const r=d.candidates?.[0]?.content?.parts?.[0]?.text||fallback(t);ty.remove();addMsg('bot',r);hist.push({role:'model',parts:[{text:r}]});}
 catch(e){ty.remove();const r=fallback(t);addMsg('bot',r);hist.push({role:'model',parts:[{text:r}]});}}
 function fallback(q){q=q.toLowerCase();
 if(q.includes('oud')||q.includes('dark')||q.includes('wood'))return'For lovers of depth and intensity, Black Oud is the house signature — smoked agarwood that settles into a warm leathered richness. For something more luminous, Golden Oud brings radiance and a touch of saffron. Which direction draws you?';

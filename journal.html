@@ -1325,7 +1325,7 @@ Help customers find their perfect attar. Ask about their preferences, lifestyle,
   document.body.appendChild(widget);
 
   let open=false, history=[];
-  const API_KEY='AIzaSyCT_aCpnWLq7Xu67QC4m7H3VTSSrI_HNQ4'; // Replace with your Gemini API key from aistudio.google.com
+  const API_KEY='AQ.Ab8RN6Kq4nf_TEU1jBzKzKPKTc_-aytJeSiqMdtgxvgpdtX2bg'; // Gemini API key from aistudio.google.com
 
   function toggle(){
     open=!open;
@@ -1362,10 +1362,10 @@ Help customers find their perfect attar. Ask about their preferences, lifestyle,
         generationConfig:{maxOutputTokens:200,temperature:.78}
       };
       const res=await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`,
-        {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`,
+        {method:'POST',headers:{'Content-Type':'application/json','X-goog-api-key':API_KEY},body:JSON.stringify(body)}
       );
-      if(!res.ok)throw new Error(res.status);
+      if(!res.ok){const errText=await res.text();console.error('Gemini API error:',res.status,errText);throw new Error(res.status);}
       const data=await res.json();
       const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||fallback(text);
       typing.remove(); addMsg('bot',reply);
