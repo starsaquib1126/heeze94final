@@ -37,7 +37,7 @@ Help customers find their perfect attar. Ask about their preferences, lifestyle,
   document.body.appendChild(widget);
 
   let open=false, history=[];
-  const API_KEY='AIzaSyCT_aCpnWLq7Xu67QC4m7H3VTSSrI_HNQ4'; // Replace with your Gemini API key from aistudio.google.com
+  const API_KEY='AQ.Ab8RN6Kq4nf_TEU1jBzKzKPKTc_-aytJeSiqMdtgxvgpdtX2bg'; // Gemini API key from aistudio.google.com
 
   function toggle(){
     open=!open;
