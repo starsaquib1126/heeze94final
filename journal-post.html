@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#060504"/><title>Journal — HEEZE 94 [V4]</title><link rel="icon" href="assets/brand/logo-primary.png"/><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Mulish:wght@300;400;500;600&display=swap" rel="stylesheet"><style>/* ═══ HEEZE 94 · site.css · v4 — Real Assets Edition ═══════════════════════ */
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#060504"/><title>Oil, Worn Against Skin — HEEZE 94 Journal [V4]</title><link rel="icon" href="assets/brand/logo-primary.png"/><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Mulish:wght@300;400;500;600&display=swap" rel="stylesheet"><style>/* ═══ HEEZE 94 · site.css · v4 — Real Assets Edition ═══════════════════════ */
 @import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Mulish:wght@300;400;500;600&display=swap');
 
 :root{
@@ -296,11 +296,10 @@ body:not(.gate-active) .gateway{display:none}
 ══════════════════════════════════════════════════════════ */
 .split{display:grid;grid-template-columns:1fr 1fr}
 @media(max-width:860px){.split{grid-template-columns:1fr}}
-.split-reverse{direction:rtl}.split-reverse .split-copy .inner,.split-reverse .split-media{direction:ltr}
 .split-media{overflow:hidden;min-height:480px}
-.split-media img,.split-media video{width:100%;height:100%;object-fit:cover;opacity:.65;filter:saturate(.55);
+.split-media img{width:100%;height:100%;object-fit:cover;opacity:.65;filter:saturate(.55);
   transition:filter .6s,opacity .6s}
-.split-media:hover img,.split-media:hover video{opacity:.8;filter:saturate(.8)}
+.split-media:hover img{opacity:.8;filter:saturate(.8)}
 .split-copy{display:flex;align-items:center;background:linear-gradient(135deg,var(--panel2),var(--panel))}
 .split-copy .inner{max-width:460px;padding:60px 40px}
 .split-copy h2{font-size:clamp(1.5rem,3vw,2.2rem);letter-spacing:.1em;margin:14px 0 20px}
@@ -581,6 +580,23 @@ body.cart-open .cart-drawer{transform:none}
 
 .post-featured-visual{display:flex;align-items:center;justify-content:center;background:rgba(233,190,90,.03)}
 .edu-svg-lg{width:60%;height:60%}
+/* ── Journal Article Template ── */
+.article-body{max-width:680px;margin:0 auto}
+.article-body .lede{font-size:1.08rem;color:var(--champagne);line-height:1.75;margin-bottom:8px}
+.article-body h2{font-family:'Marcellus',serif;font-size:1.3rem;letter-spacing:.03em;margin:38px 0 14px;color:var(--ivory)}
+.article-body p{color:var(--muted);font-size:.96rem;line-height:1.8;margin-bottom:16px}
+.article-list{list-style:none;margin:18px 0 24px;padding:0}
+.article-list li{color:var(--muted);font-size:.94rem;line-height:1.75;margin-bottom:14px;padding-left:22px;position:relative}
+.article-list li::before{content:'';position:absolute;left:0;top:9px;width:8px;height:1px;background:var(--gold)}
+.article-list strong{color:var(--champagne);font-weight:600}
+.article-body .quote{margin:34px 0}
+.article-cta{margin-top:34px}
+.article-nav-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-top:32px}
+.article-nav-card{display:block;border:1px solid var(--hairline);padding:24px 26px;text-decoration:none;color:inherit;transition:.35s}
+.article-nav-card:hover{border-color:rgba(233,190,90,.4);background:rgba(233,190,90,.03)}
+.article-nav-card h3{font-family:'Marcellus',serif;font-size:1rem;letter-spacing:.02em;margin-top:10px;line-height:1.4}
+@media(max-width:600px){.article-body h2{font-size:1.15rem}}
+
 
 .ic.bump{animation:cartBump .45s cubic-bezier(.34,1.56,.64,1)}
 @keyframes cartBump{0%{transform:scale(1)}35%{transform:scale(1.3) rotate(-6deg)}60%{transform:scale(.95)}100%{transform:scale(1) rotate(0)}}
@@ -632,101 +648,30 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
   <button class="icon-btn menu-toggle" aria-label="Open menu"><svg viewBox="0 0 24 24"><path d="M4 8h16M4 16h16"/></svg></button>
 </div></nav></div></header>
 <div class="mobile-menu"><a href="index.html">Home</a><a href="house.html">The House</a><a href="collection.html">Attar</a><a href="parfums.html">Parfum</a><a href="craftsmanship.html">Craftsmanship</a><a href="bespoke.html">Build Your Own</a><a href="journal.html">Journal</a><a href="contact.html">Contact</a><a href="#" data-mobile-account>My Account</a><div class="mobile-meta">A Luxury Fragrance House · Crafted in UAE</div></div><main>
-<section class="page-hero">
-  <img src="assets/Parfum/arabian-nights.jpg" alt="HEEZE 94" fetchpriority="high"/>
+<section class="page-hero" style="min-height:50vh">
+  <img src="assets/Attar/attar-hero-3.jpg" alt="Journal" fetchpriority="high" id="postHeroImg"/>
   <div class="container page-hero-content reveal">
-    <div class="eyebrow">The Journal</div>
-    <h1>Stories in scent.</h1>
-    <p>Editorial notes on attar, materials, personal ritual and the sensorial world of HEEZE 94.</p>
+    <div class="eyebrow" id="postMeta">Loading…</div>
+    <h1 id="postTitle"></h1>
+    <p id="postExcerpt"></p>
   </div>
 </section>
-<section class="section section-dark"><div class="container">
 
-  <a class="post-featured reveal" href="journal-attar.html">
-    <div class="post-featured-media post-featured-visual"><svg viewBox="0 0 160 140" class="edu-svg edu-svg-lg">
-      <path d="M55 95 C50 70 52 40 68 25 C74 19 82 19 86 26 C90 33 88 45 82 52 C90 48 100 50 104 58 C108 66 104 76 96 80 C104 82 110 90 108 99 C106 109 96 113 86 110 L60 108 Z" fill="none" stroke="var(--gold)" stroke-width="1.4" opacity=".55"/>
-      <circle class="pulse-ring" cx="80" cy="65" r="6"/><circle class="pulse-ring pulse-ring-2" cx="80" cy="65" r="6"/><circle class="pulse-ring pulse-ring-3" cx="80" cy="65" r="6"/>
-      <circle cx="80" cy="65" r="3.5" fill="var(--gold)"/>
-    </svg></div>
-    <div class="post-featured-body">
-      <div class="post-meta"><span class="eyebrow">Guide · Attar</span><span class="post-dot">·</span><span class="post-read">3 min read</span></div>
-      <h2>Oil, worn against skin.</h2>
-      <p>Attar is 100% concentrated fragrance oil — no alcohol, no dilution, nothing to evaporate off in the first ten minutes. Dab, don't rub: a drop on each inner wrist and one at the base of the throat is enough for a scent that lasts the full day.</p>
-      <span class="post-more">Read the guide →</span>
-    </div>
-  </a>
+<section class="section section-dark"><div class="container article-body" id="postBody">
 
-  <div class="post-feed">
-
-    <a class="post-row reveal" href="journal-perfume.html">
-      <div class="post-row-media post-row-visual"><svg viewBox="0 0 160 140" class="edu-svg">
-        <rect x="30" y="40" width="18" height="70" rx="2" fill="none" stroke="var(--gold)" stroke-width="1.2" opacity=".5"/>
-        <rect x="71" y="40" width="18" height="70" rx="2" fill="none" stroke="var(--gold)" stroke-width="1.2" opacity=".5"/>
-        <rect x="112" y="40" width="18" height="70" rx="2" fill="none" stroke="var(--gold)" stroke-width="1.2" opacity=".5"/>
-        <rect class="conc-fill conc-fill-1" x="32" y="95" width="14" height="13" fill="var(--gold)"/>
-        <rect class="conc-fill conc-fill-2" x="73" y="80" width="14" height="28" fill="var(--gold)"/>
-        <rect class="conc-fill conc-fill-3" x="114" y="55" width="14" height="53" fill="var(--gold)"/>
-        <text x="39" y="122" text-anchor="middle" class="edu-label">EDT</text><text x="80" y="122" text-anchor="middle" class="edu-label">EDP</text><text x="121" y="122" text-anchor="middle" class="edu-label">Extrait</text>
-      </svg></div>
-      <div class="post-row-body">
-        <div class="post-meta"><span class="eyebrow">Guide · Perfume</span><span class="post-dot">·</span><span class="post-read">4 min read</span></div>
-        <h3>EDT, EDP, Extrait — one scent, three strengths.</h3>
-        <p>What actually separates the three, and why spraying is different from dabbing.</p>
-      </div>
-    </a>
-
-    <a class="post-row reveal" href="journal-structure.html">
-      <div class="post-row-media post-row-visual"><svg viewBox="0 0 160 140" class="edu-svg">
-        <path class="note-layer note-top" d="M80 20 L120 60 L40 60 Z" fill="var(--gold)"/>
-        <path class="note-layer note-heart" d="M80 45 L130 95 L30 95 Z" fill="var(--gold)"/>
-        <path class="note-layer note-base" d="M80 70 L145 118 L15 118 Z" fill="var(--gold)"/>
-      </svg></div>
-      <div class="post-row-body">
-        <div class="post-meta"><span class="eyebrow">Guide · Structure</span><span class="post-dot">·</span><span class="post-read">4 min read</span></div>
-        <h3>Top, heart, base — a scent in three acts.</h3>
-        <p>Why the fragrance you smell in the bottle isn't the one you'll wear all day.</p>
-      </div>
-    </a>
-
-  </div>
-
-  <div class="post-feed" data-sanity-feed></div>
+  <p class="lede">Loading article…</p>
 
 </div></section>
 
-<section class="split">
-  <div class="split-media"><video autoplay loop muted playsinline poster="assets/Attar/black-oud.jpg"><source src="assets/video/product-10.mp4" type="video/mp4"/></video></div>
-  <div class="split-copy"><div class="inner reveal">
-    <div class="eyebrow">Attar</div>
-    <h2>Concentrated. Undiluted. Intimate.</h2>
-    <p>Attar is fragrance in its purest form — oil that lives on the pulse and unfolds with the warmth of the skin, revealing new facets over hours.</p>
-    <a class="text-link" href="collection.html">Explore the Attar collection</a>
-  </div></div>
-</section>
-
-<section class="split split-reverse">
-  <div class="split-media"><video autoplay loop muted playsinline poster="assets/Parfum/al-durrah.jpg" style="filter:blur(2px) brightness(.82) saturate(.9)"><source src="assets/video/product-9.mp4" type="video/mp4"/></video></div>
-  <div class="split-copy"><div class="inner reveal">
-    <div class="eyebrow">Parfum · Coming Soon</div>
-    <h2>The next expression of the House.</h2>
-    <p>Our parfum collection is being composed with the same discipline — a wider projection of the HEEZE 94 signature, revealed only when every detail is right.</p>
-    <a class="text-link" href="parfums.html">Preview the Parfums</a>
-  </div></div>
-</section>
-
-
-
-
-
-<section class="split">
-  <div class="split-copy"><div class="inner reveal">
-    <div class="eyebrow">A Note from the House</div>
-    <h2>Fragrance is biography without words.</h2>
-    <p style="color:var(--muted)">The scents we return to become markers of time: a room, a person, a season, a version of ourselves.</p>
-    <div class="quote">Choose a signature not because it is noticed first, but because it is remembered last.</div>
-  </div></div>
-  <div class="split-media"><img src="assets/Attar/attar-hero-2.jpg" alt="HEEZE 94 bottles" loading="lazy"/></div>
-</section></main><div class="cart-veil"></div><aside class="cart-drawer" aria-label="Shopping bag"><div class="cart-head"><h2>Your Bag</h2><button class="cart-close" data-close-cart>×</button></div><div class="cart-items" data-cart-items></div><div class="cart-foot"><div class="promo-row"><input type="text" placeholder="Promo code" data-promo-input><button class="promo-apply" data-promo-apply>Apply</button></div><div class="promo-msg" data-promo-msg></div><div class="cart-total"><span>Subtotal</span><strong data-cart-total>₹0</strong></div><button class="btn btn-gold" data-checkout style="width:100%">Continue to secure checkout</button><p class="cart-note">Razorpay · UPI · Cards · Netbanking</p></div></aside><div class="checkout-veil" data-checkout-veil></div>
+<section class="section section-panel"><div class="container">
+  <div class="section-head reveal"><div><div class="eyebrow">Continue Reading</div><h2>More from the Journal.</h2></div></div>
+  <div class="article-nav-grid reveal">
+    <a class="article-nav-card" href="journal-perfume.html"><span class="eyebrow">Guide · Perfume</span><h3>EDT, EDP, Extrait — one scent, three strengths.</h3></a>
+    <a class="article-nav-card" href="journal-structure.html"><span class="eyebrow">Guide · Structure</span><h3>Top, heart, base — a scent in three acts.</h3></a>
+  </div>
+</div></section>
+</main>
+<div class="cart-veil"></div><aside class="cart-drawer" aria-label="Shopping bag"><div class="cart-head"><h2>Your Bag</h2><button class="cart-close" data-close-cart>×</button></div><div class="cart-items" data-cart-items></div><div class="cart-foot"><div class="promo-row"><input type="text" placeholder="Promo code" data-promo-input><button class="promo-apply" data-promo-apply>Apply</button></div><div class="promo-msg" data-promo-msg></div><div class="cart-total"><span>Subtotal</span><strong data-cart-total>₹0</strong></div><button class="btn btn-gold" data-checkout style="width:100%">Continue to secure checkout</button><p class="cart-note">Razorpay · UPI · Cards · Netbanking</p></div></aside><div class="checkout-veil" data-checkout-veil></div>
 <div class="checkout-modal" data-checkout-modal aria-label="Checkout details">
   <div class="checkout-modal-head"><h2 data-checkout-title>Checkout</h2><button class="cart-close" data-checkout-close>×</button></div>
 
@@ -975,37 +920,60 @@ function initVideos(){
   }
 }
 
-/* ── Sanity CMS: Journal Feed (shows any article NOT already hand-built as a static page) ── */
-const SANITY_PROJECT_ID = '3v9zb964';
-const SANITY_DATASET = 'production';
-// Slugs that already have a dedicated hand-crafted page — skip these in the dynamic feed
-const SANITY_STATIC_SLUGS = ['oil-worn-against-skin','edt-edp-extrait-one-scent-three-strengths','top-heart-base-a-scent-in-three-acts'];
+/* ── Sanity CMS: dynamic article loader ── */
+const SANITY_PROJECT_ID='3v9zb964', SANITY_DATASET='production';
 
-async function loadSanityJournalFeed(){
-  const feedEl = document.querySelector('[data-sanity-feed]');
-  if(!feedEl) return;
+function renderPortableText(blocks){
+  if(!Array.isArray(blocks)) return '';
+  let html='';
+  let listOpen=false;
+  blocks.forEach(block=>{
+    if(block._type!=='block'){ return; }
+    const text=(block.children||[]).map(c=>c.text||'').join('');
+    if(!text.trim()) return;
+    const isListItem = block.listItem==='bullet';
+    if(isListItem && !listOpen){ html+='<ul class="article-list">'; listOpen=true; }
+    if(!isListItem && listOpen){ html+='</ul>'; listOpen=false; }
+    if(isListItem){
+      html+=`<li>${text}</li>`;
+    } else if(block.style==='h2'){
+      html+=`<h2>${text}</h2>`;
+    } else if(block.style==='blockquote'){
+      html+=`<div class="quote">"${text}"</div>`;
+    } else {
+      html+=`<p>${text}</p>`;
+    }
+  });
+  if(listOpen) html+='</ul>';
+  return html;
+}
+
+async function loadArticleFromSanity(){
+  const slug=new URLSearchParams(location.search).get('slug');
+  const bodyEl=document.getElementById('postBody');
+  if(!slug){ if(bodyEl) bodyEl.innerHTML='<p class="lede">Article not found.</p>'; return; }
   try{
-    const query = encodeURIComponent(`*[_type == "journalArticle"] | order(publishedAt desc){title,"slug":slug.current,category,readTime,excerpt}`);
-    const url = `https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=${query}`;
-    const res = await fetch(url);
-    if(!res.ok) return;
-    const {result} = await res.json();
-    const newArticles = (result||[]).filter(a=>a.slug && !SANITY_STATIC_SLUGS.includes(a.slug));
-    if(!newArticles.length) return; // nothing new — leave the section empty, no visual change
-    feedEl.innerHTML = newArticles.map(a => `
-      <a class="post-row reveal in-view" href="journal-post.html?slug=${encodeURIComponent(a.slug)}">
-        <div class="post-row-media post-row-visual"><svg viewBox="0 0 160 140" class="edu-svg">
-          <circle cx="80" cy="65" r="30" fill="none" stroke="var(--gold)" stroke-width="1.4" opacity=".5"/>
-          <circle cx="80" cy="65" r="4" fill="var(--gold)"/>
-        </svg></div>
-        <div class="post-row-body">
-          <div class="post-meta"><span class="eyebrow">${a.category||'Journal'}</span><span class="post-dot">·</span><span class="post-read">${a.readTime||''}</span></div>
-          <h3>${a.title||''}</h3>
-          <p>${a.excerpt||''}</p>
-        </div>
-      </a>`).join('');
+    const query=encodeURIComponent(`*[_type == "journalArticle" && slug.current == "${slug}"][0]{title,category,readTime,excerpt,body,"heroUrl":heroImage.asset->url}`);
+    const url=`https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=${query}`;
+    const res=await fetch(url);
+    if(!res.ok) throw new Error(res.status);
+    const {result}=await res.json();
+    if(!result){ if(bodyEl) bodyEl.innerHTML='<p class="lede">Article not found.</p>'; return; }
+    document.title=(result.title||'Journal')+' — HEEZE 94';
+    const metaEl=document.getElementById('postMeta');
+    if(metaEl) metaEl.textContent=[result.category,result.readTime].filter(Boolean).join(' · ');
+    const titleEl=document.getElementById('postTitle');
+    if(titleEl) titleEl.textContent=result.title||'';
+    const excerptEl=document.getElementById('postExcerpt');
+    if(excerptEl) excerptEl.textContent=result.excerpt||'';
+    if(result.heroUrl){
+      const imgEl=document.getElementById('postHeroImg');
+      if(imgEl) imgEl.src=result.heroUrl;
+    }
+    if(bodyEl) bodyEl.innerHTML=renderPortableText(result.body)||'<p class="lede">This article has no content yet.</p>';
   }catch(e){
-    console.error('Sanity journal feed error:', e);
+    console.error('Sanity article load error:',e);
+    if(bodyEl) bodyEl.innerHTML='<p class="lede">Could not load this article right now.</p>';
   }
 }
 
@@ -1027,7 +995,7 @@ function initFilters(){
 document.addEventListener('DOMContentLoaded',async()=>{
   await initGeoCurrency();
   initYear();initReveals();initMenu();initTicker();initFilters();initVideos();
-  loadSanityJournalFeed();
+  loadArticleFromSanity();
   document.querySelectorAll('[data-product-grid]').forEach(el=>{
     renderGrid(el,{
       featuredOnly:el.dataset.featuredOnly==='true',
