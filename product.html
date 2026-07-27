@@ -3,7 +3,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="theme-color" content="#050403"/>
-<meta name="description" content="HEEZE 94 — Premium attars crafted in Dubai. Black Oud, Golden Oud and Rose Musk."/>
+<meta name="description" content="HEEZE 94 — Premium attars crafted in UAE. Black Oud, Golden Oud and Rose Musk."/>
 <title>Product — HEEZE 94 [V4]</title>
 <link rel="icon" href="assets/images/logo-clear-256.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Mulish:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -523,7 +523,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
     </div>
   </div>
 </nav>
-<div class="mob-menu"><a href="index.html">Home</a><a href="house.html">The House</a><a href="collection.html">Attar</a><a href="parfums.html">Parfum</a><a href="craftsmanship.html">Craftsmanship</a><a href="bespoke.html">Build Your Own</a><a href="journal.html">Journal</a><a href="contact.html">Contact</a><span class="mob-sub">A Luxury Fragrance House · Crafted in Dubai</span></div>
+<div class="mob-menu"><a href="index.html">Home</a><a href="house.html">The House</a><a href="collection.html">Attar</a><a href="parfums.html">Parfum</a><a href="craftsmanship.html">Craftsmanship</a><a href="bespoke.html">Build Your Own</a><a href="journal.html">Journal</a><a href="contact.html">Contact</a><span class="mob-sub">A Luxury Fragrance House · Crafted in UAE</span></div>
 <main>
 <section class="page-hero" id="prodHero" style="min-height:40vh">
   <img src="assets/images/home-hero.jpg" alt="" id="heroImg" fetchpriority="high"/>
@@ -580,7 +580,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
     <div class="ft-grid">
       <div class="ft-brand">
         <img src="assets/images/logo-clear-256.png" alt="HEEZE 94"/>
-        <p>Premium attars — intimate, enduring and composed to become part of the wearer. Crafted in Dubai.</p>
+        <p>Premium attars — intimate, enduring and composed to become part of the wearer. Crafted in UAE.</p>
       </div>
       <div class="ft-col"><h4>Explore</h4>
         <a href="collection.html">Collection</a><a href="parfums.html">Parfums</a>
@@ -754,7 +754,7 @@ function renderGrid(el,opts={}){
       <div class="pcard-body">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <div class="ey">${p.family}</div>
-          <span style="font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);border-radius:3px;padding:2px 6px;opacity:.85">0% Alcohol</span>
+          <span style="font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);border-radius:3px;padding:2px 6px;opacity:.85">Alcohol Free</span>
         </div>
         <h3>${p.name}</h3>
         <p class="pcard-desc">${(p.desc||'').substring(0,80)}…</p>
@@ -1073,7 +1073,7 @@ return{addToCart,cq:changeQty,openCart,closeCart,cat,saveCat,fmt,showToast,rende
 })();
 </script><script>
 (()=>{
-const SYS=`You are the fragrance advisor for HEEZE 94, a premium attar house crafted in Dubai. You speak with quiet, elegant authority — like a knowledgeable consultant in a luxury boutique.
+const SYS=`You are the fragrance advisor for HEEZE 94, a premium attar house crafted in UAE. You speak with quiet, elegant authority — like a knowledgeable consultant in a luxury boutique.
 Our attars (pure concentrated oils, 3ml/6ml/12ml):
 - Black Oud: Smoked agarwood, dark resin, leather. Intense, ceremonial. ₹499–₹1499.
 - Golden Oud: Saffron, honey, radiant oud, amber. Warm, luminous, regal. ₹499–₹1499.
@@ -1096,7 +1096,6 @@ w.innerHTML=`<button class="ai-fab" aria-label="Open fragrance advisor" id="aiFa
 </div>`;
 document.body.appendChild(w);
 let open=false,hist=[];
-const KEY='AQ.Ab8RN6KLbw_VVXGM4HYKXUu9gt6_QrJOKK3TWpGzf6huOOLDnw'; // Gemini API key
 document.getElementById('aiFab').onclick=toggle;
 document.getElementById('aiX').onclick=toggle;
 document.getElementById('aiSend').onclick=send;
@@ -1106,8 +1105,8 @@ function greet(){addMsg('bot','Welcome to HEEZE 94. I am your personal fragrance
 function addMsg(r,t){const m=document.getElementById('aiMsgs');const d=document.createElement('div');d.className='ai-m '+r;d.textContent=t;m.appendChild(d);m.scrollTop=m.scrollHeight;}
 function addTyp(){const m=document.getElementById('aiMsgs');const d=document.createElement('div');d.className='ai-m bot typ';d.id='aiTyp';d.textContent='…';m.appendChild(d);m.scrollTop=m.scrollHeight;return d;}
 async function send(){const i=document.getElementById('aiIn');const t=i.value.trim();if(!t)return;i.value='';addMsg('usr',t);hist.push({role:'user',parts:[{text:t}]});const ty=addTyp();
-try{const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`,{method:'POST',headers:{'Content-Type':'application/json','X-goog-api-key':KEY},body:JSON.stringify({system_instruction:{parts:[{text:SYS}]},contents:hist,generationConfig:{maxOutputTokens:200,temperature:.78}})});
-if(!res.ok){const et=await res.text();console.error('Gemini API error:',res.status,et);throw 0;}const d=await res.json();const r=d.candidates?.[0]?.content?.parts?.[0]?.text||fallback(t);ty.remove();addMsg('bot',r);hist.push({role:'model',parts:[{text:r}]});}
+try{const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({history:hist})});
+if(!res.ok){const et=await res.text();console.error('Chat API error:',res.status,et);throw 0;}const d=await res.json();const r=d.reply||fallback(t);ty.remove();addMsg('bot',r);hist.push({role:'model',parts:[{text:r}]});}
 catch(e){ty.remove();const r=fallback(t);addMsg('bot',r);hist.push({role:'model',parts:[{text:r}]});}}
 function fallback(q){q=q.toLowerCase();
 if(q.includes('oud')||q.includes('dark')||q.includes('wood'))return'For lovers of depth and intensity, Black Oud is the house signature — smoked agarwood that settles into a warm leathered richness. For something more luminous, Golden Oud brings radiance and a touch of saffron. Which direction draws you?';

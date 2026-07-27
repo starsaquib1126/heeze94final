@@ -559,7 +559,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
   </button>
   <button class="icon-btn menu-toggle" aria-label="Open menu"><svg viewBox="0 0 24 24"><path d="M4 8h16M4 16h16"/></svg></button>
 </div></nav></div></header>
-<div class="mobile-menu"><a href="index.html">Home</a><a href="house.html">The House</a><a href="collection.html">Attar</a><a href="parfums.html">Parfum</a><a href="craftsmanship.html">Craftsmanship</a><a href="bespoke.html">Build Your Own</a><a href="journal.html">Journal</a><a href="contact.html">Contact</a><a href="#" data-mobile-account>My Account</a><div class="mobile-meta">A Luxury Fragrance House · Crafted in Dubai</div></div><main>
+<div class="mobile-menu"><a href="index.html">Home</a><a href="house.html">The House</a><a href="collection.html">Attar</a><a href="parfums.html">Parfum</a><a href="craftsmanship.html">Craftsmanship</a><a href="bespoke.html">Build Your Own</a><a href="journal.html">Journal</a><a href="contact.html">Contact</a><a href="#" data-mobile-account>My Account</a><div class="mobile-meta">A Luxury Fragrance House · Crafted in UAE</div></div><main>
 <section class="parfum-hero">
   <div class="parfum-bg-grid">
     <img src="assets/images/parfum-al-durrah-pink.jpg" alt=""/>
@@ -570,7 +570,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
     <img src="assets/images/gateway-emblem.png" alt="HEEZE 94"/>
     <div class="eyebrow">The Next Chapter</div>
     <h1>Parfums,<em>coming soon.</em></h1>
-    <p>A wider collection is being composed at our Dubai atelier. Al-Durrah, Arabian Knight's and further expressions will arrive when they are ready — each one worth the wait.</p>
+    <p>A wider collection is being composed at our UAE atelier. Al-Durrah, Arabian Knight's and further expressions will arrive when they are ready — each one worth the wait.</p>
     <div class="parfum-cta">
       <a class="btn btn-gold" href="contact.html">Request launch updates</a>
       <a class="btn btn-line" href="collection.html">Explore attars instead</a>
@@ -785,7 +785,7 @@ function renderGrid(container,opts={}){
       <div class="product-info">
         <div class="eyebrow-row" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <div class="eyebrow">${p.family}</div>
-          <span class="alcohol-free-tag" style="font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);border-radius:3px;padding:2px 6px;opacity:.85">0% Alcohol</span>
+          <span class="alcohol-free-tag" style="font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);border-radius:3px;padding:2px 6px;opacity:.85">Alcohol Free</span>
         </div>
         <h3>${p.name}</h3>
         <p class="product-short">${(p.desc||'').substring(0,82)}…</p>
@@ -1157,7 +1157,7 @@ return {addToCart,changeQty,openCart,closeCart,getCat,saveCat,fmt,showToast,rend
 })();
 </script><script>/* HEEZE 94 · chat.js · Gemini AI Fragrance Advisor */
 (function(){
-  const SYSTEM=`You are the fragrance advisor for HEEZE 94, a premium attar house whose oils are crafted in Dubai. You speak with quiet, elegant authority — like a knowledgeable consultant in a luxury perfume boutique.
+  const SYSTEM=`You are the fragrance advisor for HEEZE 94, a premium attar house whose oils are crafted in UAE. You speak with quiet, elegant authority — like a knowledgeable consultant in a luxury perfume boutique.
 
 Our attar collection (pure concentrated oils, 3ml / 6ml / 12ml):
 - Black Oud: Smoked agarwood, dark resin, leather accord, deep woods, warm musk. Intense, ceremonial. ₹499–₹1499.
@@ -1194,8 +1194,6 @@ Help customers find their perfect attar. Ask about their preferences, lifestyle,
   document.body.appendChild(widget);
 
   let open=false, history=[];
-  const API_KEY='AQ.Ab8RN6KLbw_VVXGM4HYKXUu9gt6_QrJOKK3TWpGzf6huOOLDnw'; // Gemini API key from aistudio.google.com
-
   function toggle(){
     open=!open;
     document.getElementById('aiPanel').classList.toggle('open',open);
@@ -1225,18 +1223,14 @@ Help customers find their perfect attar. Ask about their preferences, lifestyle,
     history.push({role:'user',parts:[{text}]});
     const typing=addTyping();
     try{
-      const body={
-        system_instruction:{parts:[{text:SYSTEM}]},
-        contents:history,
-        generationConfig:{maxOutputTokens:200,temperature:.78}
-      };
-      const res=await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`,
-        {method:'POST',headers:{'Content-Type':'application/json','X-goog-api-key':API_KEY},body:JSON.stringify(body)}
-      );
-      if(!res.ok){const errText=await res.text();console.error('Gemini API error:',res.status,errText);throw new Error(res.status);}
+      const res=await fetch('/api/chat',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({history})
+      });
+      if(!res.ok){const errText=await res.text();console.error('Chat API error:',res.status,errText);throw new Error(res.status);}
       const data=await res.json();
-      const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||fallback(text);
+      const reply=data.reply||fallback(text);
       typing.remove(); addMsg('bot',reply);
       history.push({role:'model',parts:[{text:reply}]});
     }catch(e){
