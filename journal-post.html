@@ -929,19 +929,37 @@ function renderPortableText(blocks){
   let listOpen=false;
   blocks.forEach(block=>{
     if(block._type!=='block'){ return; }
-    const text=(block.children||[]).map(c=>c.text||'').join('');
-    if(!text.trim()) return;
+    const children=block.children||[];
+    const plainText=children.map(c=>c.text||'').join('');
+    if(!plainText.trim()) return;
+
+    // Render each child span with its marks (bold/italic) preserved
+    const richText=children.map(c=>{
+      let t=(c.text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const marks=c.marks||[];
+      if(marks.includes('strong')) t=`<strong>${t}</strong>`;
+      if(marks.includes('em')) t=`<em>${t}</em>`;
+      return t;
+    }).join('');
+
+    // A short line where EVERY span is bolded (and nothing else) reads as an
+    // intended heading, even though it was styled with Bold rather than the
+    // Heading 2 style — this matches how headings were actually written here.
+    const allBold = children.length && children.every(c=>(c.marks||[]).includes('strong'));
+    const looksLikeHeading = allBold && plainText.trim().length < 80 && !plainText.trim().endsWith('.');
+
     const isListItem = block.listItem==='bullet';
     if(isListItem && !listOpen){ html+='<ul class="article-list">'; listOpen=true; }
     if(!isListItem && listOpen){ html+='</ul>'; listOpen=false; }
+
     if(isListItem){
-      html+=`<li>${text}</li>`;
-    } else if(block.style==='h2'){
-      html+=`<h2>${text}</h2>`;
+      html+=`<li>${richText}</li>`;
+    } else if(block.style==='h2' || looksLikeHeading){
+      html+=`<h2>${plainText}</h2>`;
     } else if(block.style==='blockquote'){
-      html+=`<div class="quote">"${text}"</div>`;
+      html+=`<div class="quote">"${plainText}"</div>`;
     } else {
-      html+=`<p>${text}</p>`;
+      html+=`<p>${richText}</p>`;
     }
   });
   if(listOpen) html+='</ul>';
