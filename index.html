@@ -921,8 +921,6 @@ function initFilters(){
 }
 
 /* ── Sanity CMS: Home Page content ── */
-const SANITY_PROJECT_ID='3v9zb964', SANITY_DATASET='production';
-
 async function loadHomePageFromSanity(){
   try{
     const query=encodeURIComponent(`*[_type=="homePage"][0]{heroEyebrow,heroSubtext,duoSection,journalSection,fourIdeas,bespokeTeaser}`);
