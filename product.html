@@ -694,6 +694,33 @@ const DEF=[
 ];
 const cat=()=>{try{const s=localStorage.getItem('h94c');return s?JSON.parse(s):DEF;}catch(e){return DEF;}};
 const saveCat=c=>localStorage.setItem('h94c',JSON.stringify(c));
+
+/* ── Sanity CMS: merge product descriptions/images/status into the catalog ── */
+const SANITY_PROJECT_ID='3v9zb964', SANITY_DATASET='production';
+async function syncSanityProductContent(){
+  try{
+    const query=encodeURIComponent(`*[_type=="productContent"]{productSlug,status,shortDescription,"heroUrl":heroImage.asset->url}`);
+    const url=`https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=${query}`;
+    const res=await fetch(url);
+    if(!res.ok) return;
+    const {result}=await res.json();
+    if(!Array.isArray(result)) return;
+    result.forEach(entry=>{
+      if(!entry.productSlug) return;
+      const item=DEF.find(p=>p.id===entry.productSlug);
+      if(!item) return;
+      item.status = entry.status || 'active';
+      if(entry.shortDescription) item.desc = entry.shortDescription;
+      if(entry.heroUrl) item.img = entry.heroUrl;
+    });
+    for(let i=DEF.length-1;i>=0;i--){
+      if(DEF[i].status==='hidden') DEF.splice(i,1);
+    }
+  }catch(e){
+    console.error('Sanity product sync error:',e);
+  }
+}
+
 let cart={};let appliedPromo=null;try{cart=JSON.parse(localStorage.getItem('h94_cart')||'{}');}catch(e){}
 const saveCart=()=>localStorage.setItem('h94_cart',JSON.stringify(cart));
 let CURR={code:'INR',symbol:'₹',rate:1};
@@ -798,6 +825,7 @@ function initVideo(){
 }
 document.addEventListener('DOMContentLoaded',async()=>{
   await window.__geoReady;
+  await syncSanityProductContent();
   initYear();initReveals();initMenu();initTicker();initFilters();initNav();initVideo();
   document.querySelectorAll('[data-pg]').forEach(el=>{
     renderGrid(el,{featured:el.dataset.feat==='1',limit:el.dataset.lim,cat:el.dataset.cat});
@@ -1129,6 +1157,7 @@ function selSize(ml){
 }
 document.addEventListener('DOMContentLoaded',async()=>{
   await window.__geoReady;
+  await syncSanityProductContent();
   const id=new URLSearchParams(location.search).get('id');
   curId=id;
   const p=H94.cat().find(x=>x.id===id);

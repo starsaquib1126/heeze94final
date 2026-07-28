@@ -888,7 +888,7 @@ function renderGrid(container,opts={}){
         </div>
         <h3>${p.name}</h3>
         <p class="product-short">${(p.desc||'').substring(0,82)}…</p>
-        <div class="product-price">From ${fmt(Math.min(...p.sizes.map(s=>s.price)))} <span>· 3 · 6 · 12 ml</span></div>
+        ${p.status==='coming_soon' ? '<div class="product-price" style="color:var(--gold)">Coming Soon</div>' : p.status==='sold_out' ? '<div class="product-price" style="color:var(--muted)">Sold Out</div>' : `<div class="product-price">From ${fmt(Math.min(...p.sizes.map(s=>s.price)))} <span>· 3 · 6 · 12 ml</span></div>`}
       </div>
     </article>`).join('');
 }

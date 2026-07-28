@@ -708,6 +708,34 @@ const DEFAULT = [
     sizes:[{ml:3,price:399},{ml:6,price:749},{ml:12,price:1299}]}
 ];
 
+/* ── Sanity CMS: merge product descriptions/images/status into the catalog ── */
+const SANITY_PROJECT_ID='3v9zb964', SANITY_DATASET='production';
+async function syncSanityProductContent(){
+  try{
+    const query=encodeURIComponent(`*[_type=="productContent"]{productSlug,status,shortDescription,"heroUrl":heroImage.asset->url}`);
+    const url=`https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=${query}`;
+    const res=await fetch(url);
+    if(!res.ok) return;
+    const {result}=await res.json();
+    if(!Array.isArray(result)) return;
+    result.forEach(entry=>{
+      if(!entry.productSlug) return;
+      const item=DEFAULT.find(p=>p.id===entry.productSlug);
+      if(!item) return; // product not yet added to the site's price/size catalog
+      item.status = entry.status || 'active';
+      if(entry.shortDescription) item.desc = entry.shortDescription;
+      if(entry.heroUrl) item.img = entry.heroUrl;
+    });
+    // Remove anything explicitly hidden in Sanity from the visible catalog
+    for(let i=DEFAULT.length-1;i>=0;i--){
+      if(DEFAULT[i].status==='hidden') DEFAULT.splice(i,1);
+    }
+  }catch(e){
+    console.error('Sanity product sync error:',e);
+    // Keep showing the existing hardcoded catalog if Sanity is unreachable
+  }
+}
+
 function getCat(){
   return DEFAULT; /* file is single source of truth */
 }
@@ -805,7 +833,7 @@ function renderGrid(container,opts={}){
         </div>
         <h3>${p.name}</h3>
         <p class="product-short">${(p.desc||'').substring(0,82)}…</p>
-        <div class="product-price">From ${fmt(Math.min(...p.sizes.map(s=>s.price)))} <span>· 3 · 6 · 12 ml</span></div>
+        ${p.status==='coming_soon' ? '<div class="product-price" style="color:var(--gold)">Coming Soon</div>' : p.status==='sold_out' ? '<div class="product-price" style="color:var(--muted)">Sold Out</div>' : `<div class="product-price">From ${fmt(Math.min(...p.sizes.map(s=>s.price)))} <span>· 3 · 6 · 12 ml</span></div>`}
       </div>
     </article>`).join('');
 }
@@ -874,6 +902,7 @@ function initFilters(){
 /* ── DOMContentLoaded init ── */
 document.addEventListener('DOMContentLoaded',async()=>{
   await initGeoCurrency();
+  await syncSanityProductContent();
   initYear();initReveals();initMenu();initTicker();initFilters();initVideos();
   document.querySelectorAll('[data-product-grid]').forEach(el=>{
     renderGrid(el,{
