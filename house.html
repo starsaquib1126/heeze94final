@@ -595,17 +595,17 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
   <img src="assets/house/heritage-hero-bottles.jpg" alt="HEEZE 94" fetchpriority="high"/>
   <div class="container page-hero-content reveal">
     <div class="eyebrow">The House</div>
-    <h1>A legacy of fragrance craftsmanship, refined since 1994.</h1>
-    <p>HEEZE 94 is not a brand founded in 1994 — the number marks the beginning of a personal journey: the creator behind HEEZE 94, dedicated to the art of fragrance since that year.</p>
+    <h1 id="houseHeroHeadline">A legacy of fragrance craftsmanship, refined since 1994.</h1>
+    <p id="houseHeroSubtext">HEEZE 94 is not a brand founded in 1994 — the number marks the beginning of a personal journey: the creator behind HEEZE 94, dedicated to the art of fragrance since that year.</p>
   </div>
 </section>
 
 <section class="section section-dark"><div class="container">
   <div class="section-head reveal" style="justify-content:center;text-align:center">
-    <div style="margin:0 auto"><div class="eyebrow">Our Story</div><h2>Born from decades of passion and experience.</h2></div>
+    <div style="margin:0 auto"><div class="eyebrow">Our Story</div><h2 id="houseStoryHeadline">Born from decades of passion and experience.</h2></div>
   </div>
   <div class="value-grid reveal" style="max-width:820px;margin:0 auto;text-align:center">
-    <p style="color:var(--muted);font-size:.95rem;line-height:1.85;grid-column:1/-1">HEEZE 94 represents a lifelong journey in the world of fragrance. Since 1994, the creator behind HEEZE 94 has explored the art of blending, refining and perfecting fragrances — preserving traditional techniques while embracing modern elegance. Each attar and parfum creation reflects years of knowledge, patience and dedication.</p>
+    <p id="houseStoryBody" style="color:var(--muted);font-size:.95rem;line-height:1.85;grid-column:1/-1">HEEZE 94 represents a lifelong journey in the world of fragrance. Since 1994, the creator behind HEEZE 94 has explored the art of blending, refining and perfecting fragrances — preserving traditional techniques while embracing modern elegance. Each attar and parfum creation reflects years of knowledge, patience and dedication.</p>
   </div>
 </div></section>
 
@@ -614,19 +614,19 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
     <div style="margin:0 auto"><div class="eyebrow">Our Philosophy</div><h2>Blending tradition and modernity in perfect balance.</h2></div>
   </div>
   <div class="value-grid reveal" style="margin-top:48px">
-    <div class="value">
+    <div class="value" data-philosophy-index="0">
       <svg class="value-icon" viewBox="0 0 48 48"><path d="M24 10c-6 6-6 14 0 20 6-6 6-14 0-20Z" fill="none" stroke="var(--gold)" stroke-width="1.5"/><path d="M12 30c4-2 8-2 12 0M24 30c4-2 8-2 12 0" stroke="var(--gold)" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
       <h3>Harmony</h3><p>Blending tradition and modernity in perfect balance.</p>
     </div>
-    <div class="value">
+    <div class="value" data-philosophy-index="1">
       <svg class="value-icon" viewBox="0 0 48 48"><path d="M24 8c8 4 14 10 14 18a14 14 0 0 1-28 0c0-8 6-14 14-18Z" fill="none" stroke="var(--gold)" stroke-width="1.5"/></svg>
       <h3>Elegance</h3><p>Creating refined fragrances that express individuality.</p>
     </div>
-    <div class="value">
+    <div class="value" data-philosophy-index="2">
       <svg class="value-icon" viewBox="0 0 48 48"><path d="M24 8c3 8 10 12 10 20a10 10 0 0 1-20 0c0-8 7-12 10-20Z" fill="none" stroke="var(--gold)" stroke-width="1.5"/></svg>
       <h3>Essence</h3><p>Capturing emotions, memories and moments through scent.</p>
     </div>
-    <div class="value">
+    <div class="value" data-philosophy-index="3">
       <svg class="value-icon" viewBox="0 0 48 48"><path d="M24 6l4 12h13l-10.5 8 4 12L24 30l-10.5 8 4-12L7 18h13Z" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linejoin="round"/></svg>
       <h3>Zeal</h3><p>Driven by passion and continuous pursuit of perfection.</p>
     </div>
@@ -637,17 +637,17 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
   <div class="split-media"><img src="assets/craftsmanship/craftsmanship.jpg" alt="HEEZE 94 UAE atelier" loading="lazy"/></div>
   <div class="split-copy"><div class="inner reveal">
     <div class="eyebrow">Our Origin</div>
-    <h2>A lifelong pursuit, since 1994.</h2>
-    <p>The journey behind HEEZE 94 began in 1994, when a passion for fragrance craftsmanship became a lifelong pursuit. From a small beginning to an evolving expression of artistry, the dedication to quality, authenticity and excellence remains at the heart of every creation.</p>
+    <h2 id="houseOriginHeadline">A lifelong pursuit, since 1994.</h2>
+    <p id="houseOriginBody">The journey behind HEEZE 94 began in 1994, when a passion for fragrance craftsmanship became a lifelong pursuit. From a small beginning to an evolving expression of artistry, the dedication to quality, authenticity and excellence remains at the heart of every creation.</p>
   </div></div>
 </section>
 
 <section class="section section-dark"><div class="container">
   <div class="section-head reveal">
-    <div><div class="eyebrow">Attar</div><h2>Rooted in traditional artistry.</h2></div>
-    <p>Each attar is carefully crafted through patience, natural ingredients and time-honoured techniques.</p>
+    <div><div class="eyebrow">Attar</div><h2 id="houseAttarHeadline">Rooted in traditional artistry.</h2></div>
+    <p id="houseAttarBody">Each attar is carefully crafted through patience, natural ingredients and time-honoured techniques.</p>
   </div>
-  <ul class="feature-list reveal" style="max-width:520px">
+  <ul class="feature-list reveal" style="max-width:520px" data-attar-features>
     <li><svg viewBox="0 0 24 24"><path d="M12 3v18M5 8l7-5 7 5"/></svg><div><strong>100% Perfume Oil</strong><span>Alcohol free</span></div></li>
     <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg><div><strong>Natural Ingredients</strong><span>Sourced with care</span></div></li>
     <li><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><div><strong>Traditional Methods</strong><span>Preserved through generations</span></div></li>
@@ -657,10 +657,10 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
 
 <section class="section section-panel"><div class="container">
   <div class="section-head reveal">
-    <div><div class="eyebrow">Parfum · Coming Soon</div><h2>Modern composition, timeless intent.</h2></div>
-    <p>Combining years of fragrance expertise with modern composition, each parfum is created to deliver a distinctive and memorable signature.</p>
+    <div><div class="eyebrow">Parfum · Coming Soon</div><h2 id="houseParfumHeadline">Modern composition, timeless intent.</h2></div>
+    <p id="houseParfumBody">Combining years of fragrance expertise with modern composition, each parfum is created to deliver a distinctive and memorable signature.</p>
   </div>
-  <ul class="feature-list reveal" style="max-width:520px">
+  <ul class="feature-list reveal" style="max-width:520px" data-parfum-features>
     <li><svg viewBox="0 0 24 24"><path d="M12 3v18M5 8l7-5 7 5"/></svg><div><strong>Finest Ingredients</strong><span>Globally sourced</span></div></li>
     <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg><div><strong>Expert Blending</strong><span>Artistry in every note</span></div></li>
     <li><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><div><strong>Modern Composition</strong><span>Balanced and sophisticated</span></div></li>
@@ -672,22 +672,22 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
   <div class="section-head reveal" style="justify-content:center;text-align:center">
     <div style="margin:0 auto"><div class="eyebrow">Our Craftsmanship Journey</div><h2>Six stages. No shortcuts.</h2></div>
   </div>
-  <div class="stage-grid reveal">
-    <div class="stage-card"><div class="stage-media"><img src="assets/craftsmanship/stage-01-sourcing.jpg" alt="Sourcing rare raw materials" loading="lazy"/></div><div class="stage-body"><span class="value-num">01</span><h3>Sourcing</h3><p>Selecting the finest natural ingredients from around the world.</p></div></div>
-    <div class="stage-card"><div class="stage-media"><img src="assets/craftsmanship/stage-02-preparation.jpg" alt="Preparing ingredients by hand" loading="lazy"/></div><div class="stage-body"><span class="value-num">02</span><h3>Preparation</h3><p>Traditional preparation with care and precision.</p></div></div>
-    <div class="stage-card"><div class="stage-media"><img src="assets/craftsmanship/stage-04-blending.jpg" alt="Expert blending" loading="lazy"/></div><div class="stage-body"><span class="value-num">03</span><h3>Blending</h3><p>Artful blending to create harmonious accords.</p></div></div>
-    <div class="stage-card"><div class="stage-media"><img src="assets/craftsmanship/stage-05-maturation.jpg" alt="Maturation of the blend" loading="lazy"/></div><div class="stage-body"><span class="value-num">04</span><h3>Maturation</h3><p>Time is given for the fragrance to evolve.</p></div></div>
-    <div class="stage-card"><div class="stage-media"><img src="assets/craftsmanship/stage-03-extraction.jpg" alt="Filtration" loading="lazy"/></div><div class="stage-body"><span class="value-num">05</span><h3>Filtration</h3><p>Careful filtration for purity and clarity.</p></div></div>
-    <div class="stage-card"><div class="stage-media"><img src="assets/craftsmanship/stage-06-bottling.jpg" alt="Bottling by hand" loading="lazy"/></div><div class="stage-body"><span class="value-num">06</span><h3>Bottling</h3><p>Elegantly bottled with pride and perfection.</p></div></div>
+  <div class="stage-grid reveal" data-stage-grid>
+    <div class="stage-card" data-stage-index="0"><div class="stage-media"><img src="assets/craftsmanship/stage-01-sourcing.jpg" alt="Sourcing rare raw materials" loading="lazy"/></div><div class="stage-body"><span class="value-num">01</span><h3>Sourcing</h3><p>Selecting the finest natural ingredients from around the world.</p></div></div>
+    <div class="stage-card" data-stage-index="1"><div class="stage-media"><img src="assets/craftsmanship/stage-02-preparation.jpg" alt="Preparing ingredients by hand" loading="lazy"/></div><div class="stage-body"><span class="value-num">02</span><h3>Preparation</h3><p>Traditional preparation with care and precision.</p></div></div>
+    <div class="stage-card" data-stage-index="2"><div class="stage-media"><img src="assets/craftsmanship/stage-04-blending.jpg" alt="Expert blending" loading="lazy"/></div><div class="stage-body"><span class="value-num">03</span><h3>Blending</h3><p>Artful blending to create harmonious accords.</p></div></div>
+    <div class="stage-card" data-stage-index="3"><div class="stage-media"><img src="assets/craftsmanship/stage-05-maturation.jpg" alt="Maturation of the blend" loading="lazy"/></div><div class="stage-body"><span class="value-num">04</span><h3>Maturation</h3><p>Time is given for the fragrance to evolve.</p></div></div>
+    <div class="stage-card" data-stage-index="4"><div class="stage-media"><img src="assets/craftsmanship/stage-03-extraction.jpg" alt="Filtration" loading="lazy"/></div><div class="stage-body"><span class="value-num">05</span><h3>Filtration</h3><p>Careful filtration for purity and clarity.</p></div></div>
+    <div class="stage-card" data-stage-index="5"><div class="stage-media"><img src="assets/craftsmanship/stage-06-bottling.jpg" alt="Bottling by hand" loading="lazy"/></div><div class="stage-body"><span class="value-num">06</span><h3>Bottling</h3><p>Elegantly bottled with pride and perfection.</p></div></div>
   </div>
   <p style="text-align:center;margin-top:32px"><a href="craftsmanship.html" class="btn btn-line">See the Full Journey</a></p>
 </div></section>
 
 <section class="section section-dark"><div class="container">
   <div class="section-head reveal" style="justify-content:center;text-align:center">
-    <div style="margin:0 auto"><h2>More than a fragrance. A legacy crafted into every drop.</h2></div>
+    <div style="margin:0 auto"><h2 id="houseClosingHeadline">More than a fragrance. A legacy crafted into every drop.</h2></div>
   </div>
-  <p style="text-align:center;max-width:600px;margin:0 auto;color:var(--muted);font-size:.95rem;line-height:1.85">At HEEZE 94, every creation is a reflection of decades of experience, passion and a lifelong devotion to the art of fragrance. Thank you for being a part of our journey.</p>
+  <p id="houseClosingBody" style="text-align:center;max-width:600px;margin:0 auto;color:var(--muted);font-size:.95rem;line-height:1.85">At HEEZE 94, every creation is a reflection of decades of experience, passion and a lifelong devotion to the art of fragrance. Thank you for being a part of our journey.</p>
   <div class="promise-strip reveal" style="margin-top:44px">
     <span>Harmony</span><span>Elegance</span><span>Essence</span><span>Zeal</span>
   </div>
@@ -954,10 +954,96 @@ function initFilters(){
   });
 }
 
+/* ── Sanity CMS: House Page content ── */
+const SANITY_PROJECT_ID='3v9zb964', SANITY_DATASET='production';
+
+async function loadHousePageFromSanity(){
+  try{
+    const query=encodeURIComponent(`*[_type=="housePage"][0]{heroHeadline,heroSubtext,ourStory,philosophy,ourOrigin{headline,body,"imageUrl":image.asset->url},attarSection,parfumSection,craftsmanshipJourney[]{stageName,body,"imageUrl":image.asset->url},closingStatement}`);
+    const url=`https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=${query}`;
+    const res=await fetch(url);
+    if(!res.ok) return;
+    const {result}=await res.json();
+    if(!result) return;
+
+    const setText=(id,val)=>{ if(val){ const el=document.getElementById(id); if(el) el.textContent=val; } };
+
+    setText('houseHeroHeadline', result.heroHeadline);
+    setText('houseHeroSubtext', result.heroSubtext);
+
+    if(result.ourStory){
+      setText('houseStoryHeadline', result.ourStory.headline);
+      setText('houseStoryBody', result.ourStory.body);
+    }
+
+    if(Array.isArray(result.philosophy)){
+      result.philosophy.forEach((item,i)=>{
+        const card=document.querySelector(`[data-philosophy-index="${i}"]`);
+        if(!card) return;
+        if(item.word) card.querySelector('h3').textContent=item.word;
+        if(item.body) card.querySelector('p').textContent=item.body;
+      });
+    }
+
+    if(result.ourOrigin){
+      setText('houseOriginHeadline', result.ourOrigin.headline);
+      setText('houseOriginBody', result.ourOrigin.body);
+      if(result.ourOrigin.imageUrl){
+        const img=document.querySelector('.split-media img');
+        if(img) img.src=result.ourOrigin.imageUrl;
+      }
+    }
+
+    const applyFeatures=(section, selector)=>{
+      if(!section) return;
+      const container=document.querySelector(selector);
+      if(Array.isArray(section.features) && container){
+        const items=container.querySelectorAll('li > div');
+        section.features.forEach((f,i)=>{
+          const item=items[i];
+          if(!item) return;
+          if(f.title) item.querySelector('strong').textContent=f.title;
+          if(f.subtitle) item.querySelector('span').textContent=f.subtitle;
+        });
+      }
+    };
+
+    if(result.attarSection){
+      setText('houseAttarHeadline', result.attarSection.headline);
+      setText('houseAttarBody', result.attarSection.body);
+      applyFeatures(result.attarSection, '[data-attar-features]');
+    }
+    if(result.parfumSection){
+      setText('houseParfumHeadline', result.parfumSection.headline);
+      setText('houseParfumBody', result.parfumSection.body);
+      applyFeatures(result.parfumSection, '[data-parfum-features]');
+    }
+
+    if(Array.isArray(result.craftsmanshipJourney)){
+      result.craftsmanshipJourney.forEach((stage,i)=>{
+        const card=document.querySelector(`[data-stage-index="${i}"]`);
+        if(!card) return;
+        if(stage.stageName) card.querySelector('h3').textContent=stage.stageName;
+        if(stage.body) card.querySelector('p').textContent=stage.body;
+        if(stage.imageUrl){ const img=card.querySelector('img'); if(img) img.src=stage.imageUrl; }
+      });
+    }
+
+    if(result.closingStatement){
+      setText('houseClosingHeadline', result.closingStatement.headline);
+      setText('houseClosingBody', result.closingStatement.body);
+    }
+  }catch(e){
+    console.error('Sanity house page load error:',e);
+    // Silently keep the existing hardcoded text if Sanity is unreachable
+  }
+}
+
 /* ── DOMContentLoaded init ── */
 document.addEventListener('DOMContentLoaded',async()=>{
   await initGeoCurrency();
   initYear();initReveals();initMenu();initTicker();initFilters();initVideos();
+  loadHousePageFromSanity();
   document.querySelectorAll('[data-product-grid]').forEach(el=>{
     renderGrid(el,{
       featuredOnly:el.dataset.featuredOnly==='true',

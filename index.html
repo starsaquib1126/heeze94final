@@ -551,9 +551,9 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
     <div class="hero-copy reveal">
       <div class="hero-emblem"><img src="assets/brand/logo-primary.png" alt="HEEZE 94"/></div>
       <div class="hero-text">
-      <div class="eyebrow">The House of HEEZE 94</div>
+      <div class="eyebrow" id="homeHeroEyebrow">The House of HEEZE 94</div>
       <h1>Fragrance,<em>distilled into presence.</em></h1>
-      <p class="hero-lead">A luxury fragrance house where tradition meets elegance — concentrated attars today, a parfum collection being composed for tomorrow.</p>
+      <p class="hero-lead" id="homeHeroLead">A luxury fragrance house where tradition meets elegance — concentrated attars today, a parfum collection being composed for tomorrow.</p>
       <div class="hero-actions">
         <a class="btn btn-gold" href="collection.html">Explore the Attars</a>
         <a class="btn btn-line" href="parfums.html">Preview the Parfums</a>
@@ -568,7 +568,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
 </section>
 <section class="section section-dark"><div class="container">
   <div class="section-head reveal">
-    <div><div class="eyebrow">One House · Two Expressions</div><h2>Attar and Parfum, from a single atelier.</h2></div>
+    <div><div class="eyebrow" id="homeDuoEyebrow">One House · Two Expressions</div><h2 id="homeDuoHeadline">Attar and Parfum, from a single atelier.</h2></div>
     <p style="font-size:1.15rem;font-weight:600;color:var(--gold)">Every HEEZE 94 creation begins in UAE — expressed today as concentrated attar oils, and soon as a full parfum collection.</p>
   </div>
   <div class="house-duo reveal">
@@ -593,9 +593,9 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
   </div>
   <div class="split-copy"><div class="inner reveal">
     <div class="eyebrow">From the Journal</div>
-    <h2>Stories in scent, from attar to parfum.</h2>
-    <p>Notes on materials, ritual and the philosophy behind every HEEZE 94 creation — attar and parfum alike.</p>
-    <div class="quote">"Not worn around you. Worn with you."</div>
+    <h2 id="homeJournalHeadline">Stories in scent, from attar to parfum.</h2>
+    <p id="homeJournalBody">Notes on materials, ritual and the philosophy behind every HEEZE 94 creation — attar and parfum alike.</p>
+    <div class="quote" id="homeJournalQuote">"Not worn around you. Worn with you."</div>
     <a class="text-link" href="journal.html">Read the journal</a>
   </div></div>
 </section>
@@ -605,16 +605,16 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
     <p>Not a slogan — the actual list we check every creation against before it carries the HEEZE 94 name.</p>
   </div>
   <div class="value-grid reveal">
-    <div class="value"><span class="value-num">Harmony</span><h3>Balance over volume</h3><p>Notes chosen to complement each other, not compete — a blend is only finished once nothing overpowers.</p></div>
-    <div class="value"><span class="value-num">Elegance</span><h3>Refined, not loud</h3><p>Built to express the person wearing it, not to announce a name across a room.</p></div>
-    <div class="value"><span class="value-num">Zeal</span><h3>Passion, not trend</h3><p>Driven by a continuous pursuit of the right composition, not a seasonal shape to chase.</p></div>
-    <div class="value"><span class="value-num">Essence</span><h3>Meaning, not just scent</h3><p>Capturing an emotion or a memory — the reason a fragrance is chosen in the first place.</p></div>
+    <div class="value" data-idea-index="0"><span class="value-num">Harmony</span><h3>Balance over volume</h3><p>Notes chosen to complement each other, not compete — a blend is only finished once nothing overpowers.</p></div>
+    <div class="value" data-idea-index="1"><span class="value-num">Elegance</span><h3>Refined, not loud</h3><p>Built to express the person wearing it, not to announce a name across a room.</p></div>
+    <div class="value" data-idea-index="2"><span class="value-num">Zeal</span><h3>Passion, not trend</h3><p>Driven by a continuous pursuit of the right composition, not a seasonal shape to chase.</p></div>
+    <div class="value" data-idea-index="3"><span class="value-num">Essence</span><h3>Meaning, not just scent</h3><p>Capturing an emotion or a memory — the reason a fragrance is chosen in the first place.</p></div>
   </div>
 </div></section>
 <section class="section section-panel"><div class="container">
   <div class="section-head reveal">
-    <div><div class="eyebrow">Bespoke</div><h2>Create a fragrance that belongs only to you.</h2></div>
-    <p>Family, notes, intensity, format — composed with expert guidance and finished with your name on the bottle.</p>
+    <div><div class="eyebrow">Bespoke</div><h2 id="homeBespokeHeadline">Create a fragrance that belongs only to you.</h2></div>
+    <p id="homeBespokeBody">Family, notes, intensity, format — composed with expert guidance and finished with your name on the bottle.</p>
   </div>
   <div class="reveal" style="margin-top:26px"><a class="btn btn-gold" href="bespoke.html">Build Your Own Perfume</a></div>
 </div></section>
@@ -892,10 +892,57 @@ function initFilters(){
   });
 }
 
+/* ── Sanity CMS: Home Page content ── */
+const SANITY_PROJECT_ID='3v9zb964', SANITY_DATASET='production';
+
+async function loadHomePageFromSanity(){
+  try{
+    const query=encodeURIComponent(`*[_type=="homePage"][0]{heroEyebrow,heroSubtext,duoSection,journalSection,fourIdeas,bespokeTeaser}`);
+    const url=`https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=${query}`;
+    const res=await fetch(url);
+    if(!res.ok) return;
+    const {result}=await res.json();
+    if(!result) return;
+
+    if(result.heroEyebrow) document.getElementById('homeHeroEyebrow').textContent=result.heroEyebrow;
+    if(result.heroSubtext) document.getElementById('homeHeroLead').textContent=result.heroSubtext;
+
+    if(result.duoSection){
+      if(result.duoSection.eyebrow) document.getElementById('homeDuoEyebrow').textContent=result.duoSection.eyebrow;
+      if(result.duoSection.headline) document.getElementById('homeDuoHeadline').textContent=result.duoSection.headline;
+    }
+
+    if(result.journalSection){
+      if(result.journalSection.headline) document.getElementById('homeJournalHeadline').textContent=result.journalSection.headline;
+      if(result.journalSection.body) document.getElementById('homeJournalBody').textContent=result.journalSection.body;
+      if(result.journalSection.quote) document.getElementById('homeJournalQuote').textContent=`"${result.journalSection.quote}"`;
+    }
+
+    if(Array.isArray(result.fourIdeas)){
+      result.fourIdeas.forEach((idea,i)=>{
+        const card=document.querySelector(`[data-idea-index="${i}"]`);
+        if(!card) return;
+        if(idea.word) card.querySelector('.value-num').textContent=idea.word;
+        if(idea.subhead) card.querySelector('h3').textContent=idea.subhead;
+        if(idea.body) card.querySelector('p').textContent=idea.body;
+      });
+    }
+
+    if(result.bespokeTeaser){
+      if(result.bespokeTeaser.headline) document.getElementById('homeBespokeHeadline').textContent=result.bespokeTeaser.headline;
+      if(result.bespokeTeaser.body) document.getElementById('homeBespokeBody').textContent=result.bespokeTeaser.body;
+    }
+  }catch(e){
+    console.error('Sanity home page load error:',e);
+    // Silently keep the existing hardcoded text if Sanity is unreachable
+  }
+}
+
 /* ── DOMContentLoaded init ── */
 document.addEventListener('DOMContentLoaded',async()=>{
   await initGeoCurrency();
   initYear();initReveals();initMenu();initTicker();initFilters();initVideos();
+  loadHomePageFromSanity();
   document.querySelectorAll('[data-product-grid]').forEach(el=>{
     renderGrid(el,{
       featuredOnly:el.dataset.featuredOnly==='true',
