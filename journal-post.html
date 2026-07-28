@@ -923,44 +923,69 @@ function initVideos(){
 /* ── Sanity CMS: dynamic article loader ── */
 const SANITY_PROJECT_ID='3v9zb964', SANITY_DATASET='production';
 
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
 function renderPortableText(blocks){
   if(!Array.isArray(blocks)) return '';
   let html='';
   let listOpen=false;
+
   blocks.forEach(block=>{
     if(block._type!=='block'){ return; }
     const children=block.children||[];
-    const plainText=children.map(c=>c.text||'').join('');
-    if(!plainText.trim()) return;
-
-    // Render each child span with its marks (bold/italic) preserved
-    const richText=children.map(c=>{
-      let t=(c.text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      const marks=c.marks||[];
-      if(marks.includes('strong')) t=`<strong>${t}</strong>`;
-      if(marks.includes('em')) t=`<em>${t}</em>`;
-      return t;
-    }).join('');
-
-    // A short line where EVERY span is bolded (and nothing else) reads as an
-    // intended heading, even though it was styled with Bold rather than the
-    // Heading 2 style — this matches how headings were actually written here.
-    const allBold = children.length && children.every(c=>(c.marks||[]).includes('strong'));
-    const looksLikeHeading = allBold && plainText.trim().length < 80 && !plainText.trim().endsWith('.');
-
     const isListItem = block.listItem==='bullet';
-    if(isListItem && !listOpen){ html+='<ul class="article-list">'; listOpen=true; }
-    if(!isListItem && listOpen){ html+='</ul>'; listOpen=false; }
 
     if(isListItem){
-      html+=`<li>${richText}</li>`;
-    } else if(block.style==='h2' || looksLikeHeading){
-      html+=`<h2>${plainText}</h2>`;
-    } else if(block.style==='blockquote'){
-      html+=`<div class="quote">"${plainText}"</div>`;
-    } else {
-      html+=`<p>${richText}</p>`;
+      if(!listOpen){ html+='<ul class="article-list">'; listOpen=true; }
+      const richText=children.map(c=>{
+        let t=esc(c.text||'');
+        const marks=c.marks||[];
+        if(marks.includes('strong')) t=`<strong>${t}</strong>`;
+        if(marks.includes('em')) t=`<em>${t}</em>`;
+        return t;
+      }).join('');
+      if(richText.trim()) html+=`<li>${richText}</li>`;
+      return;
     }
+    if(listOpen){ html+='</ul>'; listOpen=false; }
+
+    // Some entries have paragraph breaks pasted as literal double-newlines
+    // INSIDE one block's text, rather than as separate blocks. Split each
+    // child span on those breaks, keeping its marks, so every real paragraph
+    // (and any heading sitting alone between breaks) renders as its own element.
+    let paragraphs=[[]]; // array of paragraphs, each an array of {text,marks}
+    children.forEach(c=>{
+      const marks=c.marks||[];
+      const parts=(c.text||'').split(/\n\s*\n/);
+      parts.forEach((part,i)=>{
+        if(part!=='') paragraphs[paragraphs.length-1].push({text:part,marks});
+        if(i<parts.length-1) paragraphs.push([]);
+      });
+    });
+    paragraphs=paragraphs.filter(p=>p.some(r=>r.text.trim()!==''));
+
+    paragraphs.forEach(runs=>{
+      const plain=runs.map(r=>r.text).join('').trim();
+      if(!plain) return;
+      const allBold = runs.length && runs.every(r=>r.marks.includes('strong'));
+      const looksLikeHeading = allBold && plain.length<80 && !plain.endsWith('.') && !plain.endsWith('"');
+
+      if(block.style==='blockquote'){
+        html+=`<div class="quote">"${esc(plain)}"</div>`;
+        return;
+      }
+      if(block.style==='h2' || looksLikeHeading){
+        html+=`<h2>${esc(plain)}</h2>`;
+        return;
+      }
+      const rich=runs.map(r=>{
+        let t=esc(r.text);
+        if(r.marks.includes('strong')) t=`<strong>${t}</strong>`;
+        if(r.marks.includes('em')) t=`<em>${t}</em>`;
+        return t;
+      }).join('');
+      html+=`<p>${rich}</p>`;
+    });
   });
   if(listOpen) html+='</ul>';
   return html;
