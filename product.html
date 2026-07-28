@@ -225,7 +225,7 @@ body:not(.gate-open) .gateway{display:none}
 /* ── PRODUCT DETAIL ── */
 .pd{padding:0 0 96px}
 .pd-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;padding-top:40px}
-@media(max-width:880px){.pd-grid{grid-template-columns:1fr;gap:32px}}
+@media(max-width:880px){.pd-grid{grid-template-columns:1fr;gap:32px}.pd-gallery{position:static !important;top:auto}}
 .pd-gallery{position:sticky;top:88px}
 .pd-img{aspect-ratio:3/4;overflow:hidden;border:1px solid rgba(233,190,90,.14)}
 .pd-img img{width:100%;height:100%;object-fit:cover;filter:saturate(.78);transition:.6s}
@@ -1097,7 +1097,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   });
   renderCart();
 });
-return{addToCart,cq:changeQty,openCart,closeCart,cat,saveCat,fmt,showToast,renderGrid};
+return{addToCart,cq:changeQty,openCart,closeCart,cat,saveCat,fmt,showToast,renderGrid,syncSanityProductContent};
 })();
 </script><script>
 (()=>{
@@ -1157,7 +1157,7 @@ function selSize(ml){
 }
 document.addEventListener('DOMContentLoaded',async()=>{
   await window.__geoReady;
-  await syncSanityProductContent();
+  await H94.syncSanityProductContent();
   const id=new URLSearchParams(location.search).get('id');
   curId=id;
   const p=H94.cat().find(x=>x.id===id);
