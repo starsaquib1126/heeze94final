@@ -735,6 +735,9 @@ async function syncSupabaseLivePricing(){
       if(!item) return;
       if(Array.isArray(entry.sizes) && entry.sizes.length){
         item.sizes=entry.sizes.map(s=>({ml:s.ml, price:s.price, variantId:s.variantId, stock:s.stock}));
+        const cheapest=item.sizes.reduce((a,b)=>a.price<b.price?a:b);
+        const matching=entry.sizes.find(s=>s.ml===cheapest.ml);
+        item.compareAt=(matching && matching.compareAt) ? matching.compareAt : null;
       }
     });
   }catch(e){
