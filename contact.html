@@ -581,17 +581,19 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
       <div class="contact-line"><span>Fragrance consultation</span>Personal guidance across the premium collection.</div>
       <div class="contact-line"><span>Wholesale</span>Retail, hospitality and curated partnership enquiries.</div>
       <div class="contact-line"><span>Gifting</span>Private, corporate and occasion-based fragrance gifting.</div>
-      <div class="contact-line"><span>WhatsApp</span><a href="https://wa.me/910000000000" style="color:var(--gold)">+91 00000 00000 — update this</a></div>
-      <div class="contact-line"><span>Instagram</span><a href="https://instagram.com/heeze94" style="color:var(--gold)">@heeze94 — update this</a></div>
+      <div class="contact-line"><span>Email</span><a id="contactEmail" href="mailto:connect@heeze94.com" style="color:var(--gold)">connect@heeze94.com</a></div>
+      <div class="contact-line"><span>WhatsApp</span><a id="contactWhatsapp" href="https://wa.me/919643391003" style="color:var(--gold)">+91 96433 91003</a></div>
+      <div class="contact-line"><span>Instagram</span><a id="contactInstagram" href="https://instagram.com/heeze94" style="color:var(--gold)">@heeze94</a></div>
+      <div class="contact-line" id="contactAddressLine" style="display:none"><span>Address</span><span id="contactAddress"></span></div>
     </div>
-    <form class="contact-form reveal" onsubmit="event.preventDefault();document.getElementById('formOk').textContent='Thank you — we will respond within 24 hours.';this.reset()">
+    <form class="contact-form reveal" id="contactForm">
       <div class="field"><label for="name">Name</label><input id="name" name="name" required/></div>
       <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required/></div>
       <div class="field"><label for="interest">Enquiry</label>
         <select id="interest"><option>Fragrance guidance</option><option>Wholesale</option><option>Gifting</option><option>Press &amp; collaboration</option></select></div>
       <div class="field"><label for="phone">Phone / WhatsApp</label><input id="phone" name="phone"/></div>
       <div class="field"><label for="message">Message</label><textarea id="message" name="message" required></textarea></div>
-      <button class="btn btn-gold" type="submit" style="align-self:flex-start">Send enquiry</button>
+      <button class="btn btn-gold" type="submit" id="contactSubmitBtn" style="align-self:flex-start">Send enquiry</button>
       <p class="form-ok" id="formOk"></p>
     </form>
   </div>
@@ -699,7 +701,7 @@ const DEFAULT = [
 const SANITY_PROJECT_ID='3v9zb964', SANITY_DATASET='production';
 async function syncSanityProductContent(){
   try{
-    const query=encodeURIComponent(`*[_type=="productContent"]{productSlug,status,shortDescription,"heroUrl":heroImage.asset->url}`);
+    const query=encodeURIComponent(`*[_type=="productContent"]{productSlug,status,shortDescription,"heroUrl":heroImage.asset->url,"galleryUrls":gallery[].asset->url}`);
     const url=`https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=${query}`;
     const res=await fetch(url);
     if(!res.ok) return;
@@ -721,6 +723,79 @@ async function syncSanityProductContent(){
     console.error('Sanity product sync error:',e);
     // Keep showing the existing hardcoded catalog if Sanity is unreachable
   }
+}
+
+async function loadContactInfoFromSanity(){
+  try{
+    const query=encodeURIComponent(`*[_type=="contactInfo"][0]{email,phone,instagramHandle,instagramUrl,address}`);
+    const url=`https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=${query}`;
+    const res=await fetch(url);
+    if(!res.ok) return;
+    const {result}=await res.json();
+    if(!result) return;
+
+    if(result.email){
+      const el=document.getElementById('contactEmail');
+      if(el){ el.textContent=result.email; el.href=`mailto:${result.email}`; }
+    }
+    if(result.phone){
+      const el=document.getElementById('contactWhatsapp');
+      if(el){ el.textContent=result.phone; el.href=`https://wa.me/${result.phone.replace(/[^0-9]/g,'')}`; }
+    }
+    if(result.instagramHandle || result.instagramUrl){
+      const el=document.getElementById('contactInstagram');
+      if(el){
+        if(result.instagramHandle) el.textContent=result.instagramHandle;
+        if(result.instagramUrl) el.href=result.instagramUrl;
+      }
+    }
+    if(result.address){
+      const line=document.getElementById('contactAddressLine');
+      const addr=document.getElementById('contactAddress');
+      if(line && addr){ addr.textContent=result.address; line.style.display=''; }
+    }
+  }catch(e){
+    console.error('Sanity contact info load error:',e);
+  }
+}
+
+function initContactForm(){
+  const form=document.getElementById('contactForm');
+  if(!form) return;
+  const btn=document.getElementById('contactSubmitBtn');
+  const msgEl=document.getElementById('formOk');
+  form.addEventListener('submit', async(e)=>{
+    e.preventDefault();
+    const fd=new FormData(form);
+    const payload={
+      name: fd.get('name'),
+      email: fd.get('email'),
+      phone: fd.get('phone'),
+      interest: document.getElementById('interest')?.value || '',
+      message: fd.get('message')
+    };
+    const origText=btn.textContent;
+    btn.disabled=true; btn.textContent='Sending…';
+    msgEl.textContent=''; msgEl.style.color='';
+    try{
+      const res=await fetch('/api/contact-enquiry',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(payload)
+      });
+      const data=await res.json();
+      if(!res.ok) throw new Error(data.error||'Something went wrong');
+      msgEl.textContent='Thank you — we will respond within 24 hours.';
+      msgEl.style.color='';
+      form.reset();
+    }catch(err){
+      console.error('Contact form submit error:', err);
+      msgEl.textContent=err.message||'Could not send your message — please try WhatsApp or email us directly.';
+      msgEl.style.color='#c0392b';
+    }finally{
+      btn.disabled=false; btn.textContent=origText;
+    }
+  });
 }
 
 function getCat(){
@@ -891,6 +966,8 @@ function initFilters(){
 document.addEventListener('DOMContentLoaded',async()=>{
   await initGeoCurrency();
   await syncSanityProductContent();
+  loadContactInfoFromSanity();
+  initContactForm();
   initYear();initReveals();initMenu();initTicker();initFilters();initVideos();
   document.querySelectorAll('[data-product-grid]').forEach(el=>{
     renderGrid(el,{

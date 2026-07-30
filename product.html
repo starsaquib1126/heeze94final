@@ -231,6 +231,11 @@ body:not(.gate-open) .gateway{display:none}
 @media(max-width:880px){.pd-grid{grid-template-columns:1fr;gap:32px}.pd-gallery{position:static !important;top:auto}}
 .pd-gallery{position:sticky;top:88px}
 .pd-img{aspect-ratio:3/4;overflow:hidden;border:1px solid rgba(233,190,90,.14)}
+.pd-thumbs{display:flex}
+.pd-thumb{width:64px;height:64px;flex-shrink:0;overflow:hidden;border:1px solid rgba(233,190,90,.14);
+  cursor:pointer;opacity:.6;transition:.25s}
+.pd-thumb:hover,.pd-thumb.on{opacity:1;border-color:var(--gold)}
+.pd-thumb img{width:100%;height:100%;object-fit:cover}
 .pd-img img{width:100%;height:100%;object-fit:cover;filter:saturate(.78);transition:.6s}
 .pd-img:hover img{filter:saturate(1);transform:scale(1.03)}
 .pd-info h1{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;
@@ -539,6 +544,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
   <div class="pd-grid">
     <div class="pd-gallery rv">
       <div class="pd-img"><img id="pdImg" src="assets/images/home-hero.jpg" alt=""/></div>
+      <div class="pd-thumbs" id="pdThumbs" style="display:none;gap:10px;margin-top:14px"></div>
     </div>
     <div class="rv rv2">
       <div class="ey" id="pdFam"></div>
@@ -703,7 +709,7 @@ const saveCat=c=>localStorage.setItem('h94c',JSON.stringify(c));
 const SANITY_PROJECT_ID='3v9zb964', SANITY_DATASET='production';
 async function syncSanityProductContent(){
   try{
-    const query=encodeURIComponent(`*[_type=="productContent"]{productSlug,status,shortDescription,"heroUrl":heroImage.asset->url}`);
+    const query=encodeURIComponent(`*[_type=="productContent"]{productSlug,status,shortDescription,"heroUrl":heroImage.asset->url,"galleryUrls":gallery[].asset->url}`);
     const url=`https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=${query}`;
     const res=await fetch(url);
     if(!res.ok) return;
@@ -716,6 +722,7 @@ async function syncSanityProductContent(){
       item.status = entry.status || 'active';
       if(entry.shortDescription) item.desc = entry.shortDescription;
       if(entry.heroUrl) item.img = entry.heroUrl;
+      if(Array.isArray(entry.galleryUrls) && entry.galleryUrls.length) item.gallery = entry.galleryUrls;
     });
     for(let i=DEF.length-1;i>=0;i--){
       if(DEF[i].status==='hidden') DEF.splice(i,1);
@@ -1152,6 +1159,24 @@ return'I would be glad to guide you. Could you tell me the kinds of scents you a
 let curId=null,curMl=null,curQty=1;
 function adjQty(d){curQty=Math.max(1,curQty+d);document.getElementById('qtyVal').textContent=curQty;}
 function addPD(){if(!curId||!curMl)return;H94.addToCart(curId,curMl,curQty);}
+function renderGalleryThumbs(p){
+  const wrap=document.getElementById('pdThumbs');
+  const mainImg=document.getElementById('pdImg');
+  if(!wrap||!mainImg) return;
+  const photos=[p.img, ...(Array.isArray(p.gallery)?p.gallery:[])];
+  if(photos.length<2){ wrap.style.display='none'; wrap.innerHTML=''; return; }
+  wrap.style.display='flex';
+  wrap.innerHTML=photos.map((url,i)=>
+    `<div class="pd-thumb${i===0?' on':''}" data-thumb="${i}"><img src="${url}" alt="View ${i+1}"/></div>`
+  ).join('');
+  wrap.querySelectorAll('.pd-thumb').forEach(t=>{
+    t.addEventListener('click',()=>{
+      mainImg.src=photos[+t.dataset.thumb];
+      wrap.querySelectorAll('.pd-thumb').forEach(x=>x.classList.remove('on'));
+      t.classList.add('on');
+    });
+  });
+}
 function selSize(ml){
   curMl=ml;
   const p=H94.cat().find(x=>x.id===curId);
@@ -1170,6 +1195,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   document.title=p.name+' — HEEZE 94';
   document.getElementById('heroImg').src=p.img;
   document.getElementById('pdImg').src=p.img;
+  renderGalleryThumbs(p);
   document.getElementById('prodFamily').textContent=p.family;
   document.getElementById('prodName').textContent=p.name;
   document.getElementById('pdFam').textContent=p.family+' · Pure Attar';

@@ -576,12 +576,12 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
   </div>
   <div class="house-duo reveal">
     <a class="duo-panel" href="collection.html">
-      <img src="assets/Attar/golden-oud.jpg" alt="HEEZE 94 Attar collection" loading="lazy"/>
+      <img id="homeDuoAttarImg" src="assets/Attar/golden-oud.jpg" alt="HEEZE 94 Attar collection" loading="lazy"/>
       <span class="duo-shade"></span>
       <span class="duo-copy"><span class="eyebrow">Available Now</span><strong>Attar</strong><span class="duo-sub">Black Oud · Golden Oud · Rose Musk</span><span class="duo-cta">Enter the collection →</span></span>
     </a>
     <a class="duo-panel duo-soon" href="parfums.html">
-      <img src="assets/Parfum/arabian-nights.jpg" alt="HEEZE 94 Parfum collection — coming soon" loading="lazy"/>
+      <img id="homeDuoParfumImg" src="assets/Parfum/arabian-nights.jpg" alt="HEEZE 94 Parfum collection — coming soon" loading="lazy"/>
       <span class="duo-shade"></span>
       <span class="duo-copy"><span class="eyebrow">Coming Soon</span><strong>Parfum</strong><span class="duo-sub">Arabian Knights · Al Durrah</span><span class="duo-cta">Preview the house →</span></span>
     </a>
@@ -591,7 +591,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
 
 <section class="split">
   <div class="split-media split-swap">
-    <img class="swap-a" src="assets/Attar/attar-hero-1.jpg" alt="HEEZE 94 attar"/>
+    <img class="swap-a" id="homeJournalImg" src="assets/Attar/attar-hero-1.jpg" alt="HEEZE 94 attar"/>
     <img class="swap-b" src="assets/Parfum/al-durrah-2.jpg" alt="HEEZE 94 parfum"/>
   </div>
   <div class="split-copy"><div class="inner reveal">
@@ -733,7 +733,7 @@ const DEFAULT = [
 const SANITY_PROJECT_ID='3v9zb964', SANITY_DATASET='production';
 async function syncSanityProductContent(){
   try{
-    const query=encodeURIComponent(`*[_type=="productContent"]{productSlug,status,shortDescription,"heroUrl":heroImage.asset->url}`);
+    const query=encodeURIComponent(`*[_type=="productContent"]{productSlug,status,shortDescription,"heroUrl":heroImage.asset->url,"galleryUrls":gallery[].asset->url}`);
     const url=`https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=${query}`;
     const res=await fetch(url);
     if(!res.ok) return;
@@ -927,7 +927,7 @@ function initFilters(){
 /* ── Sanity CMS: Home Page content ── */
 async function loadHomePageFromSanity(){
   try{
-    const query=encodeURIComponent(`*[_type=="homePage"][0]{heroEyebrow,heroSubtext,duoSection,journalSection,fourIdeas,bespokeTeaser}`);
+    const query=encodeURIComponent(`*[_type=="homePage"][0]{heroEyebrow,heroSubtext,"heroImageUrl":heroImage.asset->url,duoSection{eyebrow,headline,body,"attarImageUrl":attarImage.asset->url,"parfumImageUrl":parfumImage.asset->url},journalSection{headline,body,quote,"imageUrl":image.asset->url},fourIdeas,bespokeTeaser}`);
     const url=`https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=${query}`;
     const res=await fetch(url);
     if(!res.ok) return;
@@ -936,16 +936,20 @@ async function loadHomePageFromSanity(){
 
     if(result.heroEyebrow) document.getElementById('homeHeroEyebrow').textContent=result.heroEyebrow;
     if(result.heroSubtext) document.getElementById('homeHeroLead').textContent=result.heroSubtext;
+    if(result.heroImageUrl){ const v=document.getElementById('heroVideo'); if(v) v.poster=result.heroImageUrl; }
 
     if(result.duoSection){
       if(result.duoSection.eyebrow) document.getElementById('homeDuoEyebrow').textContent=result.duoSection.eyebrow;
       if(result.duoSection.headline) document.getElementById('homeDuoHeadline').textContent=result.duoSection.headline;
+      if(result.duoSection.attarImageUrl){ const img=document.getElementById('homeDuoAttarImg'); if(img) img.src=result.duoSection.attarImageUrl; }
+      if(result.duoSection.parfumImageUrl){ const img=document.getElementById('homeDuoParfumImg'); if(img) img.src=result.duoSection.parfumImageUrl; }
     }
 
     if(result.journalSection){
       if(result.journalSection.headline) document.getElementById('homeJournalHeadline').textContent=result.journalSection.headline;
       if(result.journalSection.body) document.getElementById('homeJournalBody').textContent=result.journalSection.body;
       if(result.journalSection.quote) document.getElementById('homeJournalQuote').textContent=`"${result.journalSection.quote}"`;
+      if(result.journalSection.imageUrl){ const img=document.getElementById('homeJournalImg'); if(img) img.src=result.journalSection.imageUrl; }
     }
 
     if(Array.isArray(result.fourIdeas)){

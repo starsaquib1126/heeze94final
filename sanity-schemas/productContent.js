@@ -13,6 +13,21 @@ export default {
       description: 'e.g. black-oud, golden-oud, rose-musk, arabian-nights, al-durrah',
       validation: R => R.required()
     },
+    {
+      name: 'status', title: 'Status', type: 'string',
+      description: 'Controls how this product appears on the live site.',
+      options: {
+        list: [
+          { title: 'Active — buyable now', value: 'active' },
+          { title: 'Coming Soon — shown, no purchase', value: 'coming_soon' },
+          { title: 'Sold Out — shown, disabled', value: 'sold_out' },
+          { title: 'Hidden — not shown on site', value: 'hidden' }
+        ],
+        layout: 'radio'
+      },
+      initialValue: 'active',
+      validation: R => R.required()
+    },
     { name: 'displayName', title: 'Display Name', type: 'string' },
     { name: 'shortDescription', title: 'Short Description (used in listings)', type: 'text', rows: 2 },
     { name: 'fullDescription', title: 'Full Description (used on product detail page)', type: 'array', of: [{ type: 'block' }] },

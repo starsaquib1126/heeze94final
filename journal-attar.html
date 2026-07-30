@@ -804,7 +804,7 @@ const DEFAULT = [
 const SANITY_PROJECT_ID='3v9zb964', SANITY_DATASET='production';
 async function syncSanityProductContent(){
   try{
-    const query=encodeURIComponent(`*[_type=="productContent"]{productSlug,status,shortDescription,"heroUrl":heroImage.asset->url}`);
+    const query=encodeURIComponent(`*[_type=="productContent"]{productSlug,status,shortDescription,"heroUrl":heroImage.asset->url,"galleryUrls":gallery[].asset->url}`);
     const url=`https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=${query}`;
     const res=await fetch(url);
     if(!res.ok) return;

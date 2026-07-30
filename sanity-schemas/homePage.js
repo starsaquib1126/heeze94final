@@ -7,12 +7,15 @@ export default {
     { name: 'heroEyebrow', title: 'Hero Eyebrow Text', type: 'string' },
     { name: 'heroHeadline', title: 'Hero Headline', type: 'string' },
     { name: 'heroSubtext', title: 'Hero Subtext (below headline)', type: 'text', rows: 3 },
+    { name: 'heroImage', title: 'Hero Background Image', type: 'image', options: { hotspot: true } },
     {
       name: 'duoSection', title: 'One House, Two Expressions Section', type: 'object',
       fields: [
         { name: 'eyebrow', type: 'string', title: 'Eyebrow' },
         { name: 'headline', type: 'string', title: 'Headline' },
-        { name: 'body', type: 'text', title: 'Body Text', rows: 3 }
+        { name: 'body', type: 'text', title: 'Body Text', rows: 3 },
+        { name: 'attarImage', title: 'Attar Card Image', type: 'image', options: { hotspot: true } },
+        { name: 'parfumImage', title: 'Parfum Card Image', type: 'image', options: { hotspot: true } }
       ]
     },
     {
@@ -20,7 +23,8 @@ export default {
       fields: [
         { name: 'headline', type: 'string', title: 'Headline' },
         { name: 'body', type: 'text', title: 'Body Text', rows: 3 },
-        { name: 'quote', type: 'string', title: 'Pull Quote' }
+        { name: 'quote', type: 'string', title: 'Pull Quote' },
+        { name: 'image', title: 'Section Image', type: 'image', options: { hotspot: true } }
       ]
     },
     {
