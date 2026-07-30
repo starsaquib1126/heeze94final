@@ -243,6 +243,9 @@ body:not(.gate-active) .gateway{display:none}
 .product-card:hover{transform:translateY(-8px);border-color:rgba(233,190,90,.42);
   box-shadow:0 28px 64px -20px rgba(0,0,0,.9),0 0 48px -20px rgba(233,190,90,.2)}
 .product-img-wrap{aspect-ratio:4/3;overflow:hidden;position:relative}
+.discount-ribbon{position:absolute;top:12px;left:12px;z-index:2;background:var(--gold);color:#1a1208;
+  font-size:.68rem;font-weight:700;letter-spacing:.06em;padding:5px 10px;border-radius:3px;
+  text-transform:uppercase;box-shadow:0 2px 8px rgba(0,0,0,.35)}
 .product-img-wrap img{width:100%;height:100%;object-fit:cover;
   transition:transform .7s cubic-bezier(.19,1,.22,1),filter .7s;filter:saturate(.7)}
 .product-card:hover .product-img-wrap img{transform:scale(1.06);filter:saturate(.95)}
@@ -784,17 +787,17 @@ const DEFAULT = [
     img:'assets/Attar/black-oud.jpg',
     desc:'The most intense expression of the house. Opens with dark smoked agarwood, settling into a leathered resin warmth that stays close to the skin for hours.',
     notes:{Top:'Smoked agarwood',Heart:'Dark resin, leather accord',Base:'Deep woods, warm musk'},
-    sizes:[{ml:3,price:499},{ml:6,price:899},{ml:12,price:1499}]},
+    sizes:[{ml:3,price:499},{ml:6,price:899},{ml:12,price:1499}],compareAt:null},
   { id:'golden-oud', name:'Golden Oud', family:'Oud · Amber', featured:true, category:'oud',
     img:'assets/Attar/golden-oud.jpg',
     desc:'Oud in its most luminous form. Radiant agarwood with golden amber and a trace of saffron honey — regal, warm and unmistakably HEEZE 94.',
     notes:{Top:'Saffron, golden honey',Heart:'Radiant oud',Base:'Golden amber, soft woods'},
-    sizes:[{ml:3,price:499},{ml:6,price:899},{ml:12,price:1499}]},
+    sizes:[{ml:3,price:499},{ml:6,price:899},{ml:12,price:1499}],compareAt:null},
   { id:'rose-musk', name:'Rose Musk', family:'Floral · Musk', featured:true, category:'musk',
     img:'assets/Attar/rose-musk.jpg',
     desc:'A romance in oil form. Velvet rose petals wrapped in soft white musk — tender at first, then quietly magnetic on the skin.',
     notes:{Top:'Fresh rose petals',Heart:'Velvet damask rose',Base:'Soft white musk'},
-    sizes:[{ml:3,price:399},{ml:6,price:749},{ml:12,price:1299}]}
+    sizes:[{ml:3,price:399},{ml:6,price:749},{ml:12,price:1299}],compareAt:null}
 ];
 
 /* ── Sanity CMS: merge product descriptions/images/status into the catalog ── */
@@ -913,6 +916,7 @@ function renderGrid(container,opts={}){
   container.innerHTML=products.map(p=>`
     <article class="product-card" onclick="location.href='product.html?id=${p.id}'" tabindex="0">
       <div class="product-img-wrap">
+        ${(()=>{const cheapest=Math.min(...p.sizes.map(s=>s.price));return p.compareAt && p.compareAt>cheapest ? `<div class="discount-ribbon">-${Math.round((1-cheapest/p.compareAt)*100)}% OFF</div>` : '';})()}
         <img src="${p.img}" alt="${p.name} attar" loading="lazy"/>
       </div>
       <div class="product-info">

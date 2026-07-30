@@ -212,7 +212,10 @@ body:not(.gate-open) .gateway{display:none}
   cursor:pointer;overflow:hidden;transition:.55s cubic-bezier(.19,1,.22,1);display:block;text-decoration:none}
 .pcard:hover{transform:translateY(-8px);border-color:rgba(233,190,90,.42);
   box-shadow:0 28px 60px -20px rgba(0,0,0,.95),0 0 44px -18px rgba(233,190,90,.2)}
-.pcard-img{aspect-ratio:4/3;overflow:hidden}
+.pcard-img{aspect-ratio:4/3;overflow:hidden;position:relative}
+.discount-ribbon{position:absolute;top:12px;left:12px;z-index:2;background:var(--gold);color:#1a1208;
+  font-size:.68rem;font-weight:700;letter-spacing:.06em;padding:5px 10px;border-radius:3px;
+  text-transform:uppercase;box-shadow:0 2px 8px rgba(0,0,0,.35)}
 .pcard-img img{width:100%;height:100%;object-fit:cover;filter:saturate(.7);transition:.7s cubic-bezier(.19,1,.22,1)}
 .pcard:hover .pcard-img img{transform:scale(1.06);filter:saturate(.95)}
 .pcard-body{padding:22px 24px 28px}
@@ -545,6 +548,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
       <div class="ey" style="margin-bottom:12px">Select Size</div>
       <div class="sz-row" id="szRow"></div>
       <div class="pd-buy">
+        <span class="pd-price-was" id="pdPriceWas" style="color:var(--muted);text-decoration:line-through;font-size:.85rem;margin-right:8px"></span>
         <span class="pd-price" id="pdPrice"></span>
         <div class="qty">
           <button onclick="adjQty(-1)">−</button>
@@ -680,17 +684,17 @@ const DEF=[
    img:'assets/Attar/black-oud.jpg',
    desc:'The most intense expression of the house. Opens with dark smoked agarwood, settling into a leathered warmth that stays close to the skin for hours.',
    notes:{Top:'Smoked agarwood',Heart:'Dark resin, leather accord',Base:'Deep woods, warm musk'},
-   sizes:[{ml:3,price:499},{ml:6,price:899},{ml:12,price:1499}]},
+   sizes:[{ml:3,price:499},{ml:6,price:899},{ml:12,price:1499}],compareAt:null},
   {id:'golden-oud', name:'Golden Oud', family:'Oud · Amber', cat:'oud', featured:true,
    img:'assets/Attar/golden-oud.jpg',
    desc:'Oud in its most luminous form. Radiant agarwood with golden amber and a trace of saffron honey — regal, warm, unmistakably HEEZE 94.',
    notes:{Top:'Saffron, golden honey',Heart:'Radiant oud',Base:'Golden amber, soft woods'},
-   sizes:[{ml:3,price:499},{ml:6,price:899},{ml:12,price:1499}]},
+   sizes:[{ml:3,price:499},{ml:6,price:899},{ml:12,price:1499}],compareAt:null},
   {id:'rose-musk', name:'Rose Musk', family:'Floral · Musk', cat:'musk', featured:true,
    img:'assets/Attar/rose-musk.jpg',
    desc:'A romance in oil form. Velvet rose petals wrapped in soft white musk — tender at first, then quietly magnetic on the skin.',
    notes:{Top:'Fresh rose petals',Heart:'Velvet damask rose',Base:'Soft white musk'},
-   sizes:[{ml:3,price:399},{ml:6,price:749},{ml:12,price:1299}]}
+   sizes:[{ml:3,price:399},{ml:6,price:749},{ml:12,price:1299}],compareAt:null}
 ];
 const cat=()=>{try{const s=localStorage.getItem('h94c');return s?JSON.parse(s):DEF;}catch(e){return DEF;}};
 const saveCat=c=>localStorage.setItem('h94c',JSON.stringify(c));
@@ -777,7 +781,7 @@ function renderGrid(el,opts={}){
   if(!prods.length){el.innerHTML='<p style="color:var(--muted);padding:40px 0;text-align:center;font-style:italic">No fragrances found.</p>';return;}
   el.innerHTML=prods.map(p=>`
     <a class="pcard" href="product.html?id=${p.id}">
-      <div class="pcard-img"><img src="${p.img}" alt="${p.name}" loading="lazy"/></div>
+      <div class="pcard-img">${(()=>{const cheapest=minPrice(p);return p.compareAt && p.compareAt>cheapest ? `<div class="discount-ribbon">-${Math.round((1-cheapest/p.compareAt)*100)}% OFF</div>` : '';})()}<img src="${p.img}" alt="${p.name}" loading="lazy"/></div>
       <div class="pcard-body">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <div class="ey">${p.family}</div>
@@ -1153,6 +1157,7 @@ function selSize(ml){
   const p=H94.cat().find(x=>x.id===curId);
   const s=p&&p.sizes.find(x=>x.ml===ml);
   document.getElementById('pdPrice').textContent=s?H94.fmt(s.price):'';
+  document.getElementById('pdPriceWas').textContent=(p&&p.compareAt&&s&&p.compareAt>s.price)?H94.fmt(p.compareAt):'';
   document.querySelectorAll('.sz-opt').forEach(b=>b.classList.toggle('on',+b.dataset.ml===ml));
 }
 document.addEventListener('DOMContentLoaded',async()=>{
@@ -1181,6 +1186,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
       <span class="ml">${s.ml} ml</span><span class="sp">${H94.fmt(s.price)}</span>
     </button>`).join('');
   document.getElementById('pdPrice').textContent=H94.fmt(defSz.price);
+  document.getElementById('pdPriceWas').textContent=(p.compareAt&&p.compareAt>defSz.price)?H94.fmt(p.compareAt):'';
 });
 </script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></body></html>
