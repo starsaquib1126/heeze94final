@@ -706,17 +706,17 @@ const DEFAULT = [
     img:'assets/Attar/black-oud.jpg',
     desc:'The most intense expression of the house. Opens with dark smoked agarwood, settling into a leathered resin warmth that stays close to the skin for hours.',
     notes:{Top:'Smoked agarwood',Heart:'Dark resin, leather accord',Base:'Deep woods, warm musk'},
-    sizes:[{ml:3,price:499},{ml:6,price:899},{ml:12,price:1499}],compareAt:null},
+    sizes:[{ml:3,price:1149},{ml:6,price:1999},{ml:12,price:2999}],compareAt:null},
   { id:'golden-oud', name:'Golden Oud', family:'Oud · Amber', featured:true, category:'oud',
     img:'assets/Attar/golden-oud.jpg',
     desc:'Oud in its most luminous form. Radiant agarwood with golden amber and a trace of saffron honey — regal, warm and unmistakably HEEZE 94.',
     notes:{Top:'Saffron, golden honey',Heart:'Radiant oud',Base:'Golden amber, soft woods'},
-    sizes:[{ml:3,price:499},{ml:6,price:899},{ml:12,price:1499}],compareAt:null},
+    sizes:[{ml:3,price:899},{ml:6,price:1199},{ml:12,price:2149}],compareAt:null},
   { id:'rose-musk', name:'Rose Musk', family:'Floral · Musk', featured:true, category:'musk',
     img:'assets/Attar/rose-musk.jpg',
     desc:'A romance in oil form. Velvet rose petals wrapped in soft white musk — tender at first, then quietly magnetic on the skin.',
     notes:{Top:'Fresh rose petals',Heart:'Velvet damask rose',Base:'Soft white musk'},
-    sizes:[{ml:3,price:399},{ml:6,price:749},{ml:12,price:1299}],compareAt:null}
+    sizes:[{ml:3,price:899},{ml:6,price:1199},{ml:12,price:2059}],compareAt:null}
 ];
 
 /* ── Sanity CMS: merge product descriptions/images/status into the catalog ── */
@@ -744,6 +744,26 @@ async function syncSanityProductContent(){
   }catch(e){
     console.error('Sanity product sync error:',e);
     // Keep showing the existing hardcoded catalog if Sanity is unreachable
+  }
+}
+
+/* ── Live pricing/stock from Supabase (source of truth for checkout) ── */
+async function syncSupabaseLivePricing(){
+  try{
+    const res=await fetch('/api/products');
+    if(!res.ok) return;
+    const live=await res.json();
+    if(!Array.isArray(live)) return;
+    live.forEach(entry=>{
+      const item=DEFAULT.find(p=>p.id===entry.id);
+      if(!item) return;
+      if(Array.isArray(entry.sizes) && entry.sizes.length){
+        item.sizes=entry.sizes.map(s=>({ml:s.ml, price:s.price, variantId:s.variantId, stock:s.stock}));
+      }
+    });
+  }catch(e){
+    console.error('Live pricing sync error:',e);
+    // Keep showing the existing hardcoded prices if this fails
   }
 }
 
@@ -915,6 +935,7 @@ function initFilters(){
 document.addEventListener('DOMContentLoaded',async()=>{
   await initGeoCurrency();
   await syncSanityProductContent();
+  await syncSupabaseLivePricing();
   initYear();initReveals();initMenu();initTicker();initFilters();initVideos();
   document.querySelectorAll('[data-product-grid]').forEach(el=>{
     renderGrid(el,{

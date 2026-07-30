@@ -690,17 +690,17 @@ const DEF=[
    img:'assets/Attar/black-oud.jpg',
    desc:'The most intense expression of the house. Opens with dark smoked agarwood, settling into a leathered warmth that stays close to the skin for hours.',
    notes:{Top:'Smoked agarwood',Heart:'Dark resin, leather accord',Base:'Deep woods, warm musk'},
-   sizes:[{ml:3,price:499},{ml:6,price:899},{ml:12,price:1499}],compareAt:null},
+   sizes:[{ml:3,price:1149},{ml:6,price:1999},{ml:12,price:2999}],compareAt:null},
   {id:'golden-oud', name:'Golden Oud', family:'Oud · Amber', cat:'oud', featured:true,
    img:'assets/Attar/golden-oud.jpg',
    desc:'Oud in its most luminous form. Radiant agarwood with golden amber and a trace of saffron honey — regal, warm, unmistakably HEEZE 94.',
    notes:{Top:'Saffron, golden honey',Heart:'Radiant oud',Base:'Golden amber, soft woods'},
-   sizes:[{ml:3,price:499},{ml:6,price:899},{ml:12,price:1499}],compareAt:null},
+   sizes:[{ml:3,price:899},{ml:6,price:1199},{ml:12,price:2149}],compareAt:null},
   {id:'rose-musk', name:'Rose Musk', family:'Floral · Musk', cat:'musk', featured:true,
    img:'assets/Attar/rose-musk.jpg',
    desc:'A romance in oil form. Velvet rose petals wrapped in soft white musk — tender at first, then quietly magnetic on the skin.',
    notes:{Top:'Fresh rose petals',Heart:'Velvet damask rose',Base:'Soft white musk'},
-   sizes:[{ml:3,price:399},{ml:6,price:749},{ml:12,price:1299}],compareAt:null}
+   sizes:[{ml:3,price:899},{ml:6,price:1199},{ml:12,price:2059}],compareAt:null}
 ];
 const cat=()=>{try{const s=localStorage.getItem('h94c');return s?JSON.parse(s):DEF;}catch(e){return DEF;}};
 const saveCat=c=>localStorage.setItem('h94c',JSON.stringify(c));
@@ -729,6 +729,25 @@ async function syncSanityProductContent(){
     }
   }catch(e){
     console.error('Sanity product sync error:',e);
+  }
+}
+
+/* ── Live pricing/stock from Supabase (source of truth for checkout) ── */
+async function syncSupabaseLivePricing(){
+  try{
+    const res=await fetch('/api/products');
+    if(!res.ok) return;
+    const live=await res.json();
+    if(!Array.isArray(live)) return;
+    live.forEach(entry=>{
+      const item=DEF.find(p=>p.id===entry.id);
+      if(!item) return;
+      if(Array.isArray(entry.sizes) && entry.sizes.length){
+        item.sizes=entry.sizes.map(s=>({ml:s.ml, price:s.price, variantId:s.variantId, stock:s.stock}));
+      }
+    });
+  }catch(e){
+    console.error('Live pricing sync error:',e);
   }
 }
 
@@ -837,6 +856,7 @@ function initVideo(){
 document.addEventListener('DOMContentLoaded',async()=>{
   await window.__geoReady;
   await syncSanityProductContent();
+  await syncSupabaseLivePricing();
   initYear();initReveals();initMenu();initTicker();initFilters();initNav();initVideo();
   document.querySelectorAll('[data-pg]').forEach(el=>{
     renderGrid(el,{featured:el.dataset.feat==='1',limit:el.dataset.lim,cat:el.dataset.cat});
@@ -1108,7 +1128,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   });
   renderCart();
 });
-return{addToCart,cq:changeQty,openCart,closeCart,cat,saveCat,fmt,showToast,renderGrid,syncSanityProductContent};
+return{addToCart,cq:changeQty,openCart,closeCart,cat,saveCat,fmt,showToast,renderGrid,syncSanityProductContent,syncSupabaseLivePricing};
 })();
 </script><script>
 (()=>{
@@ -1203,6 +1223,7 @@ function selSize(ml){
 document.addEventListener('DOMContentLoaded',async()=>{
   await window.__geoReady;
   await H94.syncSanityProductContent();
+  await H94.syncSupabaseLivePricing();
   const id=new URLSearchParams(location.search).get('id');
   curId=id;
   const p=H94.cat().find(x=>x.id===id);
