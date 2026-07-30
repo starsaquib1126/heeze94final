@@ -1159,23 +1159,38 @@ return'I would be glad to guide you. Could you tell me the kinds of scents you a
 let curId=null,curMl=null,curQty=1;
 function adjQty(d){curQty=Math.max(1,curQty+d);document.getElementById('qtyVal').textContent=curQty;}
 function addPD(){if(!curId||!curMl)return;H94.addToCart(curId,curMl,curQty);}
+let galleryTimer=null;
 function renderGalleryThumbs(p){
   const wrap=document.getElementById('pdThumbs');
   const mainImg=document.getElementById('pdImg');
   if(!wrap||!mainImg) return;
+  if(galleryTimer){ clearInterval(galleryTimer); galleryTimer=null; }
   const photos=[p.img, ...(Array.isArray(p.gallery)?p.gallery:[])];
   if(photos.length<2){ wrap.style.display='none'; wrap.innerHTML=''; return; }
   wrap.style.display='flex';
   wrap.innerHTML=photos.map((url,i)=>
     `<div class="pd-thumb${i===0?' on':''}" data-thumb="${i}"><img src="${url}" alt="View ${i+1}"/></div>`
   ).join('');
+  let activeIdx=0;
+  const goTo=(i)=>{
+    activeIdx=i;
+    mainImg.style.opacity='0';
+    setTimeout(()=>{ mainImg.src=photos[i]; mainImg.style.opacity='1'; },150);
+    wrap.querySelectorAll('.pd-thumb').forEach(x=>x.classList.remove('on'));
+    wrap.querySelector(`[data-thumb="${i}"]`)?.classList.add('on');
+  };
+  const startAutoRotate=()=>{
+    if(galleryTimer) clearInterval(galleryTimer);
+    galleryTimer=setInterval(()=>{ goTo((activeIdx+1)%photos.length); }, 4000);
+  };
   wrap.querySelectorAll('.pd-thumb').forEach(t=>{
     t.addEventListener('click',()=>{
-      mainImg.src=photos[+t.dataset.thumb];
-      wrap.querySelectorAll('.pd-thumb').forEach(x=>x.classList.remove('on'));
-      t.classList.add('on');
+      goTo(+t.dataset.thumb);
+      startAutoRotate(); // resume rotation from the newly chosen photo
     });
   });
+  mainImg.style.transition='opacity .3s ease';
+  startAutoRotate();
 }
 function selSize(ml){
   curMl=ml;
