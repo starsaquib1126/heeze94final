@@ -355,6 +355,11 @@ body:not(.gate-active) .gateway{display:none}
   background:linear-gradient(transparent,rgba(6,5,4,.85));text-align:center}
 .parfum-card-label strong{display:block;font-family:'Marcellus',serif;font-size:1.1rem;letter-spacing:.2em;color:var(--champagne)}
 .parfum-card-label span{font-size:.64rem;letter-spacing:.34em;text-transform:uppercase;color:var(--gold-deep)}
+.parfum-card.is-active{cursor:pointer}
+.parfum-card.is-active img{filter:saturate(.85);opacity:1}
+.parfum-card.is-active:hover img{filter:saturate(1);transform:scale(1.03)}
+.parfum-card.is-active .parfum-card-label{text-align:left}
+.parfum-card-price{display:block;font-size:.85rem;color:var(--gold);margin-top:6px;letter-spacing:.04em}
 
 /* ══════════════════════════════════════════════════════════
    VALUES / CRAFT
@@ -590,7 +595,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
     <div><div class="eyebrow">A Preview</div><h2>Forms yet to be revealed.</h2></div>
     <p>The parfum collection is intentionally obscured until every detail is right.</p>
   </div>
-  <div class="parfum-cards">
+  <div class="parfum-cards" data-parfum-cards>
     <div class="parfum-card"><img src="assets/images/parfum-al-durrah-pink-preview.jpg" alt="Al-Durrah — coming soon" loading="lazy"/><div class="parfum-card-label"><span>Coming Soon</span><strong>Al-Durrah</strong></div></div>
     <div class="parfum-card"><img src="assets/images/parfum-arabian-knights-preview.jpg" alt="Arabian Knights — coming soon" loading="lazy"/><div class="parfum-card-label"><span>Coming Soon</span><strong>Arabian Knights</strong></div></div>
     <div class="parfum-card" style="display:flex;align-items:center;justify-content:center;background:var(--panel);border:1px solid var(--hairline);aspect-ratio:3/4"><div style="text-align:center;padding:24px"><div class="eyebrow">And More</div><p style="color:var(--muted);margin-top:12px;font-size:.9rem">Further expressions are in development. Contact the house to be first to know.</p></div></div>
@@ -903,6 +908,32 @@ function initVideos(){
 }
 
 /* ── Filters ── */
+function renderParfumCards(){
+  const wrap=document.querySelector('[data-parfum-cards]');
+  if(!wrap) return;
+  const parfums=DEFAULT.filter(p=>p.category==='parfum');
+  if(!parfums.length) return; // keep the existing hardcoded "coming soon" cards as-is
+
+  const cardsHtml=parfums.map(p=>{
+    if(p.status==='active' && p.sizes.length){
+      const cheapest=Math.min(...p.sizes.map(s=>s.price));
+      return `<div class="parfum-card is-active" onclick="location.href='product.html?id=${p.id}'">
+        <img src="${p.img}" alt="${p.name}" loading="lazy"/>
+        <div class="parfum-card-label"><span>Now Available</span><strong>${p.name}</strong><span class="parfum-card-price">From ${fmt(cheapest)}</span></div>
+      </div>`;
+    }
+    // coming_soon / sold_out / anything else — same mysterious blurred treatment as before
+    return `<div class="parfum-card">
+      <img src="${p.img}" alt="${p.name} — coming soon" loading="lazy"/>
+      <div class="parfum-card-label"><span>${p.status==='sold_out'?'Sold Out':'Coming Soon'}</span><strong>${p.name}</strong></div>
+    </div>`;
+  }).join('');
+
+  const moreCard = `<div class="parfum-card" style="display:flex;align-items:center;justify-content:center;background:var(--panel);border:1px solid var(--hairline);aspect-ratio:3/4"><div style="text-align:center;padding:24px"><div class="eyebrow">And More</div><p style="color:var(--muted);margin-top:12px;font-size:.9rem">Further expressions are in development. Contact the house to be first to know.</p></div></div>`;
+
+  wrap.innerHTML = cardsHtml + moreCard;
+}
+
 function initFilters(){
   document.querySelectorAll('.filter').forEach(btn=>{
     btn.addEventListener('click',()=>{
@@ -921,6 +952,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   await initGeoCurrency();
   await loadProductsFromSupabase();
   await syncSanityProductContent();
+  renderParfumCards();
   initYear();initReveals();initMenu();initTicker();initFilters();initVideos();
   document.querySelectorAll('[data-product-grid]').forEach(el=>{
     renderGrid(el,{
