@@ -732,25 +732,32 @@ async function syncSanityProductContent(){
   }
 }
 
-/* ── Live pricing/stock from Supabase (source of truth for checkout) ── */
-async function syncSupabaseLivePricing(){
+/* ── Live product list from Supabase (single source of truth) ── */
+async function loadProductsFromSupabase(){
   try{
     const res=await fetch('/api/products');
     if(!res.ok) return;
     const live=await res.json();
-    if(!Array.isArray(live)) return;
-    live.forEach(entry=>{
-      const item=DEF.find(p=>p.id===entry.id);
-      if(!item) return;
-      if(Array.isArray(entry.sizes) && entry.sizes.length){
-        item.sizes=entry.sizes.map(s=>({ml:s.ml, price:s.price, variantId:s.variantId, stock:s.stock}));
-        const cheapest=item.sizes.reduce((a,b)=>a.price<b.price?a:b);
-        const matching=entry.sizes.find(s=>s.ml===cheapest.ml);
-        item.compareAt=(matching && matching.compareAt) ? matching.compareAt : null;
-      }
+    if(!Array.isArray(live) || !live.length) return; // keep hardcoded fallback if this fails
+    DEF.length=0;
+    live.forEach(p=>{
+      const cheapest = p.sizes.length ? p.sizes.reduce((a,b)=>a.price<b.price?a:b) : null;
+      DEF.push({
+        id: p.id,
+        name: p.name,
+        family: p.family || '',
+        category: p.category,
+        featured: true,
+        status: p.status,
+        img: p.img,
+        desc: p.desc,
+        notes: p.notes || {},
+        sizes: p.sizes.map(s=>({ml:s.ml, price:s.price, variantId:s.variantId, stock:s.stock})),
+        compareAt: cheapest && cheapest.compareAt ? cheapest.compareAt : null
+      });
     });
   }catch(e){
-    console.error('Live pricing sync error:',e);
+    console.error('Product load error:',e);
   }
 }
 
@@ -858,8 +865,8 @@ function initVideo(){
 }
 document.addEventListener('DOMContentLoaded',async()=>{
   await window.__geoReady;
+  await loadProductsFromSupabase();
   await syncSanityProductContent();
-  await syncSupabaseLivePricing();
   initYear();initReveals();initMenu();initTicker();initFilters();initNav();initVideo();
   document.querySelectorAll('[data-pg]').forEach(el=>{
     renderGrid(el,{featured:el.dataset.feat==='1',limit:el.dataset.lim,cat:el.dataset.cat});
@@ -1131,7 +1138,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   });
   renderCart();
 });
-return{addToCart,cq:changeQty,openCart,closeCart,cat,saveCat,fmt,showToast,renderGrid,syncSanityProductContent,syncSupabaseLivePricing};
+return{addToCart,cq:changeQty,openCart,closeCart,cat,saveCat,fmt,showToast,renderGrid,syncSanityProductContent,loadProductsFromSupabase};
 })();
 </script><script>
 (()=>{
@@ -1225,8 +1232,8 @@ function selSize(ml){
 }
 document.addEventListener('DOMContentLoaded',async()=>{
   await window.__geoReady;
+  await H94.loadProductsFromSupabase();
   await H94.syncSanityProductContent();
-  await H94.syncSupabaseLivePricing();
   const id=new URLSearchParams(location.search).get('id');
   curId=id;
   const p=H94.cat().find(x=>x.id===id);

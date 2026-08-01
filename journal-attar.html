@@ -828,26 +828,32 @@ async function syncSanityProductContent(){
   }
 }
 
-/* ── Live pricing/stock from Supabase (source of truth for checkout) ── */
-async function syncSupabaseLivePricing(){
+async function loadProductsFromSupabase(){
   try{
     const res=await fetch('/api/products');
     if(!res.ok) return;
     const live=await res.json();
-    if(!Array.isArray(live)) return;
-    live.forEach(entry=>{
-      const item=DEFAULT.find(p=>p.id===entry.id);
-      if(!item) return;
-      if(Array.isArray(entry.sizes) && entry.sizes.length){
-        item.sizes=entry.sizes.map(s=>({ml:s.ml, price:s.price, variantId:s.variantId, stock:s.stock}));
-        const cheapest=item.sizes.reduce((a,b)=>a.price<b.price?a:b);
-        const matching=entry.sizes.find(s=>s.ml===cheapest.ml);
-        item.compareAt=(matching && matching.compareAt) ? matching.compareAt : null;
-      }
+    if(!Array.isArray(live) || !live.length) return; // keep hardcoded fallback if this fails
+    DEFAULT.length=0;
+    live.forEach(p=>{
+      const cheapest = p.sizes.length ? p.sizes.reduce((a,b)=>a.price<b.price?a:b) : null;
+      DEFAULT.push({
+        id: p.id,
+        name: p.name,
+        family: p.family || '',
+        category: p.category,
+        featured: true,
+        status: p.status,
+        img: p.img,
+        desc: p.desc,
+        notes: p.notes || {},
+        sizes: p.sizes.map(s=>({ml:s.ml, price:s.price, variantId:s.variantId, stock:s.stock})),
+        compareAt: cheapest && cheapest.compareAt ? cheapest.compareAt : null
+      });
     });
   }catch(e){
-    console.error('Live pricing sync error:',e);
-    // Keep showing the existing hardcoded prices if this fails
+    console.error('Product load error:',e);
+    // Keep the hardcoded fallback catalog if this fails entirely
   }
 }
 
@@ -1018,8 +1024,8 @@ function initFilters(){
 /* ── DOMContentLoaded init ── */
 document.addEventListener('DOMContentLoaded',async()=>{
   await initGeoCurrency();
+  await loadProductsFromSupabase();
   await syncSanityProductContent();
-  await syncSupabaseLivePricing();
   initYear();initReveals();initMenu();initTicker();initFilters();initVideos();
   document.querySelectorAll('[data-product-grid]').forEach(el=>{
     renderGrid(el,{

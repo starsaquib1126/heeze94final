@@ -1,6 +1,9 @@
 // GET /api/products
-// Returns all visible products with their sizes/prices, read live from Supabase.
-// This will eventually replace the hardcoded product list in the site's HTML.
+// Returns all visible products with their full display data (name, family,
+// notes, description, image) and live sizes/prices/discounts — read entirely
+// from Supabase. This is now the SINGLE SOURCE OF TRUTH for which products
+// exist on the site: adding a row here means the product appears on the
+// live site immediately, with no website code changes needed.
 
 import { createClient } from '@supabase/supabase-js';
 
@@ -17,7 +20,7 @@ export default async function handler(req, res) {
   const { data: products, error } = await supabase
     .from('products')
     .select(`
-      id, slug, name, category, description, status, image_url,
+      id, slug, name, category, family, description, status, image_url, notes,
       product_variants ( id, size_ml, price, compare_at_price, stock )
     `)
     .neq('status', 'hidden')
@@ -32,9 +35,11 @@ export default async function handler(req, res) {
     id: p.slug,
     name: p.name,
     category: p.category,
+    family: p.family || '',
     status: p.status,
     desc: p.description,
     img: p.image_url,
+    notes: p.notes || {},
     sizes: p.product_variants
       .map(v => ({
         variantId: v.id,
