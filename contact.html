@@ -491,7 +491,7 @@ body.cart-open .cart-drawer{transform:none}
 .footer-col a:hover{color:var(--gold)}
 .footer-bottom{border-top:1px solid var(--hairline);padding-top:22px;
   display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
-.footer-bottom span{font-size:.68rem;color:var(--dim);letter-spacing:.08em}
+.footer-bottom span{font-size:.68rem;color:var(--muted);letter-spacing:.08em;font-weight:600}
 
 /* ══════════════════════════════════════════════════════════
    REVEALS
@@ -548,8 +548,8 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
 .promo-msg.ok{color:#8FD19E}
 .promo-msg.err{color:#E08585}
 </style></head><body class=""><header class="site-header"><div class="container"><nav class="nav">
-<a class="brand" href="index.html"><img src="assets/brand/logo-new.png" alt="HEEZE 94" height="52"/></a>
-<div class="nav-links"><a href="index.html">Home</a><a href="house.html">The House</a><a href="collection.html">Attar</a><a href="parfums.html">Parfum</a><a href="craftsmanship.html">Craftsmanship</a><a href="bespoke.html">Build Your Own</a><a href="journal.html">Journal</a><a href="contact.html" class='active'>Contact</a></div>
+<a class="brand" href="index"><img src="assets/brand/logo-new.png" alt="HEEZE 94" height="52"/></a>
+<div class="nav-links"><a href="index">Home</a><a href="house">The House</a><a href="collection">Attar</a><a href="parfums">Parfum</a><a href="craftsmanship">Craftsmanship</a><a href="bespoke">Build Your Own</a><a href="journal">Journal</a><a href="contact" class='active'>Contact</a></div>
 <div class="nav-actions">
   <button class="icon-btn" data-search-btn aria-label="Search">
     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -563,7 +563,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
   </button>
   <button class="icon-btn menu-toggle" aria-label="Open menu"><svg viewBox="0 0 24 24"><path d="M4 8h16M4 16h16"/></svg></button>
 </div></nav></div></header>
-<div class="mobile-menu"><a href="index.html">Home</a><a href="house.html">The House</a><a href="collection.html">Attar</a><a href="parfums.html">Parfum</a><a href="craftsmanship.html">Craftsmanship</a><a href="bespoke.html">Build Your Own</a><a href="journal.html">Journal</a><a href="contact.html">Contact</a><a href="#" data-mobile-account>My Account</a><div class="mobile-meta">A Luxury Fragrance House · Crafted in UAE</div></div><main>
+<div class="mobile-menu"><a href="index">Home</a><a href="house">The House</a><a href="collection">Attar</a><a href="parfums">Parfum</a><a href="craftsmanship">Craftsmanship</a><a href="bespoke">Build Your Own</a><a href="journal">Journal</a><a href="contact">Contact</a><a href="#" data-mobile-account>My Account</a><div class="mobile-meta">A Luxury Fragrance House · Crafted in UAE</div></div><main>
 <section class="page-hero">
   <img src="assets/house/heritage-hands-pouring.jpg" alt="HEEZE 94" fetchpriority="high"/>
   <div class="container page-hero-content reveal">
@@ -582,16 +582,17 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
       <div class="contact-line"><span>Wholesale</span>Retail, hospitality and curated partnership enquiries.</div>
       <div class="contact-line"><span>Gifting</span>Private, corporate and occasion-based fragrance gifting.</div>
       <div class="contact-line"><span>Email</span><a id="contactEmail" href="mailto:connect@heeze94.com" style="color:var(--gold)">connect@heeze94.com</a></div>
-      <div class="contact-line"><span>WhatsApp</span><a id="contactWhatsapp" href="https://wa.me/919643391003" style="color:var(--gold)">+91 96433 91003</a></div>
-      <div class="contact-line"><span>Instagram</span><a id="contactInstagram" href="https://instagram.com/heeze94" style="color:var(--gold)">@heeze94</a></div>
+      <div class="contact-line"><span>WhatsApp</span><a id="contactWhatsapp" href="https://wa.me/919643391003" target="_blank" rel="noopener noreferrer" style="color:var(--gold)">+91 96433 91003</a></div>
+      <div class="contact-line"><span>Instagram</span><a id="contactInstagram" href="https://instagram.com/heeze.94" target="_blank" rel="noopener noreferrer" style="color:var(--gold)">@heeze.94</a></div>
+      <div class="contact-line" id="contactFacebookLine"><span>Facebook</span><a id="contactFacebook" href="https://www.facebook.com/share/18F98tnAWd/" target="_blank" rel="noopener noreferrer" style="color:var(--gold)">HEEZE 94</a></div>
       <div class="contact-line" id="contactAddressLine" style="display:none"><span>Address</span><span id="contactAddress"></span></div>
     </div>
     <form class="contact-form reveal" id="contactForm">
       <div class="field"><label for="name">Name</label><input id="name" name="name" required/></div>
-      <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required/></div>
+      <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required title="Enter a valid email address, e.g. name@example.com"/></div>
       <div class="field"><label for="interest">Enquiry</label>
         <select id="interest"><option>Fragrance guidance</option><option>Wholesale</option><option>Gifting</option><option>Press &amp; collaboration</option></select></div>
-      <div class="field"><label for="phone">Phone / WhatsApp</label><input id="phone" name="phone"/></div>
+      <div class="field"><label for="phone">Phone / WhatsApp</label><input id="phone" name="phone" type="tel" required pattern="[+]?[0-9\s\-]{7,15}" title="Enter a valid phone number (7-15 digits, optional + country code)"/></div>
       <div class="field"><label for="message">Message</label><textarea id="message" name="message" required></textarea></div>
       <button class="btn btn-gold" type="submit" id="contactSubmitBtn" style="align-self:flex-start">Send enquiry</button>
       <p class="form-ok" id="formOk"></p>
@@ -676,7 +677,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
     <div class="search-results" data-search-results></div>
   </div>
 </div>
-<div class="toast" role="status"></div><footer class="footer"><div class="container"><div class="footer-top"><div class="footer-brand"><img src="assets/brand/logo-primary.png" alt="HEEZE 94"/><p>Premium attars — intimate, enduring, composed to become part of the wearer.</p></div><div class="footer-col"><h3>Explore</h3><a href="collection.html">Collection</a><a href="parfums.html">Parfums</a><a href="films.html">Films</a><a href="journal.html">Journal</a></div><div class="footer-col"><h3>The House</h3><a href="house.html">Our Story</a><a href="contact.html">Private Client</a><a href="contact.html">Wholesale</a></div><div class="footer-col"><h3>Client Care</h3><a href="contact.html">Contact</a><a href="privacy.html">Privacy Policy</a></div></div><div class="footer-bottom"><span>© <span data-year></span> HEEZE 94</span><span>Fragrance in its most intimate form</span></div></div></footer><script>/* ═══ HEEZE 94 · catalogue.js · v4 · Real Assets ════════════════════════════ */
+<div class="toast" role="status"></div><footer class="footer"><div class="container"><div class="footer-top"><div class="footer-brand"><img src="assets/brand/logo-primary.png" alt="HEEZE 94"/><p>Premium attars — intimate, enduring, composed to become part of the wearer.</p></div><div class="footer-col"><h3>Explore</h3><a href="collection">Collection</a><a href="parfums">Parfums</a><a href="films">Films</a><a href="journal">Journal</a></div><div class="footer-col"><h3>The House</h3><a href="house">Our Story</a><a href="contact">Private Client</a><a href="contact">Wholesale</a></div><div class="footer-col"><h3>Client Care</h3><a href="contact">Contact</a><a href="privacy">Privacy Policy</a></div></div><div class="footer-bottom"><span>© <span data-year></span> HEEZE 94</span><span>Fragrance in its most intimate form</span></div></div></footer><script>/* ═══ HEEZE 94 · catalogue.js · v4 · Real Assets ════════════════════════════ */
 const H94 = (() => {
 
 const DEFAULT = [
@@ -756,7 +757,7 @@ async function loadProductsFromSupabase(){
 
 async function loadContactInfoFromSanity(){
   try{
-    const query=encodeURIComponent(`*[_type=="contactInfo"][0]{email,phone,instagramHandle,instagramUrl,address}`);
+    const query=encodeURIComponent(`*[_type=="contactInfo"][0]{email,phone,instagramHandle,instagramUrl,facebookUrl,address}`);
     const url=`https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=${query}`;
     const res=await fetch(url);
     if(!res.ok) return;
@@ -777,6 +778,10 @@ async function loadContactInfoFromSanity(){
         if(result.instagramHandle) el.textContent=result.instagramHandle;
         if(result.instagramUrl) el.href=result.instagramUrl;
       }
+    }
+    if(result.facebookUrl){
+      const el=document.getElementById('contactFacebook');
+      if(el) el.href=result.facebookUrl;
     }
     if(result.address){
       const line=document.getElementById('contactAddressLine');
@@ -913,7 +918,7 @@ function renderGrid(container,opts={}){
   if(opts.limit)products=products.slice(0,+opts.limit);
   if(!products.length){container.innerHTML='<p class="no-products">No fragrances found.</p>';return;}
   container.innerHTML=products.map(p=>`
-    <article class="product-card" onclick="location.href='product.html?id=${p.id}'" tabindex="0">
+    <article class="product-card" onclick="location.href='product?id=${p.id}'" tabindex="0">
       <div class="product-img-wrap">
         ${(()=>{const cheapest=Math.min(...p.sizes.map(s=>s.price));return p.compareAt && p.compareAt>cheapest ? `<div class="discount-ribbon">-${Math.round((1-cheapest/p.compareAt)*100)}% OFF</div>` : '';})()}
         <img src="${p.img}" alt="${p.name} attar" loading="lazy"/>
@@ -1050,6 +1055,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     gateEl.style.display='none'; authEl.style.display=''; titleEl.textContent='Sign In';
   });
   document.querySelector('[data-auth-back]')?.addEventListener('click',()=>{
+    if(cameFromAccount){ document.body.classList.remove('checkout-open'); cameFromAccount=false; return; }
     authEl.style.display='none'; gateEl.style.display=''; titleEl.textContent='Checkout';
   });
 
@@ -1107,7 +1113,9 @@ document.addEventListener('DOMContentLoaded',async()=>{
   document.querySelector('[data-mobile-account]')?.addEventListener('click',(e)=>{e.preventDefault();document.querySelector('.mobile-menu')?.classList.remove('open');openAccount();});
   document.querySelector('[data-account-close]')?.addEventListener('click',closeAccount);
   document.querySelector('[data-account-veil]')?.addEventListener('click',closeAccount);
+  let cameFromAccount=false;
   document.querySelector('[data-account-signin]')?.addEventListener('click',()=>{
+    cameFromAccount=true;
     closeAccount();
     document.body.classList.add('checkout-open');
     gateEl.style.display='none'; authEl.style.display=''; titleEl.textContent='Sign In';
@@ -1169,7 +1177,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     if(q) matches=all.filter(p=>(p.name+' '+(p.family||'')+' '+(p.desc||'')).toLowerCase().includes(q));
     if(!matches.length){searchResults.innerHTML='<p class="search-empty">No fragrances found.</p>';return;}
     searchResults.innerHTML=matches.slice(0,8).map(p=>`
-      <div class="search-result-item" onclick="location.href='product.html?id=${p.id}'">
+      <div class="search-result-item" onclick="location.href='product?id=${p.id}'">
         <img src="${p.img}" alt="${p.name}"/>
         <div><div class="sr-name">${p.name}</div><div class="sr-fam">${p.family||''}</div></div>
       </div>`).join('');
@@ -1284,7 +1292,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   });
   renderCart();
   // Mark active nav link
-  const path=location.pathname.split('/').pop()||'index.html';
+  const path=location.pathname.split('/').pop()||'index';
   document.querySelectorAll('.nav-links a').forEach(a=>{
     const href=a.getAttribute('href');
     if(href&&(href===path||href.replace('.html','')==='/'+path.replace('.html',''))){

@@ -42,7 +42,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           system_instruction: { parts: [{ text: SYSTEM }] },
           contents: history,
-          generationConfig: { maxOutputTokens: 200, temperature: 0.78 }
+          generationConfig: { maxOutputTokens: 600, temperature: 0.78 }
         })
       }
     );

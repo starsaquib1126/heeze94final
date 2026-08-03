@@ -439,7 +439,7 @@ body.cart-open .drawer{transform:none}
 .ft-col a:hover{color:var(--gold)}
 .ft-bot{border-top:1px solid var(--line);padding-top:20px;
   display:flex;justify-content:space-between;flex-wrap:wrap;gap:9px}
-.ft-bot span{font-size:.66rem;color:var(--dim);letter-spacing:.08em}
+.ft-bot span{font-size:.66rem;color:var(--muted);letter-spacing:.08em;font-weight:600}
 
 /* ── REVEALS ── */
 .rv{opacity:0;transform:translateY(22px);
@@ -512,8 +512,8 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
 <body>
 <nav class="nav-bar">
   <div class="nav-inner">
-    <a class="nav-logo" href="index.html"><img src="assets/brand/logo-new.png" alt="HEEZE 94"/></a>
-    <div class="nav-links"><a href="index.html">Home</a><a href="house.html">The House</a><a href="collection.html" class='here'>Attar</a><a href="parfums.html">Parfum</a><a href="craftsmanship.html">Craftsmanship</a><a href="bespoke.html">Build Your Own</a><a href="journal.html">Journal</a><a href="contact.html">Contact</a></div>
+    <a class="nav-logo" href="index"><img src="assets/brand/logo-new.png" alt="HEEZE 94"/></a>
+    <div class="nav-links"><a href="index">Home</a><a href="house">The House</a><a href="collection" class='here'>Attar</a><a href="parfums">Parfum</a><a href="craftsmanship">Craftsmanship</a><a href="bespoke">Build Your Own</a><a href="journal">Journal</a><a href="contact">Contact</a></div>
     <div class="nav-right">
       <button class="ic" data-search-btn aria-label="Search">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -531,7 +531,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
     </div>
   </div>
 </nav>
-<div class="mob-menu"><a href="index.html">Home</a><a href="house.html">The House</a><a href="collection.html">Attar</a><a href="parfums.html">Parfum</a><a href="craftsmanship.html">Craftsmanship</a><a href="bespoke.html">Build Your Own</a><a href="journal.html">Journal</a><a href="contact.html">Contact</a><span class="mob-sub">A Luxury Fragrance House · Crafted in UAE</span></div>
+<div class="mob-menu"><a href="index">Home</a><a href="house">The House</a><a href="collection">Attar</a><a href="parfums">Parfum</a><a href="craftsmanship">Craftsmanship</a><a href="bespoke">Build Your Own</a><a href="journal">Journal</a><a href="contact">Contact</a><span class="mob-sub">A Luxury Fragrance House · Crafted in UAE</span></div>
 <main>
 <section class="page-hero" id="prodHero" style="min-height:40vh">
   <img src="assets/images/home-hero.jpg" alt="" id="heroImg" fetchpriority="high"/>
@@ -553,6 +553,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
       <div class="pd-notes" id="pdNotes"></div>
       <div class="ey" style="margin-bottom:12px">Select Size</div>
       <div class="sz-row" id="szRow"></div>
+      <p id="alreadyInCart" style="font-size:.82rem;color:var(--gold);margin:-6px 0 14px;display:none"></p>
       <div class="pd-buy">
         <span class="pd-price-was" id="pdPriceWas" style="color:var(--muted);text-decoration:line-through;font-size:.85rem;margin-right:8px"></span>
         <span class="pd-price" id="pdPrice"></span>
@@ -564,7 +565,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
         <button class="btn btn-g" onclick="addPD()">Add to Bag</button>
       </div>
       <div style="margin-top:28px">
-        <a class="tlink" href="collection.html">← Back to Collection</a>
+        <a class="tlink" href="collection">← Back to Collection</a>
       </div>
     </div>
   </div>
@@ -593,15 +594,15 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
         <p>Premium attars — intimate, enduring and composed to become part of the wearer. Crafted in UAE.</p>
       </div>
       <div class="ft-col"><h4>Explore</h4>
-        <a href="collection.html">Collection</a><a href="parfums.html">Parfums</a>
-        <a href="films.html">Films</a><a href="journal.html">Journal</a>
+        <a href="collection">Collection</a><a href="parfums">Parfums</a>
+        <a href="films">Films</a><a href="journal">Journal</a>
       </div>
       <div class="ft-col"><h4>The House</h4>
-        <a href="house.html">Our Story</a><a href="contact.html">Private Client</a><a href="contact.html">Wholesale</a>
+        <a href="house">Our Story</a><a href="contact">Private Client</a><a href="contact">Wholesale</a>
       </div>
       <div class="ft-col"><h4>Client Care</h4>
-        <a href="contact.html">Contact</a>
-        <a href="privacy.html">Privacy Policy</a>
+        <a href="contact">Contact</a>
+        <a href="privacy">Privacy Policy</a>
         <a href="https://wa.me/910000000000" target="_blank">WhatsApp</a>
         
       </div>
@@ -781,6 +782,9 @@ const lineInfo=key=>{const[id,ml]=key.split('|');const p=cat().find(x=>x.id===id
 function addToCart(id,ml,qty=1){
   const key=id+'|'+ml;cart[key]=(cart[key]||0)+qty;saveCart();renderCart();showToast('Added to your bag');bumpCartIcon();
 }
+function getCartQty(id,ml){
+  return cart[id+'|'+ml] || 0;
+}
 function bumpCartIcon(){const ic=document.querySelector('[data-oc], [data-open-cart]');const bc=document.querySelector('[data-bc], [data-cart-count]');if(ic){ic.classList.remove('bump');void ic.offsetWidth;ic.classList.add('bump');}if(bc){bc.classList.remove('pop');void bc.offsetWidth;bc.classList.add('pop');}}
 
 function changeQty(key,d){
@@ -816,7 +820,7 @@ function renderGrid(el,opts={}){
   if(opts.limit)prods=prods.slice(0,+opts.limit);
   if(!prods.length){el.innerHTML='<p style="color:var(--muted);padding:40px 0;text-align:center;font-style:italic">No fragrances found.</p>';return;}
   el.innerHTML=prods.map(p=>`
-    <a class="pcard" href="product.html?id=${p.id}">
+    <a class="pcard" href="product?id=${p.id}">
       <div class="pcard-img">${(()=>{const cheapest=minPrice(p);return p.compareAt && p.compareAt>cheapest ? `<div class="discount-ribbon">-${Math.round((1-cheapest/p.compareAt)*100)}% OFF</div>` : '';})()}<img src="${p.img}" alt="${p.name}" loading="lazy"/></div>
       <div class="pcard-body">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -851,7 +855,7 @@ function initFilters(){
 }
 function initYear(){document.querySelectorAll('[data-yr]').forEach(el=>el.textContent='2026');}
 function initNav(){
-  const path=location.pathname.split('/').pop()||'index.html';
+  const path=location.pathname.split('/').pop()||'index';
   document.querySelectorAll('.nav-links a,.mob-menu a').forEach(a=>{
     if(a.getAttribute('href')===path)a.classList.add('here');
   });
@@ -914,6 +918,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     gateEl.style.display='none'; authEl.style.display=''; titleEl.textContent='Sign In';
   });
   document.querySelector('[data-auth-back]')?.addEventListener('click',()=>{
+    if(cameFromAccount){ document.body.classList.remove('checkout-open'); cameFromAccount=false; return; }
     authEl.style.display='none'; gateEl.style.display=''; titleEl.textContent='Checkout';
   });
 
@@ -971,7 +976,9 @@ document.addEventListener('DOMContentLoaded',async()=>{
   document.querySelector('[data-mobile-account]')?.addEventListener('click',(e)=>{e.preventDefault();document.querySelector('.mobile-menu')?.classList.remove('open');openAccount();});
   document.querySelector('[data-account-close]')?.addEventListener('click',closeAccount);
   document.querySelector('[data-account-veil]')?.addEventListener('click',closeAccount);
+  let cameFromAccount=false;
   document.querySelector('[data-account-signin]')?.addEventListener('click',()=>{
+    cameFromAccount=true;
     closeAccount();
     document.body.classList.add('checkout-open');
     gateEl.style.display='none'; authEl.style.display=''; titleEl.textContent='Sign In';
@@ -1033,7 +1040,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     if(q) matches=all.filter(p=>(p.name+' '+(p.family||'')+' '+(p.desc||'')).toLowerCase().includes(q));
     if(!matches.length){searchResults.innerHTML='<p class="search-empty">No fragrances found.</p>';return;}
     searchResults.innerHTML=matches.slice(0,8).map(p=>`
-      <div class="search-result-item" onclick="location.href='product.html?id=${p.id}'">
+      <div class="search-result-item" onclick="location.href='product?id=${p.id}'">
         <img src="${p.img}" alt="${p.name}"/>
         <div><div class="sr-name">${p.name}</div><div class="sr-fam">${p.family||''}</div></div>
       </div>`).join('');
@@ -1138,7 +1145,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   });
   renderCart();
 });
-return{addToCart,cq:changeQty,openCart,closeCart,cat,saveCat,fmt,showToast,renderGrid,syncSanityProductContent,loadProductsFromSupabase};
+return{addToCart,cq:changeQty,openCart,closeCart,cat,saveCat,fmt,showToast,renderGrid,syncSanityProductContent,loadProductsFromSupabase,getCartQty};
 })();
 </script><script>
 (()=>{
@@ -1188,7 +1195,7 @@ return'I would be glad to guide you. Could you tell me the kinds of scents you a
 <script>
 let curId=null,curMl=null,curQty=1;
 function adjQty(d){curQty=Math.max(1,curQty+d);document.getElementById('qtyVal').textContent=curQty;}
-function addPD(){if(!curId||!curMl)return;H94.addToCart(curId,curMl,curQty);}
+function addPD(){if(!curId||!curMl)return;H94.addToCart(curId,curMl,curQty);updateAlreadyInCartBadge(curMl);}
 let galleryTimer=null;
 function renderGalleryThumbs(p){
   const wrap=document.getElementById('pdThumbs');
@@ -1222,8 +1229,17 @@ function renderGalleryThumbs(p){
   mainImg.style.transition='opacity .3s ease';
   startAutoRotate();
 }
+function updateAlreadyInCartBadge(ml){
+  const badge=document.getElementById('alreadyInCart');
+  if(!badge||!curId) return;
+  const qty=H94.getCartQty(curId,ml);
+  if(qty>0){ badge.textContent=`Already in cart: ${qty}`; badge.style.display=''; }
+  else{ badge.style.display='none'; }
+}
 function selSize(ml){
   curMl=ml;
+  curQty=1; document.getElementById('qtyVal').textContent=1;
+  updateAlreadyInCartBadge(ml);
   const p=H94.cat().find(x=>x.id===curId);
   const s=p&&p.sizes.find(x=>x.ml===ml);
   document.getElementById('pdPrice').textContent=s?H94.fmt(s.price):'';
@@ -1237,7 +1253,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const id=new URLSearchParams(location.search).get('id');
   curId=id;
   const p=H94.cat().find(x=>x.id===id);
-  if(!p){location.href='collection.html';return;}
+  if(!p){location.href='collection';return;}
   document.title=p.name+' — HEEZE 94';
   document.getElementById('heroImg').src=p.img;
   document.getElementById('pdImg').src=p.img;
@@ -1259,6 +1275,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     </button>`).join('');
   document.getElementById('pdPrice').textContent=H94.fmt(defSz.price);
   document.getElementById('pdPriceWas').textContent=(p.compareAt&&p.compareAt>defSz.price)?H94.fmt(p.compareAt):'';
+  updateAlreadyInCartBadge(defSz.ml);
 });
 </script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></body></html>
