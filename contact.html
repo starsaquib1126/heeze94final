@@ -597,6 +597,13 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
       <button class="btn btn-gold" type="submit" id="contactSubmitBtn" style="align-self:flex-start">Send enquiry</button>
       <p class="form-ok" id="formOk"></p>
     </form>
+    <div id="contactVerifyStep" style="display:none;margin-top:22px">
+      <p style="font-size:.9rem;color:var(--muted);margin-bottom:14px">We've sent a 6-digit code to your email — enter it below to send your enquiry.</p>
+      <div class="field"><label for="verifyCode">Verification Code</label><input id="verifyCode" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" placeholder="000000"/></div>
+      <button class="btn btn-gold" type="button" id="verifySubmitBtn" style="margin-top:10px">Verify &amp; Send</button>
+      <button class="text-link" type="button" id="resendCodeBtn" style="margin-top:10px;margin-left:14px">Resend code</button>
+      <p class="form-ok" id="verifyMsg"></p>
+    </div>
   </div>
 </div></section></main><div class="cart-veil"></div><aside class="cart-drawer" aria-label="Shopping bag"><div class="cart-head"><h2>Your Bag</h2><button class="cart-close" data-close-cart>×</button></div><div class="cart-items" data-cart-items></div><div class="cart-foot"><div class="promo-row"><input type="text" placeholder="Promo code" data-promo-input><button class="promo-apply" data-promo-apply>Apply</button></div><div class="promo-msg" data-promo-msg></div><div class="cart-total"><span>Subtotal</span><strong data-cart-total>₹0</strong></div><button class="btn btn-gold" data-checkout style="width:100%">Continue to secure checkout</button><p class="cart-note">Razorpay · UPI · Cards · Netbanking</p></div></aside><div class="checkout-veil" data-checkout-veil></div>
 <div class="checkout-modal" data-checkout-modal aria-label="Checkout details">
@@ -798,10 +805,17 @@ function initContactForm(){
   if(!form) return;
   const btn=document.getElementById('contactSubmitBtn');
   const msgEl=document.getElementById('formOk');
-  form.addEventListener('submit', async(e)=>{
-    e.preventDefault();
+  const verifyStep=document.getElementById('contactVerifyStep');
+  const verifyBtn=document.getElementById('verifySubmitBtn');
+  const verifyMsg=document.getElementById('verifyMsg');
+  const codeInput=document.getElementById('verifyCode');
+  const resendBtn=document.getElementById('resendCodeBtn');
+  let pendingToken=null;
+  let lastPayload=null;
+
+  async function requestCode(){
     const fd=new FormData(form);
-    const payload={
+    lastPayload={
       name: fd.get('name'),
       email: fd.get('email'),
       phone: fd.get('phone'),
@@ -809,25 +823,84 @@ function initContactForm(){
       message: fd.get('message')
     };
     const origText=btn.textContent;
-    btn.disabled=true; btn.textContent='Sending…';
+    btn.disabled=true; btn.textContent='Sending code…';
     msgEl.textContent=''; msgEl.style.color='';
+    try{
+      const res=await fetch('/api/contact-request-code',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(lastPayload)
+      });
+      const data=await res.json();
+      if(!res.ok) throw new Error(data.error||'Something went wrong');
+      pendingToken=data.token;
+      form.style.display='none';
+      verifyStep.style.display='';
+      verifyMsg.textContent=''; verifyMsg.style.color='';
+      codeInput.value=''; codeInput.focus();
+    }catch(err){
+      console.error('Contact code request error:', err);
+      msgEl.textContent=err.message||'Could not send a verification code — please try WhatsApp or email us directly.';
+      msgEl.style.color='#c0392b';
+    }finally{
+      btn.disabled=false; btn.textContent=origText;
+    }
+  }
+
+  form.addEventListener('submit', async(e)=>{
+    e.preventDefault();
+    requestCode();
+  });
+
+  verifyBtn?.addEventListener('click', async()=>{
+    const code=codeInput.value.trim();
+    if(!code){ verifyMsg.textContent='Enter the 6-digit code.'; verifyMsg.style.color='#c0392b'; return; }
+    const origText=verifyBtn.textContent;
+    verifyBtn.disabled=true; verifyBtn.textContent='Verifying…';
+    verifyMsg.textContent=''; verifyMsg.style.color='';
     try{
       const res=await fetch('/api/contact-enquiry',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(payload)
+        body:JSON.stringify({ token: pendingToken, code })
       });
       const data=await res.json();
       if(!res.ok) throw new Error(data.error||'Something went wrong');
+      verifyStep.style.display='none';
+      form.style.display='';
+      form.reset();
       msgEl.textContent='Thank you — we will respond within 24 hours.';
       msgEl.style.color='';
-      form.reset();
     }catch(err){
-      console.error('Contact form submit error:', err);
-      msgEl.textContent=err.message||'Could not send your message — please try WhatsApp or email us directly.';
-      msgEl.style.color='#c0392b';
+      console.error('Contact verify error:', err);
+      verifyMsg.textContent=err.message||'Could not verify that code — please try again.';
+      verifyMsg.style.color='#c0392b';
     }finally{
-      btn.disabled=false; btn.textContent=origText;
+      verifyBtn.disabled=false; verifyBtn.textContent=origText;
+    }
+  });
+
+  resendBtn?.addEventListener('click', async()=>{
+    if(!lastPayload) return;
+    const origText=resendBtn.textContent;
+    resendBtn.disabled=true; resendBtn.textContent='Resending…';
+    verifyMsg.textContent=''; verifyMsg.style.color='';
+    try{
+      const res=await fetch('/api/contact-request-code',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(lastPayload)
+      });
+      const data=await res.json();
+      if(!res.ok) throw new Error(data.error||'Something went wrong');
+      pendingToken=data.token;
+      verifyMsg.textContent='A new code has been sent.';
+      verifyMsg.style.color='';
+    }catch(err){
+      verifyMsg.textContent=err.message||'Could not resend the code — please try again shortly.';
+      verifyMsg.style.color='#c0392b';
+    }finally{
+      resendBtn.disabled=false; resendBtn.textContent=origText;
     }
   });
 }
