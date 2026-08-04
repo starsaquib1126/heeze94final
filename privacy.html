@@ -146,6 +146,8 @@ body.account-open .account-panel{transform:none}
 .order-status.created{background:rgba(255,255,255,.06);color:var(--muted)}
 .order-details{font-size:.82rem;color:var(--muted);line-height:1.6}
 .order-track-link{display:inline-block;margin-top:8px;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);text-decoration:none;border-bottom:1px solid var(--gold-deep);padding-bottom:1px}
+.order-action-link{display:inline-block;margin-top:8px;margin-right:14px;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:none;border:none;-webkit-appearance:none;appearance:none;border-bottom:1px solid var(--dim);padding:0 0 1px;cursor:pointer;font-family:inherit;outline:none;box-shadow:none}
+.order-action-link:hover{color:var(--gold);border-color:var(--gold)}
 .order-track-link:hover{border-color:var(--gold)}
 
 /* ══════════════════════════════════════════════════════════
@@ -702,6 +704,24 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
       <h3 style="font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:8px">Order History</h3>
       <div data-order-history><p style="font-size:.85rem;color:var(--muted)">Loading orders…</p></div>
     </div>
+    <div class="account-section" data-return-form-section style="display:none;border:1px solid rgba(233,190,90,.16);border-radius:6px;padding:16px">
+      <h3 style="font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:14px">Request a Return</h3>
+      <input type="hidden" data-return-order-id>
+      <div class="field" style="margin-bottom:12px"><label style="font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Reason</label>
+        <select data-return-reason style="width:100%;margin-top:4px">
+          <option value="damaged">Item arrived damaged</option>
+          <option value="wrong_item">Wrong item received</option>
+          <option value="defective">Item is defective</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="field" style="margin-bottom:12px"><label style="font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Tell us what happened</label>
+        <textarea data-return-description rows="3" style="width:100%;margin-top:4px"></textarea>
+      </div>
+      <button class="btn btn-gold" style="width:100%;margin-bottom:8px" data-return-submit>Submit Request</button>
+      <button class="text-link" type="button" style="display:block;margin:0 auto" data-return-cancel-form>Cancel</button>
+      <p class="form-ok" data-return-msg style="margin-top:10px"></p>
+    </div>
     <button class="btn btn-line" style="width:100%;margin-top:22px" data-account-signout>Sign Out</button>
   </div>
 </div>
@@ -1083,6 +1103,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     if(supa){await supa.auth.signOut();}
     checkAccountState();
   });
+  let currentUserEmail=null;
   async function checkAccountState(){
     if(!supa){document.querySelector('[data-account-logged-out]').style.display='';document.querySelector('[data-account-logged-in]').style.display='none';return;}
     const {data:{session}}=await supa.auth.getSession();
@@ -1099,6 +1120,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     }
   }
   async function loadOrders(email){
+    currentUserEmail=email;
     const el=document.querySelector('[data-order-history]');
     if(!el) return;
     try{
@@ -1112,10 +1134,72 @@ document.addEventListener('DOMContentLoaded',async()=>{
         let totalStr='\u20b9'+Number(o.total||0).toLocaleString('en-IN');
         if(o.discount_amount>0) totalStr+=' <span style="font-size:.75rem;color:var(--gold)">('+o.promo_code+' -\u20b9'+o.discount_amount+')</span>';
         const trackBtn = o.tracking_number ? ('<a href="'+(o.tracking_url||'https://www.dtdc.com/track-your-shipment/')+'" target="_blank" rel="noopener noreferrer" class="order-track-link">Track Package \u2192</a>') : '';
-        return '<div class="order-card"><div class="order-card-head"><span class="order-id">Order #'+o.id.slice(0,8).toUpperCase()+'</span><span class="order-status '+status+'">'+statusLabel+'</span></div><div class="order-details">'+dateStr+' &middot; '+totalStr+'</div>'+trackBtn+'</div>';
+        const cancellable = ['created','paid','processing'].includes(status);
+        const cancelBtn = cancellable ? ('<button type="button" class="order-action-link" data-cancel-order="'+o.id+'">Cancel Order</button>') : '';
+        const returnBtn = status==='delivered' ? ('<button type="button" class="order-action-link" data-request-return="'+o.id+'">Request a Return</button>') : '';
+        return '<div class="order-card"><div class="order-card-head"><span class="order-id">Order #'+o.id.slice(0,8).toUpperCase()+'</span><span class="order-status '+status+'">'+statusLabel+'</span></div><div class="order-details">'+dateStr+' &middot; '+totalStr+'</div>'+trackBtn+cancelBtn+returnBtn+'</div>';
       }).join('');
     }catch(e){el.innerHTML='<p style="font-size:.85rem;color:var(--muted)">Could not load orders.</p>';}
   }
+
+  /* ── Cancel Order / Request Return (event delegation, since buttons are added dynamically) ── */
+  document.querySelector('[data-order-history]')?.addEventListener('click', async(e)=>{
+    const cancelBtn=e.target.closest('[data-cancel-order]');
+    const returnBtn=e.target.closest('[data-request-return]');
+
+    if(cancelBtn){
+      const orderId=cancelBtn.dataset.cancelOrder;
+      if(!confirm('Cancel this order and refund it to your original payment method?')) return;
+      cancelBtn.disabled=true; cancelBtn.textContent='Cancelling\u2026';
+      try{
+        const res=await fetch('/api/cancel-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId,email:currentUserEmail})});
+        const data=await res.json();
+        if(!res.ok) throw new Error(data.error||'Could not cancel this order');
+        showToast('Order cancelled \u2014 refund is on its way');
+        loadOrders(currentUserEmail);
+      }catch(err){
+        alert(err.message||'Could not cancel this order right now.');
+        cancelBtn.disabled=false; cancelBtn.textContent='Cancel Order';
+      }
+    }
+
+    if(returnBtn){
+      const orderId=returnBtn.dataset.requestReturn;
+      document.querySelector('[data-return-order-id]').value=orderId;
+      document.querySelector('[data-return-form-section]').style.display='';
+      document.querySelector('[data-return-form-section]').scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+  });
+
+  document.querySelector('[data-return-cancel-form]')?.addEventListener('click',()=>{
+    document.querySelector('[data-return-form-section]').style.display='none';
+  });
+
+  document.querySelector('[data-return-submit]')?.addEventListener('click', async()=>{
+    const orderId=document.querySelector('[data-return-order-id]').value;
+    const reason=document.querySelector('[data-return-reason]').value;
+    const description=document.querySelector('[data-return-description]').value.trim();
+    const msgEl=document.querySelector('[data-return-msg]');
+    const btn=document.querySelector('[data-return-submit]');
+    if(!description){ msgEl.textContent='Please describe what happened.'; msgEl.style.color='#c0392b'; return; }
+    const origText=btn.textContent;
+    btn.disabled=true; btn.textContent='Submitting\u2026';
+    msgEl.textContent=''; msgEl.style.color='';
+    try{
+      const res=await fetch('/api/request-return',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId,email:currentUserEmail,reason,description})});
+      const data=await res.json();
+      if(!res.ok) throw new Error(data.error||'Could not submit your request');
+      msgEl.textContent='Request submitted \u2014 we\'ll email you once it\'s reviewed.';
+      msgEl.style.color='';
+      document.querySelector('[data-return-description]').value='';
+      setTimeout(()=>{ document.querySelector('[data-return-form-section]').style.display='none'; msgEl.textContent=''; }, 2500);
+    }catch(err){
+      msgEl.textContent=err.message||'Could not submit your request \u2014 please try again.';
+      msgEl.style.color='#c0392b';
+    }finally{
+      btn.disabled=false; btn.textContent=origText;
+    }
+  });
 
   /* ── Search ── */
   const searchBtn=document.querySelector('[data-search-btn]');

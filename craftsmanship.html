@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><script async src="https://www.googletagmanager.com/gtag/js?id=G-Z695114RVX"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z695114RVX');</script><script defer src="/_vercel/insights/script.js"></script><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#060504"/><title>Contact — HEEZE 94 [V4]</title><link rel="icon" href="assets/brand/logo-primary.png"/><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Mulish:wght@300;400;500;600&display=swap" rel="stylesheet"><style>/* ═══ HEEZE 94 · site.css · v4 — Real Assets Edition ═══════════════════════ */
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><script async src="https://www.googletagmanager.com/gtag/js?id=G-Z695114RVX"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z695114RVX');</script><script defer src="/_vercel/insights/script.js"></script><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#060504"/><title>Craftsmanship — HEEZE 94 [V4]</title><link rel="icon" href="assets/brand/logo-primary.png"/><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Mulish:wght@300;400;500;600&display=swap" rel="stylesheet"><style>/* ═══ HEEZE 94 · site.css · v4 — Real Assets Edition ═══════════════════════ */
 @import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Mulish:wght@300;400;500;600&display=swap');
 
 :root{
@@ -146,6 +146,8 @@ body.account-open .account-panel{transform:none}
 .order-status.created{background:rgba(255,255,255,.06);color:var(--muted)}
 .order-details{font-size:.82rem;color:var(--muted);line-height:1.6}
 .order-track-link{display:inline-block;margin-top:8px;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);text-decoration:none;border-bottom:1px solid var(--gold-deep);padding-bottom:1px}
+.order-action-link{display:inline-block;margin-top:8px;margin-right:14px;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:none;border:none;-webkit-appearance:none;appearance:none;border-bottom:1px solid var(--dim);padding:0 0 1px;cursor:pointer;font-family:inherit;outline:none;box-shadow:none}
+.order-action-link:hover{color:var(--gold);border-color:var(--gold)}
 .order-track-link:hover{border-color:var(--gold)}
 
 /* ══════════════════════════════════════════════════════════
@@ -249,7 +251,6 @@ body:not(.gate-active) .gateway{display:none}
 .page-hero-content{position:relative;z-index:2;padding-bottom:56px}
 .page-hero-content h1{font-size:clamp(2rem,5vw,3.4rem);letter-spacing:.12em;margin:12px 0 14px}
 .page-hero-content p{color:var(--muted);max-width:520px;font-size:.97rem}
-#contactHeroLead{color:var(--champagne);font-family:'Marcellus',serif;font-style:italic;font-size:1.08rem;letter-spacing:.01em;line-height:1.6}
 
 /* ══════════════════════════════════════════════════════════
    PRODUCT CARDS — real bottle photos
@@ -318,9 +319,9 @@ body:not(.gate-active) .gateway{display:none}
 .split{display:grid;grid-template-columns:1fr 1fr}
 @media(max-width:860px){.split{grid-template-columns:1fr}}
 .split-media{overflow:hidden;min-height:480px}
-.split-media img{width:100%;height:100%;object-fit:cover;opacity:.65;filter:saturate(.55);
+.split-media img,.split-media video{width:100%;height:100%;object-fit:cover;opacity:.65;filter:saturate(.55);
   transition:filter .6s,opacity .6s}
-.split-media:hover img{opacity:.8;filter:saturate(.8)}
+.split-media:hover img,.split-media:hover video{opacity:.8;filter:saturate(.8)}
 .split-copy{display:flex;align-items:center;background:linear-gradient(135deg,var(--panel2),var(--panel))}
 .split-copy .inner{max-width:460px;padding:60px 40px}
 .split-copy h2{font-size:clamp(1.5rem,3vw,2.2rem);letter-spacing:.1em;margin:14px 0 20px}
@@ -530,6 +531,61 @@ body.cart-open .cart-drawer{transform:none}
   .reveal{opacity:1;transform:none}
   *{animation:none!important;transition:none!important}
 }
+.split-reverse{direction:rtl}.split-reverse .split-copy .inner,.split-reverse .split-media{direction:ltr}
+
+/* ── Framed showcase ── */
+.showcase{margin:44px auto 0;max-width:1080px}
+.showcase img{display:block;width:100%;height:auto;border:1px solid rgba(233,190,90,.28);box-shadow:0 0 0 10px rgba(6,5,4,.9),0 0 0 11px rgba(233,190,90,.14),0 34px 80px rgba(0,0,0,.6)}
+.showcase figcaption{margin-top:18px;text-align:center;font-size:.68rem;letter-spacing:.3em;text-transform:uppercase;color:var(--dim)}
+/* ── Stage grid ── */
+.stage-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:44px}
+.stage-card{border:1px solid rgba(233,190,90,.14);background:rgba(255,255,255,.015);overflow:hidden;transition:.5s}
+.stage-card:hover{border-color:rgba(233,190,90,.4);transform:translateY(-4px)}
+.stage-media{aspect-ratio:16/9;overflow:hidden}
+.stage-media img{width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.19,1,.22,1);filter:saturate(.85)}
+.stage-card:hover .stage-media img{transform:scale(1.06);filter:saturate(1)}
+.stage-body{padding:22px 24px 26px}
+.stage-body h3{font-family:'Marcellus',serif;font-size:1.05rem;letter-spacing:.14em;text-transform:uppercase;margin:10px 0 8px}
+.stage-body p{font-size:.88rem;color:var(--muted)}
+@media(max-width:960px){.stage-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.stage-grid{grid-template-columns:1fr}}
+
+.ingredient-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:36px;max-width:820px;margin-left:auto;margin-right:auto}
+.ingredient-strip figure{margin:0;text-align:center}
+.ingredient-strip img{width:100%;aspect-ratio:1;object-fit:cover;border:1px solid rgba(233,190,90,.18);transition:.5s}
+.ingredient-strip img:hover{border-color:rgba(233,190,90,.5);transform:translateY(-3px)}
+.ingredient-strip figcaption{margin-top:10px;font-size:.63rem;letter-spacing:.28em;text-transform:uppercase;color:var(--dim)}
+@media(max-width:760px){.ingredient-strip{grid-template-columns:repeat(3,1fr)}}
+/* ── Parfum Journey icons ── */
+.value-icon{width:44px;height:44px;margin:0 0 18px;display:block}
+
+/* Inspiration: gentle pulsing spark */
+.icon-inspiration{animation:iconPulse 3.2s ease-in-out infinite}
+@keyframes iconPulse{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
+
+/* Notes Selection: staggered rise */
+.note-bar{transform-origin:bottom;animation:noteRise 2.8s ease-in-out infinite}
+.note-bar-1{animation-delay:0s}
+.note-bar-2{animation-delay:.25s}
+.note-bar-3{animation-delay:.5s}
+@keyframes noteRise{0%,100%{transform:scaleY(1);opacity:.7}50%{transform:scaleY(1.15);opacity:1}}
+
+/* Accord Creation: circles drift together and apart */
+.accord-circle{animation:accordDrift 4s ease-in-out infinite}
+.accord-a{animation-delay:0s}
+.accord-b{animation-delay:0s;animation-name:accordDriftB}
+@keyframes accordDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(2.5px)}}
+@keyframes accordDriftB{0%,100%{transform:translateX(0)}50%{transform:translateX(-2.5px)}}
+
+/* Testing: rotating progress ring */
+.testing-ring{transform-origin:24px 24px;animation:testingSpin 2.6s linear infinite}
+@keyframes testingSpin{to{transform:rotate(360deg)}}
+
+/* Final Presentation: shine sweep */
+.icon-final{overflow:visible}
+.final-shine{animation:finalShine 3s ease-in-out infinite}
+@keyframes finalShine{0%,60%,100%{opacity:0;transform:translateX(-4px)}75%{opacity:.9;transform:translateX(4px)}}
+
 
 .ic.bump{animation:cartBump .45s cubic-bezier(.34,1.56,.64,1)}
 @keyframes cartBump{0%{transform:scale(1)}35%{transform:scale(1.3) rotate(-6deg)}60%{transform:scale(.95)}100%{transform:scale(1) rotate(0)}}
@@ -566,7 +622,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
 .promo-msg.err{color:#E08585}
 </style></head><body class=""><header class="site-header"><div class="container"><nav class="nav">
 <a class="brand" href="index"><img src="assets/brand/logo-new.png" alt="HEEZE 94" height="52"/></a>
-<div class="nav-links"><a href="index">Home</a><a href="collection">Attar</a><a href="parfums">Parfum</a><div class="nav-dropdown"><a href="#" class="nav-dropdown-trigger">Explore HEEZE 94</a><div class="nav-dropdown-menu"><a href="house">The House</a><a href="craftsmanship">Craftsmanship</a><a href="films">Films</a></div></div><a href="bespoke">Build Your Own</a><a href="journal">Journal</a><a href="contact" class='active'>Contact</a></div>
+<div class="nav-links"><a href="index">Home</a><a href="collection">Attar</a><a href="parfums">Parfum</a><div class="nav-dropdown"><a href="#" class="nav-dropdown-trigger active">Explore HEEZE 94</a><div class="nav-dropdown-menu"><a href="house">The House</a><a href="craftsmanship" class='active'>Craftsmanship</a><a href="films">Films</a></div></div><a href="bespoke">Build Your Own</a><a href="journal">Journal</a><a href="contact">Contact</a></div>
 <div class="nav-actions">
   <button class="icon-btn" data-search-btn aria-label="Search">
     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -582,47 +638,93 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
 </div></nav></div></header>
 <div class="mobile-menu"><a href="index">Home</a><a href="house">The House</a><a href="collection">Attar</a><a href="parfums">Parfum</a><a href="craftsmanship">Craftsmanship</a><a href="films">Films</a><a href="bespoke">Build Your Own</a><a href="journal">Journal</a><a href="contact">Contact</a><a href="#" data-mobile-account>My Account</a><div class="mobile-meta">A Luxury Fragrance House · Crafted in UAE</div></div><main>
 <section class="page-hero">
-  <img src="assets/house/heritage-hands-pouring.jpg" alt="HEEZE 94" fetchpriority="high"/>
+  <img src="assets/Attar/attar-hero-4.jpg" alt="HEEZE 94 atelier" fetchpriority="high"/>
   <div class="container page-hero-content reveal">
-    <div class="eyebrow">Private Client</div>
-    <h1>Begin a conversation.</h1>
-    <p id="contactHeroLead">For fragrance guidance, wholesale enquiries, gifting and future launch information.</p>
+    <div class="eyebrow">Craftsmanship</div>
+    <h1 id="craftHeroHeadline">The art of fragrance creation.</h1>
+    <p id="craftHeroSubtext">From raw oud, flowers and musk to the finished bottle — every HEEZE 94 creation follows a slow, deliberate journey at our UAE atelier.</p>
   </div>
 </section>
+
+<section class="section section-dark"><div class="container">
+  <div class="section-head reveal" style="justify-content:center;text-align:center">
+    <div style="margin:0 auto"><div class="eyebrow">The Complete Journey</div><h2 id="craftCompleteHeadline">Nature, expertise and patience — in one frame.</h2></div>
+  </div>
+  <figure class="showcase reveal">
+    <img src="assets/craftsmanship/craftsmanship.jpg" alt="The Art of Fragrance Creation — the complete HEEZE 94 process, from sourcing to bottling" loading="lazy"/>
+    <figcaption id="craftCompleteCaption">The Art of Fragrance Creation — nothing here is rushed, and nothing is left to chance.</figcaption>
+  </figure>
+</div></section>
+
 <section class="section section-panel"><div class="container">
-  <div class="contact-grid">
-    <div class="reveal">
-      <div class="eyebrow">Contact the House</div>
-      <h2 style="font-size:clamp(1.4rem,3vw,2rem);letter-spacing:.1em;margin:14px 0 20px">We would be pleased to assist.</h2>
-      <p style="color:var(--muted);margin-bottom:22px">Tell us what you are looking for and the House will guide you.</p>
-      <div class="contact-line"><span>Fragrance consultation</span>Personal guidance across the premium collection.</div>
-      <div class="contact-line"><span>Wholesale</span>Retail, hospitality and curated partnership enquiries.</div>
-      <div class="contact-line"><span>Gifting</span>Private, corporate and occasion-based fragrance gifting.</div>
-      <div class="contact-line"><span>Email</span><a id="contactEmail" href="mailto:connect@heeze94.com" style="color:var(--gold)">connect@heeze94.com</a></div>
-      <div class="contact-line"><span>WhatsApp</span><a id="contactWhatsapp" href="https://wa.me/919643391003" target="_blank" rel="noopener noreferrer" style="color:var(--gold)">+91 96433 91003</a></div>
-      <div class="contact-line"><span>Instagram</span><a id="contactInstagram" href="https://instagram.com/heeze.94" target="_blank" rel="noopener noreferrer" style="color:var(--gold)">@heeze.94</a></div>
-      <div class="contact-line" id="contactFacebookLine"><span>Facebook</span><a id="contactFacebook" href="https://www.facebook.com/share/18F98tnAWd/" target="_blank" rel="noopener noreferrer" style="color:var(--gold)">HEEZE 94</a></div>
-      <div class="contact-line" id="contactAddressLine" style="display:none"><span>Address</span><span id="contactAddress"></span></div>
+  <div class="section-head reveal">
+    <div><div class="eyebrow">The Journey of Craftsmanship</div><h2 id="craftStagesHeadline">Six stages. No shortcuts.</h2></div>
+    <p id="craftStagesBody">Whether destined to become an attar or a parfum, every fragrance passes through the same disciplined hands.</p>
+  </div>
+  <div class="stage-grid reveal">
+    <div class="stage-card" data-craft-stage-index="0"><div class="stage-media"><img src="assets/craftsmanship/stage-01-sourcing.jpg" alt="Sourcing rare raw materials" loading="lazy"/></div><div class="stage-body"><span class="value-num">01</span><h3>Sourcing</h3><p>The finest raw materials, sourced from around the world for their purity and exceptional quality.</p></div></div>
+    <div class="stage-card" data-craft-stage-index="1"><div class="stage-media"><img src="assets/craftsmanship/stage-02-preparation.jpg" alt="Preparing ingredients by hand" loading="lazy"/></div><div class="stage-body"><span class="value-num">02</span><h3>Preparation</h3><p>Ingredients are cleaned and prepared by hand, preserving their character before blending begins.</p></div></div>
+    <div class="stage-card" data-craft-stage-index="2"><div class="stage-media"><img src="assets/craftsmanship/stage-03-extraction.jpg" alt="Traditional extraction" loading="lazy"/></div><div class="stage-body"><span class="value-num">03</span><h3>Extraction</h3><p>Traditional and modern extraction methods capture the true essence of each rare ingredient.</p></div></div>
+    <div class="stage-card" data-craft-stage-index="3"><div class="stage-media"><img src="assets/craftsmanship/stage-04-blending.jpg" alt="Expert blending" loading="lazy"/></div><div class="stage-body"><span class="value-num">04</span><h3>Blending</h3><p>Our perfumers test each combination by hand until nothing in the blend overpowers another.</p></div></div>
+    <div class="stage-card" data-craft-stage-index="4"><div class="stage-media"><img src="assets/craftsmanship/stage-05-maturation.jpg" alt="Maturation of the blend" loading="lazy"/></div><div class="stage-body"><span class="value-num">05</span><h3>Maturation</h3><p>The blend is left to mature, allowing the notes to deepen and evolve beautifully over time.</p></div></div>
+    <div class="stage-card" data-craft-stage-index="5"><div class="stage-media"><img src="assets/craftsmanship/stage-06-bottling.jpg" alt="Bottling by hand" loading="lazy"/></div><div class="stage-body"><span class="value-num">06</span><h3>Bottling</h3><p>Bottled by hand, and finished — ready to wear.</p></div></div>
+  </div>
+</div></section>
+
+<section class="section section-dark"><div class="container">
+  <div class="section-head reveal">
+    <div><div class="eyebrow">Parfum · Coming Soon</div><h2 id="craftParfumHeadline">The Parfum Creation Journey.</h2></div>
+    <p id="craftParfumBody">A different discipline from attar — composed for spray, projection and a wider sillage, developed with the same patience.</p>
+  </div>
+  <figure class="showcase" style="max-width:640px;margin:36px auto 0">
+    <img src="assets/Parfum/al-durrah-2.jpg" alt="HEEZE 94 parfum in development" loading="lazy" style="filter:saturate(.85)"/>
+    <figcaption id="craftParfumCaption">Al-Durrah, in progress — the House's first parfum composition.</figcaption>
+  </figure>
+  <div class="value-grid reveal" style="grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin-top:36px">
+    <div class="value" data-parfum-step-index="0">
+      <svg class="value-icon icon-inspiration" viewBox="0 0 48 48"><path d="M24 8v6M24 34v6M8 24h6M34 24h6M13 13l4 4M31 31l4 4M35 13l-4 4M17 31l-4 4" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round"/><circle cx="24" cy="24" r="7" fill="none" stroke="var(--gold)" stroke-width="1.6"/></svg>
+      <h3>Inspiration</h3><p>Every parfum begins with a single idea — a memory, a place, a feeling to be captured in scent.</p>
     </div>
-    <form class="contact-form reveal" id="contactForm">
-      <div class="field"><label for="name">Name</label><input id="name" name="name" required/></div>
-      <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required title="Enter a valid email address, e.g. name@example.com"/></div>
-      <div class="field"><label for="interest">Enquiry</label>
-        <select id="interest"><option>Fragrance guidance</option><option>Wholesale</option><option>Gifting</option><option>Press &amp; collaboration</option></select></div>
-      <div class="field"><label for="phone">Phone / WhatsApp</label><input id="phone" name="phone" type="tel" required pattern="[+]?[0-9\s\-]{7,15}" title="Enter a valid phone number (7-15 digits, optional + country code)"/></div>
-      <div class="field"><label for="message">Message</label><textarea id="message" name="message" required></textarea></div>
-      <button class="btn btn-gold" type="submit" id="contactSubmitBtn" style="align-self:flex-start">Send enquiry</button>
-      <p class="form-ok" id="formOk"></p>
-    </form>
-    <div id="contactVerifyStep" style="display:none;margin-top:22px">
-      <p style="font-size:.9rem;color:var(--muted);margin-bottom:14px">We've sent a 6-digit code to your email — enter it below to send your enquiry.</p>
-      <div class="field"><label for="verifyCode">Verification Code</label><input id="verifyCode" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" placeholder="000000"/></div>
-      <button class="btn btn-gold" type="button" id="verifySubmitBtn" style="margin-top:10px">Verify &amp; Send</button>
-      <button class="text-link" type="button" id="resendCodeBtn" style="margin-top:10px;margin-left:14px">Resend code</button>
-      <p class="form-ok" id="verifyMsg"></p>
+    <div class="value" data-parfum-step-index="1">
+      <svg class="value-icon icon-notes" viewBox="0 0 48 48"><rect class="note-bar note-bar-1" x="10" y="26" width="6" height="12" fill="none" stroke="var(--gold)" stroke-width="1.5"/><rect class="note-bar note-bar-2" x="21" y="18" width="6" height="20" fill="none" stroke="var(--gold)" stroke-width="1.5"/><rect class="note-bar note-bar-3" x="32" y="10" width="6" height="28" fill="none" stroke="var(--gold)" stroke-width="1.5"/></svg>
+      <h3>Notes Selection</h3><p>Top, heart and base notes are chosen to build a composition that unfolds in three acts.</p>
+    </div>
+    <div class="value" data-parfum-step-index="2">
+      <svg class="value-icon icon-accord" viewBox="0 0 48 48"><circle class="accord-circle accord-a" cx="19" cy="24" r="11" fill="none" stroke="var(--gold)" stroke-width="1.5"/><circle class="accord-circle accord-b" cx="29" cy="24" r="11" fill="none" stroke="var(--gold)" stroke-width="1.5"/></svg>
+      <h3>Accord Creation</h3><p>Individual notes are fused into accords — the signature chords that give a parfum its character.</p>
+    </div>
+    <div class="value" data-parfum-step-index="3">
+      <svg class="value-icon icon-testing" viewBox="0 0 48 48"><circle cx="24" cy="24" r="14" fill="none" stroke="var(--hairline)" stroke-width="1.5"/><circle class="testing-ring" cx="24" cy="24" r="14" fill="none" stroke="var(--gold)" stroke-width="1.8" stroke-dasharray="22 66" stroke-linecap="round"/><path d="M18 24l4 4 8-9" stroke="var(--gold)" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h3>Testing</h3><p>Each formula is worn, refined and worn again, until it holds true from first spray to final trace.</p>
+    </div>
+    <div class="value" data-parfum-step-index="4">
+      <svg class="value-icon icon-final" viewBox="0 0 48 48"><rect x="17" y="16" width="14" height="24" rx="1.5" fill="none" stroke="var(--gold)" stroke-width="1.5"/><rect x="20" y="9" width="8" height="7" fill="none" stroke="var(--gold)" stroke-width="1.5"/><path class="final-shine" d="M14 24 L34 24" stroke="var(--gold)" stroke-width="1.2" stroke-linecap="round" opacity="0"/></svg>
+      <h3>Final Presentation</h3><p>Approved, bottled and finished — ready to join the HEEZE 94 parfum collection.</p>
     </div>
   </div>
-</div></section></main><div class="cart-veil"></div><aside class="cart-drawer" aria-label="Shopping bag"><div class="cart-head"><h2>Your Bag</h2><button class="cart-close" data-close-cart>×</button></div><div class="cart-items" data-cart-items></div><div class="cart-foot"><div class="promo-row"><input type="text" placeholder="Promo code" data-promo-input><button class="promo-apply" data-promo-apply>Apply</button></div><div class="promo-msg" data-promo-msg></div><div class="cart-total"><span>Subtotal</span><strong data-cart-total>₹0</strong></div><button class="btn btn-gold" data-checkout style="width:100%">Continue to secure checkout</button><p class="cart-note">Razorpay · UPI · Cards · Netbanking</p></div></aside><div class="checkout-veil" data-checkout-veil></div>
+
+</div></section>
+
+<section class="section section-panel"><div class="container">
+  <div class="section-head reveal">
+    <div><div class="eyebrow">Precious Ingredients From Nature</div><h2 id="craftIngredientsHeadline">What goes into every bottle.</h2></div>
+  </div>
+  <div class="ingredient-strip reveal">
+    <figure><img src="assets/craftsmanship/ingredient-oud.jpg" alt="Oud wood"/><figcaption>Oud</figcaption></figure>
+    <figure><img src="assets/craftsmanship/ingredient-rose.jpg" alt="Rose petals"/><figcaption>Rose</figcaption></figure>
+    <figure><img src="assets/craftsmanship/ingredient-musk.jpg" alt="Musk"/><figcaption>Musk</figcaption></figure>
+    <figure><img src="assets/craftsmanship/ingredient-amber.jpg" alt="Amber"/><figcaption>Amber</figcaption></figure>
+  </div>
+</div></section>
+
+<section class="section section-dark"><div class="container" style="text-align:center">
+  <div class="reveal">
+    <div class="eyebrow">Bespoke</div>
+    <h2 style="font-size:clamp(1.5rem,3vw,2.2rem);letter-spacing:.1em;margin:14px 0 24px">Or let us craft one only for you.</h2>
+    <a class="btn btn-gold" href="bespoke">Build Your Own Perfume</a>
+  </div>
+</div></section>
+</main><div class="cart-veil"></div><aside class="cart-drawer" aria-label="Shopping bag"><div class="cart-head"><h2>Your Bag</h2><button class="cart-close" data-close-cart>×</button></div><div class="cart-items" data-cart-items></div><div class="cart-foot"><div class="promo-row"><input type="text" placeholder="Promo code" data-promo-input><button class="promo-apply" data-promo-apply>Apply</button></div><div class="promo-msg" data-promo-msg></div><div class="cart-total"><span>Subtotal</span><strong data-cart-total>₹0</strong></div><button class="btn btn-gold" data-checkout style="width:100%">Continue to secure checkout</button><p class="cart-note">Razorpay · UPI · Cards · Netbanking</p></div></aside><div class="checkout-veil" data-checkout-veil></div>
 <div class="checkout-modal" data-checkout-modal aria-label="Checkout details">
   <div class="checkout-modal-head"><h2 data-checkout-title>Checkout</h2><button class="cart-close" data-checkout-close>×</button></div>
 
@@ -687,6 +789,24 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
     <div class="account-section">
       <h3 style="font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:8px">Order History</h3>
       <div data-order-history><p style="font-size:.85rem;color:var(--muted)">Loading orders…</p></div>
+    </div>
+    <div class="account-section" data-return-form-section style="display:none;border:1px solid rgba(233,190,90,.16);border-radius:6px;padding:16px">
+      <h3 style="font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:14px">Request a Return</h3>
+      <input type="hidden" data-return-order-id>
+      <div class="field" style="margin-bottom:12px"><label style="font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Reason</label>
+        <select data-return-reason style="width:100%;margin-top:4px">
+          <option value="damaged">Item arrived damaged</option>
+          <option value="wrong_item">Wrong item received</option>
+          <option value="defective">Item is defective</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="field" style="margin-bottom:12px"><label style="font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Tell us what happened</label>
+        <textarea data-return-description rows="3" style="width:100%;margin-top:4px"></textarea>
+      </div>
+      <button class="btn btn-gold" style="width:100%;margin-bottom:8px" data-return-submit>Submit Request</button>
+      <button class="text-link" type="button" style="display:block;margin:0 auto" data-return-cancel-form>Cancel</button>
+      <p class="form-ok" data-return-msg style="margin-top:10px"></p>
     </div>
     <button class="btn btn-line" style="width:100%;margin-top:22px" data-account-signout>Sign Out</button>
   </div>
@@ -779,147 +899,53 @@ async function loadProductsFromSupabase(){
   }
 }
 
-async function loadContactInfoFromSanity(){
+async function loadCraftsmanshipPageFromSanity(){
   try{
-    const query=encodeURIComponent(`*[_type=="contactInfo"][0]{email,phone,instagramHandle,instagramUrl,facebookUrl,address}`);
+    const query=encodeURIComponent(`*[_type=="craftsmanshipPage"][0]{heroHeadline,heroSubtext,completeJourney,stagesIntro,stages,parfumJourneyIntro,parfumSteps,ingredientsHeadline}`);
     const url=`https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=${query}`;
     const res=await fetch(url);
     if(!res.ok) return;
     const {result}=await res.json();
     if(!result) return;
 
-    if(result.email){
-      const el=document.getElementById('contactEmail');
-      if(el){ el.textContent=result.email; el.href=`mailto:${result.email}`; }
+    const setText=(id,val)=>{ if(val){ const el=document.getElementById(id); if(el) el.textContent=val; } };
+
+    setText('craftHeroHeadline', result.heroHeadline);
+    setText('craftHeroSubtext', result.heroSubtext);
+
+    if(result.completeJourney){
+      setText('craftCompleteHeadline', result.completeJourney.headline);
+      setText('craftCompleteCaption', result.completeJourney.caption);
     }
-    if(result.phone){
-      const el=document.getElementById('contactWhatsapp');
-      if(el){ el.textContent=result.phone; el.href=`https://wa.me/${result.phone.replace(/[^0-9]/g,'')}`; }
+    if(result.stagesIntro){
+      setText('craftStagesHeadline', result.stagesIntro.headline);
+      setText('craftStagesBody', result.stagesIntro.body);
     }
-    if(result.instagramHandle || result.instagramUrl){
-      const el=document.getElementById('contactInstagram');
-      if(el){
-        if(result.instagramHandle) el.textContent=result.instagramHandle;
-        if(result.instagramUrl) el.href=result.instagramUrl;
-      }
+    if(Array.isArray(result.stages)){
+      result.stages.forEach((stage,i)=>{
+        const card=document.querySelector(`[data-craft-stage-index="${i}"]`);
+        if(!card) return;
+        if(stage.name) card.querySelector('h3').textContent=stage.name;
+        if(stage.body) card.querySelector('p').textContent=stage.body;
+      });
     }
-    if(result.facebookUrl){
-      const el=document.getElementById('contactFacebook');
-      if(el) el.href=result.facebookUrl;
+    if(result.parfumJourneyIntro){
+      setText('craftParfumHeadline', result.parfumJourneyIntro.headline);
+      setText('craftParfumBody', result.parfumJourneyIntro.body);
+      setText('craftParfumCaption', result.parfumJourneyIntro.imageCaption);
     }
-    if(result.address){
-      const line=document.getElementById('contactAddressLine');
-      const addr=document.getElementById('contactAddress');
-      if(line && addr){ addr.textContent=result.address; line.style.display=''; }
+    if(Array.isArray(result.parfumSteps)){
+      result.parfumSteps.forEach((step,i)=>{
+        const card=document.querySelector(`[data-parfum-step-index="${i}"]`);
+        if(!card) return;
+        if(step.name) card.querySelector('h3').textContent=step.name;
+        if(step.body) card.querySelector('p').textContent=step.body;
+      });
     }
+    setText('craftIngredientsHeadline', result.ingredientsHeadline);
   }catch(e){
-    console.error('Sanity contact info load error:',e);
+    console.error('Sanity craftsmanship page load error:',e);
   }
-}
-
-function initContactForm(){
-  const form=document.getElementById('contactForm');
-  if(!form) return;
-  const btn=document.getElementById('contactSubmitBtn');
-  const msgEl=document.getElementById('formOk');
-  const verifyStep=document.getElementById('contactVerifyStep');
-  const verifyBtn=document.getElementById('verifySubmitBtn');
-  const verifyMsg=document.getElementById('verifyMsg');
-  const codeInput=document.getElementById('verifyCode');
-  const resendBtn=document.getElementById('resendCodeBtn');
-  let pendingToken=null;
-  let lastPayload=null;
-
-  async function requestCode(){
-    const fd=new FormData(form);
-    lastPayload={
-      name: fd.get('name'),
-      email: fd.get('email'),
-      phone: fd.get('phone'),
-      interest: document.getElementById('interest')?.value || '',
-      message: fd.get('message')
-    };
-    const origText=btn.textContent;
-    btn.disabled=true; btn.textContent='Sending code…';
-    msgEl.textContent=''; msgEl.style.color='';
-    try{
-      const res=await fetch('/api/contact-request-code',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(lastPayload)
-      });
-      const data=await res.json();
-      if(!res.ok) throw new Error(data.error||'Something went wrong');
-      pendingToken=data.token;
-      form.style.display='none';
-      verifyStep.style.display='';
-      verifyMsg.textContent=''; verifyMsg.style.color='';
-      codeInput.value=''; codeInput.focus();
-    }catch(err){
-      console.error('Contact code request error:', err);
-      msgEl.textContent=err.message||'Could not send a verification code — please try WhatsApp or email us directly.';
-      msgEl.style.color='#c0392b';
-    }finally{
-      btn.disabled=false; btn.textContent=origText;
-    }
-  }
-
-  form.addEventListener('submit', async(e)=>{
-    e.preventDefault();
-    requestCode();
-  });
-
-  verifyBtn?.addEventListener('click', async()=>{
-    const code=codeInput.value.trim();
-    if(!code){ verifyMsg.textContent='Enter the 6-digit code.'; verifyMsg.style.color='#c0392b'; return; }
-    const origText=verifyBtn.textContent;
-    verifyBtn.disabled=true; verifyBtn.textContent='Verifying…';
-    verifyMsg.textContent=''; verifyMsg.style.color='';
-    try{
-      const res=await fetch('/api/contact-enquiry',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({ token: pendingToken, code })
-      });
-      const data=await res.json();
-      if(!res.ok) throw new Error(data.error||'Something went wrong');
-      verifyStep.style.display='none';
-      form.style.display='';
-      form.reset();
-      msgEl.textContent='Thank you — we will respond within 24 hours.';
-      msgEl.style.color='';
-    }catch(err){
-      console.error('Contact verify error:', err);
-      verifyMsg.textContent=err.message||'Could not verify that code — please try again.';
-      verifyMsg.style.color='#c0392b';
-    }finally{
-      verifyBtn.disabled=false; verifyBtn.textContent=origText;
-    }
-  });
-
-  resendBtn?.addEventListener('click', async()=>{
-    if(!lastPayload) return;
-    const origText=resendBtn.textContent;
-    resendBtn.disabled=true; resendBtn.textContent='Resending…';
-    verifyMsg.textContent=''; verifyMsg.style.color='';
-    try{
-      const res=await fetch('/api/contact-request-code',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(lastPayload)
-      });
-      const data=await res.json();
-      if(!res.ok) throw new Error(data.error||'Something went wrong');
-      pendingToken=data.token;
-      verifyMsg.textContent='A new code has been sent.';
-      verifyMsg.style.color='';
-    }catch(err){
-      verifyMsg.textContent=err.message||'Could not resend the code — please try again shortly.';
-      verifyMsg.style.color='#c0392b';
-    }finally{
-      resendBtn.disabled=false; resendBtn.textContent=origText;
-    }
-  });
 }
 
 function getCat(){
@@ -1091,8 +1117,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   await initGeoCurrency();
   await loadProductsFromSupabase();
   await syncSanityProductContent();
-  loadContactInfoFromSanity();
-  initContactForm();
+  loadCraftsmanshipPageFromSanity();
   initYear();initReveals();initMenu();initTicker();initFilters();initVideos();
   document.querySelectorAll('[data-product-grid]').forEach(el=>{
     renderGrid(el,{
@@ -1214,6 +1239,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     if(supa){await supa.auth.signOut();}
     checkAccountState();
   });
+  let currentUserEmail=null;
   async function checkAccountState(){
     if(!supa){document.querySelector('[data-account-logged-out]').style.display='';document.querySelector('[data-account-logged-in]').style.display='none';return;}
     const {data:{session}}=await supa.auth.getSession();
@@ -1230,6 +1256,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     }
   }
   async function loadOrders(email){
+    currentUserEmail=email;
     const el=document.querySelector('[data-order-history]');
     if(!el) return;
     try{
@@ -1243,10 +1270,72 @@ document.addEventListener('DOMContentLoaded',async()=>{
         let totalStr='\u20b9'+Number(o.total||0).toLocaleString('en-IN');
         if(o.discount_amount>0) totalStr+=' <span style="font-size:.75rem;color:var(--gold)">('+o.promo_code+' -\u20b9'+o.discount_amount+')</span>';
         const trackBtn = o.tracking_number ? ('<a href="'+(o.tracking_url||'https://www.dtdc.com/track-your-shipment/')+'" target="_blank" rel="noopener noreferrer" class="order-track-link">Track Package \u2192</a>') : '';
-        return '<div class="order-card"><div class="order-card-head"><span class="order-id">Order #'+o.id.slice(0,8).toUpperCase()+'</span><span class="order-status '+status+'">'+statusLabel+'</span></div><div class="order-details">'+dateStr+' &middot; '+totalStr+'</div>'+trackBtn+'</div>';
+        const cancellable = ['created','paid','processing'].includes(status);
+        const cancelBtn = cancellable ? ('<button type="button" class="order-action-link" data-cancel-order="'+o.id+'">Cancel Order</button>') : '';
+        const returnBtn = status==='delivered' ? ('<button type="button" class="order-action-link" data-request-return="'+o.id+'">Request a Return</button>') : '';
+        return '<div class="order-card"><div class="order-card-head"><span class="order-id">Order #'+o.id.slice(0,8).toUpperCase()+'</span><span class="order-status '+status+'">'+statusLabel+'</span></div><div class="order-details">'+dateStr+' &middot; '+totalStr+'</div>'+trackBtn+cancelBtn+returnBtn+'</div>';
       }).join('');
     }catch(e){el.innerHTML='<p style="font-size:.85rem;color:var(--muted)">Could not load orders.</p>';}
   }
+
+  /* ── Cancel Order / Request Return (event delegation, since buttons are added dynamically) ── */
+  document.querySelector('[data-order-history]')?.addEventListener('click', async(e)=>{
+    const cancelBtn=e.target.closest('[data-cancel-order]');
+    const returnBtn=e.target.closest('[data-request-return]');
+
+    if(cancelBtn){
+      const orderId=cancelBtn.dataset.cancelOrder;
+      if(!confirm('Cancel this order and refund it to your original payment method?')) return;
+      cancelBtn.disabled=true; cancelBtn.textContent='Cancelling\u2026';
+      try{
+        const res=await fetch('/api/cancel-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId,email:currentUserEmail})});
+        const data=await res.json();
+        if(!res.ok) throw new Error(data.error||'Could not cancel this order');
+        showToast('Order cancelled \u2014 refund is on its way');
+        loadOrders(currentUserEmail);
+      }catch(err){
+        alert(err.message||'Could not cancel this order right now.');
+        cancelBtn.disabled=false; cancelBtn.textContent='Cancel Order';
+      }
+    }
+
+    if(returnBtn){
+      const orderId=returnBtn.dataset.requestReturn;
+      document.querySelector('[data-return-order-id]').value=orderId;
+      document.querySelector('[data-return-form-section]').style.display='';
+      document.querySelector('[data-return-form-section]').scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+  });
+
+  document.querySelector('[data-return-cancel-form]')?.addEventListener('click',()=>{
+    document.querySelector('[data-return-form-section]').style.display='none';
+  });
+
+  document.querySelector('[data-return-submit]')?.addEventListener('click', async()=>{
+    const orderId=document.querySelector('[data-return-order-id]').value;
+    const reason=document.querySelector('[data-return-reason]').value;
+    const description=document.querySelector('[data-return-description]').value.trim();
+    const msgEl=document.querySelector('[data-return-msg]');
+    const btn=document.querySelector('[data-return-submit]');
+    if(!description){ msgEl.textContent='Please describe what happened.'; msgEl.style.color='#c0392b'; return; }
+    const origText=btn.textContent;
+    btn.disabled=true; btn.textContent='Submitting\u2026';
+    msgEl.textContent=''; msgEl.style.color='';
+    try{
+      const res=await fetch('/api/request-return',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId,email:currentUserEmail,reason,description})});
+      const data=await res.json();
+      if(!res.ok) throw new Error(data.error||'Could not submit your request');
+      msgEl.textContent='Request submitted \u2014 we\'ll email you once it\'s reviewed.';
+      msgEl.style.color='';
+      document.querySelector('[data-return-description]').value='';
+      setTimeout(()=>{ document.querySelector('[data-return-form-section]').style.display='none'; msgEl.textContent=''; }, 2500);
+    }catch(err){
+      msgEl.textContent=err.message||'Could not submit your request \u2014 please try again.';
+      msgEl.style.color='#c0392b';
+    }finally{
+      btn.disabled=false; btn.textContent=origText;
+    }
+  });
 
   /* ── Search ── */
   const searchBtn=document.querySelector('[data-search-btn]');
