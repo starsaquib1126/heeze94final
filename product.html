@@ -569,18 +569,24 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
       <h1 id="pdName" style="font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;font-size:clamp(2rem,4vw,3rem);margin:12px 0 18px"></h1>
       <p class="pd-desc" id="pdDesc"></p>
       <div class="pd-notes" id="pdNotes"></div>
-      <div class="ey" style="margin-bottom:12px">Select Size</div>
-      <div class="sz-row" id="szRow"></div>
-      <p id="alreadyInCart" style="font-size:.82rem;color:var(--gold);margin:-6px 0 14px;display:none"></p>
-      <div class="pd-buy">
-        <span class="pd-price-was" id="pdPriceWas" style="color:var(--muted);text-decoration:line-through;font-size:.85rem;margin-right:8px"></span>
-        <span class="pd-price" id="pdPrice"></span>
-        <div class="qty">
-          <button onclick="adjQty(-1)">−</button>
-          <span id="qtyVal">1</span>
-          <button onclick="adjQty(1)">+</button>
+      <div id="pdBuySection">
+        <div class="ey" style="margin-bottom:12px">Select Size</div>
+        <div class="sz-row" id="szRow"></div>
+        <p id="alreadyInCart" style="font-size:.82rem;color:var(--gold);margin:-6px 0 14px;display:none"></p>
+        <div class="pd-buy">
+          <span class="pd-price-was" id="pdPriceWas" style="color:var(--muted);text-decoration:line-through;font-size:.85rem;margin-right:8px"></span>
+          <span class="pd-price" id="pdPrice"></span>
+          <div class="qty">
+            <button onclick="adjQty(-1)">−</button>
+            <span id="qtyVal">1</span>
+            <button onclick="adjQty(1)">+</button>
+          </div>
+          <button class="btn btn-g" onclick="addPD()">Add to Bag</button>
         </div>
-        <button class="btn btn-g" onclick="addPD()">Add to Bag</button>
+      </div>
+      <div id="pdComingSoon" style="display:none;padding:18px 0;border-top:1px solid rgba(233,190,90,.14);border-bottom:1px solid rgba(233,190,90,.14)">
+        <p style="color:var(--gold);letter-spacing:.1em;text-transform:uppercase;font-size:.8rem;margin-bottom:6px" id="pdComingSoonLabel">Coming Soon</p>
+        <p style="color:var(--muted);font-size:.9rem">This fragrance isn't available to purchase yet — check back soon, or explore what's ready now.</p>
       </div>
       <div style="margin-top:28px">
         <a class="tlink" href="collection">← Back to Collection</a>
@@ -1300,13 +1306,25 @@ document.addEventListener('DOMContentLoaded',async()=>{
   renderGalleryThumbs(p);
   document.getElementById('prodFamily').textContent=p.family;
   document.getElementById('prodName').textContent=p.name;
-  document.getElementById('pdFam').textContent=p.family+' · Pure Attar';
+  const categoryLabel=p.category==='parfum'?'Parfum':'Pure Attar';
+  document.getElementById('pdFam').textContent=(p.family?p.family+' · ':'')+categoryLabel;
   document.getElementById('pdName').textContent=p.name;
   document.getElementById('pdDesc').textContent=p.desc||'';
   if(p.notes){
     document.getElementById('pdNotes').innerHTML=Object.entries(p.notes).map(([k,v])=>
       `<div class="pd-note"><span class="pd-nl">${k}</span><span>${v}</span></div>`).join('');
   }
+  const buySection=document.getElementById('pdBuySection');
+  const comingSoonSection=document.getElementById('pdComingSoon');
+  if(p.status!=='active' || !p.sizes || !p.sizes.length){
+    // Coming soon, sold out, or otherwise not purchasable — never try to read a size that doesn't exist
+    buySection.style.display='none';
+    comingSoonSection.style.display='';
+    document.getElementById('pdComingSoonLabel').textContent=p.status==='sold_out'?'Sold Out':'Coming Soon';
+    return;
+  }
+  buySection.style.display='';
+  comingSoonSection.style.display='none';
   const defSz=p.sizes[p.sizes.length-1];
   curMl=defSz.ml;
   document.getElementById('szRow').innerHTML=p.sizes.map(s=>
