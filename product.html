@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en">
 <head>
-<meta charset="utf-8"/>
+<meta charset="utf-8"/><script async src="https://www.googletagmanager.com/gtag/js?id=G-Z695114RVX"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z695114RVX');</script><script defer src="/_vercel/insights/script.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="theme-color" content="#050403"/>
 <meta name="description" content="HEEZE 94 — Premium attars crafted in UAE. Black Oud, Golden Oud and Rose Musk."/>
@@ -27,6 +27,11 @@ h1,h2,h3,h4{font-family:'Marcellus',serif;font-weight:400;color:var(--cream)}
 /* Buttons */
 .btn{display:inline-block;font-family:'Mulish',sans-serif;font-size:.71rem;letter-spacing:.28em;
   text-transform:uppercase;padding:15px 38px;cursor:pointer;border:none;transition:.35s;font-weight:500}
+.text-link{font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);
+  border-bottom:1px solid var(--gold-deep);padding-bottom:2px;transition:.3s;display:inline-block}
+.text-link:hover{border-color:var(--gold)}
+button.text-link{background:none;-webkit-appearance:none;appearance:none;border-left:none;border-right:none;border-top:none;
+  border-radius:0;padding-left:0;padding-right:0;padding-top:0;font-family:inherit;cursor:pointer;outline:none;box-shadow:none}
 .btn-g{color:var(--black);background:linear-gradient(115deg,#C99B3F,#F2D488 52%,#C99B3F);
   font-weight:600;position:relative;overflow:hidden}
 .btn-g::after{content:'';position:absolute;top:0;left:-80%;width:48%;height:100%;
@@ -372,7 +377,7 @@ body.cart-open .drawer{transform:none}
 .dr-head{padding:22px 24px;border-bottom:1px solid var(--line);
   display:flex;justify-content:space-between;align-items:center}
 .dr-head h2{letter-spacing:.22em;font-size:.92rem;text-transform:uppercase}
-.dr-cls{background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;line-height:1}
+.dr-cls{background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;line-height:1;-webkit-appearance:none;appearance:none;box-shadow:none;padding:0;outline:none}
 .dr-items{flex:1;overflow-y:auto;padding:14px 24px}
 .dr-empty{text-align:center;color:var(--muted);padding:52px 0;
   font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.08rem}
@@ -412,7 +417,7 @@ body.cart-open .drawer{transform:none}
 .ai-hi{display:flex;align-items:center}
 .ai-ht strong{display:block;font-size:.8rem;color:var(--cream)}
 .ai-ht span{font-size:.63rem;color:var(--muted)}
-.ai-x{background:none;border:none;color:var(--muted);font-size:1.15rem;cursor:pointer}
+.ai-x{background:none;border:none;color:var(--muted);font-size:1.15rem;cursor:pointer;-webkit-appearance:none;appearance:none;box-shadow:none;padding:0;outline:none}
 .ai-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:9px}
 .ai-m{max-width:88%;font-size:.83rem;line-height:1.55;padding:9px 12px}
 .ai-m.bot{background:rgba(233,190,90,.07);border-left:2px solid var(--gold2);color:var(--ivory);align-self:flex-start}
@@ -496,7 +501,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
   font-family:inherit;font-size:.9rem}
 .checkout-modal input:focus{outline:none;border-color:var(--gold)}
 .auth-tabs{display:flex;margin-bottom:18px;border-bottom:1px solid var(--hairline)}
-.auth-tab{flex:1;padding:10px 0;background:none;border:none;color:var(--muted);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;transition:.25s}
+.auth-tab{flex:1;padding:10px 0;background:none;border:none;color:var(--muted);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;transition:.25s;-webkit-appearance:none;appearance:none;box-shadow:none;outline:none;font-family:inherit}
 .auth-tab.on{color:var(--gold);border-bottom-color:var(--gold)}
 .promo-row{display:flex;gap:8px;margin-bottom:14px}
 .promo-row input{flex:1;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid var(--hairline);color:var(--ivory);font-family:inherit;font-size:.85rem}
@@ -1178,7 +1183,8 @@ document.getElementById('aiSend').onclick=send;
 document.getElementById('aiIn').addEventListener('keydown',e=>{if(e.key==='Enter')send();});
 function toggle(){open=!open;document.getElementById('aiPanel').classList.toggle('open',open);if(open&&!hist.length)greet();if(open)setTimeout(()=>document.getElementById('aiIn').focus(),350);}
 function greet(){addMsg('bot','Welcome to HEEZE 94. I am your personal fragrance advisor — are you discovering attar for the first time, or do you have a favourite style of fragrance in mind?');}
-function addMsg(r,t){const m=document.getElementById('aiMsgs');const d=document.createElement('div');d.className='ai-m '+r;d.textContent=t;m.appendChild(d);m.scrollTop=m.scrollHeight;}
+function escChat(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function addMsg(r,t){const m=document.getElementById('aiMsgs');const d=document.createElement('div');d.className='ai-m '+r;if(r==='bot'){d.innerHTML=escChat(t).replace(/\/product\?id=([a-z0-9-]+)/g,'<a href="/product?id=$1" style="color:var(--gold);text-decoration:underline">View it here</a>');}else{d.textContent=t;}m.appendChild(d);m.scrollTop=m.scrollHeight;}
 function addTyp(){const m=document.getElementById('aiMsgs');const d=document.createElement('div');d.className='ai-m bot typ';d.id='aiTyp';d.textContent='…';m.appendChild(d);m.scrollTop=m.scrollHeight;return d;}
 async function send(){const i=document.getElementById('aiIn');const t=i.value.trim();if(!t)return;i.value='';addMsg('usr',t);hist.push({role:'user',parts:[{text:t}]});const ty=addTyp();
 try{const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({history:hist})});

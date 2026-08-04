@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#060504"/><title>Top, Heart, Base — HEEZE 94 Journal [V4]</title><link rel="icon" href="assets/brand/logo-primary.png"/><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Mulish:wght@300;400;500;600&display=swap" rel="stylesheet"><style>/* ═══ HEEZE 94 · site.css · v4 — Real Assets Edition ═══════════════════════ */
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><script async src="https://www.googletagmanager.com/gtag/js?id=G-Z695114RVX"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z695114RVX');</script><script defer src="/_vercel/insights/script.js"></script><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#060504"/><title>Top, Heart, Base — HEEZE 94 Journal [V4]</title><link rel="icon" href="assets/brand/logo-primary.png"/><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Mulish:wght@300;400;500;600&display=swap" rel="stylesheet"><style>/* ═══ HEEZE 94 · site.css · v4 — Real Assets Edition ═══════════════════════ */
 @import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Mulish:wght@300;400;500;600&display=swap');
 
 :root{
@@ -45,6 +45,8 @@ body>*{position:relative;z-index:1}
 .text-link{font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);
   border-bottom:1px solid var(--gold-deep);padding-bottom:2px;transition:.3s}
 .text-link:hover{border-color:var(--gold)}
+button.text-link{background:none;-webkit-appearance:none;appearance:none;border-left:none;border-right:none;border-top:none;
+  border-radius:0;padding-left:0;padding-right:0;padding-top:0;font-family:inherit;cursor:pointer;outline:none;box-shadow:none}
 
 /* ══════════════════════════════════════════════════════════
    NAV
@@ -624,7 +626,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
   font-family:inherit;font-size:.9rem}
 .checkout-modal input:focus{outline:none;border-color:var(--gold)}
 .auth-tabs{display:flex;margin-bottom:18px;border-bottom:1px solid var(--hairline)}
-.auth-tab{flex:1;padding:10px 0;background:none;border:none;color:var(--muted);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;transition:.25s}
+.auth-tab{flex:1;padding:10px 0;background:none;border:none;color:var(--muted);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;transition:.25s;-webkit-appearance:none;appearance:none;box-shadow:none;outline:none;font-family:inherit}
 .auth-tab.on{color:var(--gold);border-bottom-color:var(--gold)}
 .promo-row{display:flex;gap:8px;margin-bottom:14px}
 .promo-row input{flex:1;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid var(--hairline);color:var(--ivory);font-family:inherit;font-size:.85rem}
@@ -1372,10 +1374,18 @@ Help customers find their perfect attar. Ask about their preferences, lifestyle,
   function greet(){
     addMsg('bot','Welcome to HEEZE 94. I\'m your personal fragrance advisor — are you discovering attar for the first time, or do you have a favourite style of fragrance in mind?');
   }
+  function escapeChatHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function addMsg(role,text){
     const msgs=document.getElementById('aiMsgs');
     const d=document.createElement('div');
-    d.className='ai-msg '+role; d.textContent=text;
+    d.className='ai-msg '+role;
+    if(role==='bot'){
+      // Turn any product-page links the advisor mentions into real clickable links
+      const escaped=escapeChatHtml(text);
+      d.innerHTML=escaped.replace(/\/product\?id=([a-z0-9-]+)/g,'<a href="/product?id=$1" style="color:var(--gold);text-decoration:underline">View it here</a>');
+    } else {
+      d.textContent=text;
+    }
     msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight;
   }
   function addTyping(){
