@@ -134,9 +134,9 @@ body.mobile-menu-open{margin-left:-260px}
 .mobile-menu.open a:hover{transform:translateX(6px) scale(1.06)}
 .mobile-menu a:hover::after{width:100%}
 .mobile-meta{font-size:.62rem;letter-spacing:.32em;text-transform:uppercase;color:var(--dim);margin-top:18px;line-height:1.6}
-.account-veil{position:fixed;inset:0;z-index:98;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:.35s}
+.account-veil{position:fixed;inset:0;z-index:240;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:.35s}
 body.account-open .account-veil{opacity:1;pointer-events:auto}
-.account-panel{position:fixed;top:0;right:0;bottom:0;width:min(400px,90vw);z-index:99;background:var(--bg,#0a0908);
+.account-panel{position:fixed;top:0;right:0;bottom:0;width:min(400px,90vw);z-index:241;background:var(--bg,#0a0908);
   border-left:1px solid rgba(255,255,255,.06);transform:translateX(100%);transition:.4s cubic-bezier(.19,1,.22,1);
   display:flex;flex-direction:column;overflow-y:auto}
 body.account-open .account-panel{transform:none}
@@ -658,6 +658,13 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
 @keyframes h94PopMsg{from{opacity:0;transform:scale(.92) translateY(-3px)}to{opacity:1;transform:none}}
 
 /* h94ExtraPop */
+.order-card{cursor:pointer;transition:transform .25s cubic-bezier(.34,1.56,.64,1),border-color .25s,background .25s}
+.order-card:hover{border-color:var(--gold-deep);background:rgba(255,255,255,.05);transform:translateY(-1px)}
+.order-chevron{transition:transform .3s ease;flex-shrink:0;opacity:.6}
+.order-card.expanded .order-chevron{transform:rotate(180deg);opacity:1}
+.order-items{max-height:0;overflow:hidden;transition:max-height .35s ease,opacity .3s ease,margin-top .35s ease;opacity:0;margin-top:0}
+.order-card.expanded .order-items{max-height:400px;opacity:1;margin-top:10px}
+.order-item-row{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);padding:6px 0;border-top:1px solid rgba(255,255,255,.06)}
 .cart-close,.checkout-close,.account-close{transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .3s}
 .cart-close:hover,.checkout-close:hover,.account-close:hover{transform:rotate(90deg) scale(1.15)}
 .promo-apply{transition:transform .25s cubic-bezier(.34,1.56,.64,1),background .3s,color .3s}
@@ -799,6 +806,10 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
     <button type="button" class="btn btn-line" style="width:100%;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px" data-google-signin>
       <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 010-9.18l-7.98-6.19a24.0 24.0 0 000 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
       Continue with Google
+    </button>
+    <button type="button" class="btn btn-line" style="width:100%;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px" data-facebook-signin>
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      Continue with Facebook
     </button>
     <button class="btn btn-gold" style="width:100%;margin-top:4px" data-auth-submit>Sign In</button>
     <button class="text-link" style="margin-top:14px;display:block" data-auth-back>← Back</button>
@@ -1308,20 +1319,34 @@ document.addEventListener('DOMContentLoaded',async()=>{
     if(supa){await supa.auth.signOut();}
     checkAccountState();
   });
+  function swapAccountView(loggedIn){
+    const out=document.querySelector('[data-account-logged-out]');
+    const inn=document.querySelector('[data-account-logged-in]');
+    if(!out||!inn) return;
+    const showEl=loggedIn?inn:out, hideEl=loggedIn?out:inn;
+    if(hideEl.style.display==='none'){ showEl.style.display=''; showEl.style.opacity='1'; return; }
+    hideEl.style.transition='opacity .22s ease';
+    hideEl.style.opacity='0';
+    setTimeout(()=>{
+      hideEl.style.display='none';
+      showEl.style.display='';
+      showEl.style.opacity='0';
+      showEl.style.transition='opacity .28s ease';
+      requestAnimationFrame(()=>{ showEl.style.opacity='1'; });
+    },220);
+  }
   let currentUserEmail=null;
   async function checkAccountState(){
     if(!supa){document.querySelector('[data-account-logged-out]').style.display='';document.querySelector('[data-account-logged-in]').style.display='none';return;}
     const {data:{session}}=await supa.auth.getSession();
     if(session?.user){
       const u=session.user, meta=u.user_metadata||{};
-      document.querySelector('[data-account-logged-out]').style.display='none';
-      document.querySelector('[data-account-logged-in]').style.display='';
+      swapAccountView(true);
       document.querySelector('[data-account-name]').textContent=meta.full_name||meta.name||'Customer';
       document.querySelector('[data-account-email]').textContent=u.email||'';
       loadOrders(u.email);
     } else {
-      document.querySelector('[data-account-logged-out]').style.display='';
-      document.querySelector('[data-account-logged-in]').style.display='none';
+      swapAccountView(false);
     }
   }
   async function loadOrders(email){
@@ -1342,10 +1367,39 @@ document.addEventListener('DOMContentLoaded',async()=>{
         const cancellable = ['created','paid','processing'].includes(status);
         const cancelBtn = cancellable ? ('<button type="button" class="order-action-link" data-cancel-order="'+o.id+'">Cancel Order</button>') : '';
         const returnBtn = status==='delivered' ? ('<button type="button" class="order-action-link" data-request-return="'+o.id+'">Request a Return</button>') : '';
-        return '<div class="order-card"><div class="order-card-head"><span class="order-id">Order #'+o.id.slice(0,8).toUpperCase()+'</span><span class="order-status '+status+'">'+statusLabel+'</span></div><div class="order-details">'+dateStr+' &middot; '+totalStr+'</div>'+trackBtn+cancelBtn+returnBtn+'</div>';
+        return '<div class="order-card" data-order-card="'+o.id+'"><div class="order-card-head"><span class="order-id">Order #'+o.id.slice(0,8).toUpperCase()+'</span><span style="display:flex;align-items:center;gap:8px"><span class="order-status '+status+'">'+statusLabel+'</span><svg class="order-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span></div><div class="order-details">'+dateStr+' &middot; '+totalStr+'</div><div class="order-items" data-order-items></div>'+trackBtn+cancelBtn+returnBtn+'</div>';
       }).join('');
     }catch(e){el.innerHTML='<p style="font-size:.85rem;color:var(--muted)">Could not load orders.</p>';}
   }
+
+  /* ── Order card expand/collapse: shows itemized contents on click ── */
+  document.querySelector('[data-order-history]')?.addEventListener('click', async(e)=>{
+    if(e.target.closest('[data-cancel-order]')||e.target.closest('[data-request-return]')||e.target.closest('.order-track-link')) return;
+    const card=e.target.closest('[data-order-card]');
+    if(!card) return;
+    const orderId=card.dataset.orderCard;
+    const itemsEl=card.querySelector('[data-order-items]');
+    const wasOpen=card.classList.contains('expanded');
+    document.querySelectorAll('[data-order-card].expanded').forEach(c=>{ if(c!==card) c.classList.remove('expanded'); });
+    card.classList.toggle('expanded', !wasOpen);
+    if(!wasOpen && itemsEl && !itemsEl.dataset.loaded){
+      itemsEl.innerHTML='<p style="font-size:.78rem;color:var(--muted);padding:8px 0">Loading items…</p>';
+      try{
+        const {data,error}=await supa.from('order_items').select('*').eq('order_id',orderId);
+        if(error||!data||!data.length){ itemsEl.innerHTML='<p style="font-size:.78rem;color:var(--muted);padding:8px 0">Itemized details unavailable for this order.</p>'; }
+        else{
+          itemsEl.innerHTML=data.map(it=>{
+            const name=it.product_name||it.name||it.product_id||'Item';
+            const size=it.variant_size||it.size||it.ml;
+            const qty=it.quantity||it.qty||1;
+            const price=it.price||it.unit_price||it.total_price||0;
+            return '<div class="order-item-row"><span>'+name+(size?' ('+size+'ml)':'')+' &times; '+qty+'</span><span>\u20b9'+Number(price).toLocaleString('en-IN')+'</span></div>';
+          }).join('');
+        }
+      }catch(err){ itemsEl.innerHTML='<p style="font-size:.78rem;color:var(--muted);padding:8px 0">Itemized details unavailable for this order.</p>'; }
+      itemsEl.dataset.loaded='1';
+    }
+  });
 
   /* ── Cancel Order / Request Return (event delegation, since buttons are added dynamically) ── */
   document.querySelector('[data-order-history]')?.addEventListener('click', async(e)=>{
@@ -1458,6 +1512,14 @@ document.addEventListener('DOMContentLoaded',async()=>{
     if(!supa){document.querySelector('[data-auth-msg]').textContent='Auth service unavailable — try guest checkout.';document.querySelector('[data-auth-msg]').className='promo-msg err';return;}
     sessionStorage.setItem('h94_oauth_pending','1');
     const {data,error}=await supa.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});
+    if(error){sessionStorage.removeItem('h94_oauth_pending');document.querySelector('[data-auth-msg]').textContent=error.message;document.querySelector('[data-auth-msg]').className='promo-msg err';}
+  });
+
+  /* Facebook OAuth sign-in */
+  document.querySelector('[data-facebook-signin]')?.addEventListener('click', async ()=>{
+    if(!supa){document.querySelector('[data-auth-msg]').textContent='Auth service unavailable — try guest checkout.';document.querySelector('[data-auth-msg]').className='promo-msg err';return;}
+    sessionStorage.setItem('h94_oauth_pending','1');
+    const {data,error}=await supa.auth.signInWithOAuth({provider:'facebook',options:{redirectTo:window.location.href}});
     if(error){sessionStorage.removeItem('h94_oauth_pending');document.querySelector('[data-auth-msg]').textContent=error.message;document.querySelector('[data-auth-msg]').className='promo-msg err';}
   });
 
