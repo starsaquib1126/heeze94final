@@ -659,6 +659,48 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
 .promo-msg{font-size:.78rem;margin-bottom:14px;min-height:1em}
 .promo-msg.ok{color:#8FD19E}
 .promo-msg.err{color:#E08585}
+/* ═══ Motion polish — added for smoother, less blunt page/tab feel ═══ */
+html{view-transition-name:none}
+@view-transition{navigation:auto}
+::view-transition-old(root){animation:h94FadeOut .28s ease both}
+::view-transition-new(root){animation:h94FadeIn .38s cubic-bezier(.19,1,.22,1) both}
+@keyframes h94FadeOut{to{opacity:0;transform:translateY(-6px)}}
+@keyframes h94FadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
+@keyframes h94BodyIn{to{opacity:1}}
+
+.btn,.text-link,.nav-links a,.footer-col a{will-change:transform}
+.btn:hover{transform:translateY(-2px) scale(1.015)}
+.btn:active{transform:translateY(0) scale(.98);transition:.12s}
+.btn-line:hover{transform:translateY(-2px) scale(1.02)}
+
+.auth-tabs{position:relative}
+.auth-tab{position:relative;z-index:1;transition:color .3s ease,transform .3s cubic-bezier(.34,1.56,.64,1)}
+.auth-tab.on{transform:scale(1.04)}
+.auth-tab::after{content:'';position:absolute;left:8%;right:8%;bottom:-1px;height:2px;background:var(--gold);
+  transform:scaleX(0);opacity:0;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s}
+.auth-tab.on::after{transform:scaleX(1);opacity:1}
+
+[data-auth-form],[data-checkout-gate],[data-checkout-form]{animation:h94PanelIn .4s cubic-bezier(.19,1,.22,1) both}
+@keyframes h94PanelIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.checkout-modal,.account-panel,.cart-drawer{transition-timing-function:cubic-bezier(.22,1.12,.36,1)!important}
+
+.promo-msg.ok,.promo-msg.err{animation:h94PopMsg .3s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes h94PopMsg{from{opacity:0;transform:scale(.92) translateY(-3px)}to{opacity:1;transform:none}}
+
+/* h94ExtraPop */
+.cart-close,.checkout-close,.account-close{transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .3s}
+.cart-close:hover,.checkout-close:hover,.account-close:hover{transform:rotate(90deg) scale(1.15)}
+.promo-apply{transition:transform .25s cubic-bezier(.34,1.56,.64,1),background .3s,color .3s}
+.promo-apply:hover{transform:scale(1.05)}
+.promo-apply:active{transform:scale(.94)}
+@media (prefers-reduced-motion: reduce){
+  html{view-transition-name:none!important}
+  body{animation:none!important;opacity:1!important}
+  .btn:hover,.btn-line:hover,.auth-tab.on,[data-auth-form],[data-checkout-gate],[data-checkout-form],.promo-msg.ok,.promo-msg.err{animation:none!important;transform:none!important}
+}
 </style></head><body class=""><header class="site-header"><div class="container"><nav class="nav">
 <a class="brand" href="index"><img src="assets/brand/logo-new.png" alt="HEEZE 94" height="52"/></a>
 <div class="nav-links"><a href="index">Home</a><a href="collection">Attar</a><a href="parfums">Parfum</a><div class="nav-dropdown"><a href="#" class="nav-dropdown-trigger">Explore HEEZE 94</a><div class="nav-dropdown-menu"><a href="house">The House</a><a href="craftsmanship">Craftsmanship</a><a href="films">Films</a></div></div><a href="bespoke">Build Your Own</a><a href="journal" class='active'>Journal</a><a href="contact">Contact</a></div>
@@ -1128,6 +1170,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   document.querySelector('[data-guest-continue]')?.addEventListener('click',()=>showDetailsForm());
 
   document.querySelector('[data-show-signin]')?.addEventListener('click',()=>{
+    sessionStorage.setItem('h94_signin_context','checkout');
     gateEl.style.display='none'; authEl.style.display=''; titleEl.textContent='Sign In';
   });
   document.querySelector('[data-auth-back]')?.addEventListener('click',()=>{
@@ -1176,6 +1219,13 @@ document.addEventListener('DOMContentLoaded',async()=>{
       return;
     }
     msgEl.textContent='';
+    if(cameFromAccount){
+      cameFromAccount=false;
+      document.body.classList.remove('checkout-open');
+      document.body.classList.add('account-open');
+      checkAccountState();
+      return;
+    }
     const meta=data?.user?.user_metadata||{};
     showDetailsForm(email, meta.full_name||'', meta.phone||'');
   }
@@ -1192,6 +1242,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   let cameFromAccount=false;
   document.querySelector('[data-account-signin]')?.addEventListener('click',()=>{
     cameFromAccount=true;
+    sessionStorage.setItem('h94_signin_context','account');
     closeAccount();
     document.body.classList.add('checkout-open');
     gateEl.style.display='none'; authEl.style.display=''; titleEl.textContent='Sign In';
@@ -1348,26 +1399,36 @@ document.addEventListener('DOMContentLoaded',async()=>{
   /* Google OAuth sign-in */
   document.querySelector('[data-google-signin]')?.addEventListener('click', async ()=>{
     if(!supa){document.querySelector('[data-auth-msg]').textContent='Auth service unavailable — try guest checkout.';document.querySelector('[data-auth-msg]').className='promo-msg err';return;}
+    sessionStorage.setItem('h94_oauth_pending','1');
     const {data,error}=await supa.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});
-    if(error){document.querySelector('[data-auth-msg]').textContent=error.message;document.querySelector('[data-auth-msg]').className='promo-msg err';}
+    if(error){sessionStorage.removeItem('h94_oauth_pending');document.querySelector('[data-auth-msg]').textContent=error.message;document.querySelector('[data-auth-msg]').className='promo-msg err';}
   });
 
-  /* On page load, check if user just returned from Google OAuth redirect */
+  /* On page load, only act if we JUST returned from a Google OAuth redirect we ourselves initiated (flag set right before leaving for Google, consumed once here) — NOT on every later visit while already signed in. If the sign-in was started from the Account button, just log the person in — never jump into checkout. */
   (async()=>{
     if(!supa) return;
+    const justReturnedFromOAuth=sessionStorage.getItem('h94_oauth_pending')==='1';
+    if(!justReturnedFromOAuth) return;
+    sessionStorage.removeItem('h94_oauth_pending');
+    const signinContext=sessionStorage.getItem('h94_signin_context');
+    sessionStorage.removeItem('h94_signin_context');
     const {data:{session}}=await supa.auth.getSession();
-    if(session?.user){
-      const u=session.user;
-      const meta=u.user_metadata||{};
-      const email=u.email||'';
-      const name=meta.full_name||meta.name||'';
-      const phone=meta.phone||u.phone||'';
-      /* If cart has items and we just came back from OAuth, auto-open checkout */
-      const cart=JSON.parse(localStorage.getItem('h94_cart')||'{}');
-      if(Object.keys(cart).length>0){
-        document.body.classList.add('checkout-open');
-        showDetailsForm(email,name,phone);
-      }
+    if(!session?.user) return;
+    if(signinContext==='account'){
+      document.body.classList.remove('checkout-open');
+      document.body.classList.add('account-open');
+      checkAccountState();
+      return;
+    }
+    const u=session.user;
+    const meta=u.user_metadata||{};
+    const email=u.email||'';
+    const name=meta.full_name||meta.name||'';
+    const phone=meta.phone||u.phone||'';
+    const cart=JSON.parse(localStorage.getItem('h94_cart')||'{}');
+    if(Object.keys(cart).length>0){
+      document.body.classList.add('checkout-open');
+      showDetailsForm(email,name,phone);
     }
   })();
 
