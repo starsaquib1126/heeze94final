@@ -105,29 +105,35 @@ body.search-open .search-box{transform:translateY(0);opacity:1}
 @media(max-width:1040px){.nav-links{display:none}}
 
 /* ── Mobile menu ── */
-.mobile-menu{position:fixed;inset:0;z-index:90;
-  background:rgba(6,5,4,.97);backdrop-filter:blur(24px);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;
+html{overflow-x:hidden}
+body{transition:margin-left .5s cubic-bezier(.19,1,.22,1)}
+body.mobile-menu-open{margin-left:-260px}
+.mobile-menu{position:fixed;top:0;right:0;bottom:0;width:min(260px,78vw);z-index:90;
+  background:linear-gradient(165deg,rgba(22,17,10,.98),rgba(6,5,4,.99));backdrop-filter:blur(24px);
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:22px;
   transform:translateX(100%);transition:.5s cubic-bezier(.19,1,.22,1);
-  overflow-y:auto;-webkit-overflow-scrolling:touch;padding:60px 20px}
+  overflow-y:auto;-webkit-overflow-scrolling:touch;padding:60px 30px;
+  border-left:1px solid rgba(233,190,90,.16);box-shadow:-24px 0 60px rgba(0,0,0,.5)}
 .mobile-menu.open{transform:none}
-.mobile-menu a{font-family:'Marcellus',serif;font-size:2rem;letter-spacing:.18em;
-  position:relative;opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease,color .3s,letter-spacing .3s}
-.mobile-menu.open a{opacity:1;transform:translateY(0)}
-.mobile-menu.open a:nth-child(1){transition-delay:.08s}
-.mobile-menu.open a:nth-child(2){transition-delay:.13s}
-.mobile-menu.open a:nth-child(3){transition-delay:.18s}
-.mobile-menu.open a:nth-child(4){transition-delay:.23s}
-.mobile-menu.open a:nth-child(5){transition-delay:.28s}
-.mobile-menu.open a:nth-child(6){transition-delay:.33s}
-.mobile-menu.open a:nth-child(7){transition-delay:.38s}
-.mobile-menu.open a:nth-child(8){transition-delay:.43s}
-.mobile-menu.open a:nth-child(9){transition-delay:.48s}
-.mobile-menu a::after{content:'';position:absolute;left:50%;bottom:-6px;width:0;height:1px;
-  background:var(--gold);transition:width .35s ease,left .35s ease}
-.mobile-menu a:hover{color:var(--gold);letter-spacing:.24em}
-.mobile-menu a:hover::after{width:100%;left:0}
-.mobile-meta{font-size:.65rem;letter-spacing:.4em;text-transform:uppercase;color:var(--dim);margin-top:20px}
+.mobile-menu a{font-family:'Marcellus',serif;font-size:1.28rem;letter-spacing:.08em;
+  position:relative;opacity:0;transform:translateX(14px);
+  transition:opacity .45s ease,color .3s,letter-spacing .3s,text-shadow .35s}
+.mobile-menu.open a{opacity:1;transform:translateX(0);transition:opacity .45s ease,transform .45s ease}
+.mobile-menu.open a:nth-child(1){transition-delay:.06s}
+.mobile-menu.open a:nth-child(2){transition-delay:.10s}
+.mobile-menu.open a:nth-child(3){transition-delay:.14s}
+.mobile-menu.open a:nth-child(4){transition-delay:.18s}
+.mobile-menu.open a:nth-child(5){transition-delay:.22s}
+.mobile-menu.open a:nth-child(6){transition-delay:.26s}
+.mobile-menu.open a:nth-child(7){transition-delay:.30s}
+.mobile-menu.open a:nth-child(8){transition-delay:.34s}
+.mobile-menu.open a:nth-child(9){transition-delay:.38s}
+.mobile-menu a::after{content:'';position:absolute;left:0;bottom:-5px;width:0;height:1px;
+  background:var(--gold);transition:width .3s ease}
+.mobile-menu a:hover{color:var(--gold);letter-spacing:.12em;text-shadow:0 0 14px rgba(233,190,90,.55)}
+.mobile-menu.open a:hover{transform:translateX(6px) scale(1.06)}
+.mobile-menu a:hover::after{width:100%}
+.mobile-meta{font-size:.62rem;letter-spacing:.32em;text-transform:uppercase;color:var(--dim);margin-top:18px;line-height:1.6}
 .account-veil{position:fixed;inset:0;z-index:98;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:.35s}
 body.account-open .account-veil{opacity:1;pointer-events:auto}
 .account-panel{position:fixed;top:0;right:0;bottom:0;width:min(400px,90vw);z-index:99;background:var(--bg,#0a0908);
@@ -996,7 +1002,14 @@ function initYear(){
 function initMenu(){
   const toggle=document.querySelector('.menu-toggle');
   const menu=document.querySelector('.mobile-menu');
-  if(toggle&&menu)toggle.addEventListener('click',()=>menu.classList.toggle('open'));
+  if(toggle&&menu)toggle.addEventListener('click',()=>{
+    menu.classList.toggle('open');
+    document.body.classList.toggle('mobile-menu-open');
+  });
+  menu?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{
+    menu.classList.remove('open');
+    document.body.classList.remove('mobile-menu-open');
+  }));
 }
 
 /* ── Video play/pause ── */
