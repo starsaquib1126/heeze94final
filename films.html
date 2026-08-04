@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><script async src="https://www.googletagmanager.com/gtag/js?id=G-Z695114RVX"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z695114RVX');</script><script defer src="/_vercel/insights/script.js"></script><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#060504"/><title>Films — HEEZE 94 [V4]</title><link rel="icon" href="assets/brand/logo-primary.png"/><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Mulish:wght@300;400;500;600&display=swap" rel="stylesheet"><style>/* ═══ HEEZE 94 · site.css · v4 — Real Assets Edition ═══════════════════════ */
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><script async src="https://www.googletagmanager.com/gtag/js?id=G-Z695114RVX"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z695114RVX');</script><script defer src="/_vercel/insights/script.js"></script><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#060504"/><title>Craftsmanship — HEEZE 94 [V4]</title><link rel="icon" href="assets/brand/logo-primary.png"/><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Mulish:wght@300;400;500;600&display=swap" rel="stylesheet"><style>/* ═══ HEEZE 94 · site.css · v4 — Real Assets Edition ═══════════════════════ */
 @import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Mulish:wght@300;400;500;600&display=swap');
 
 :root{
@@ -145,6 +145,8 @@ body.account-open .account-panel{transform:none}
 .order-status.delivered{background:rgba(34,197,94,.12);color:#22c55e}
 .order-status.created{background:rgba(255,255,255,.06);color:var(--muted)}
 .order-details{font-size:.82rem;color:var(--muted);line-height:1.6}
+.order-track-link{display:inline-block;margin-top:8px;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);text-decoration:none;border-bottom:1px solid var(--gold-deep);padding-bottom:1px}
+.order-track-link:hover{border-color:var(--gold)}
 
 /* ══════════════════════════════════════════════════════════
    GATEWAY — full screen, black velvet, two doors
@@ -315,9 +317,9 @@ body:not(.gate-active) .gateway{display:none}
 .split{display:grid;grid-template-columns:1fr 1fr}
 @media(max-width:860px){.split{grid-template-columns:1fr}}
 .split-media{overflow:hidden;min-height:480px}
-.split-media img{width:100%;height:100%;object-fit:cover;opacity:.65;filter:saturate(.55);
+.split-media img,.split-media video{width:100%;height:100%;object-fit:cover;opacity:.65;filter:saturate(.55);
   transition:filter .6s,opacity .6s}
-.split-media:hover img{opacity:.8;filter:saturate(.8)}
+.split-media:hover img,.split-media:hover video{opacity:.8;filter:saturate(.8)}
 .split-copy{display:flex;align-items:center;background:linear-gradient(135deg,var(--panel2),var(--panel))}
 .split-copy .inner{max-width:460px;padding:60px 40px}
 .split-copy h2{font-size:clamp(1.5rem,3vw,2.2rem);letter-spacing:.1em;margin:14px 0 20px}
@@ -527,6 +529,61 @@ body.cart-open .cart-drawer{transform:none}
   .reveal{opacity:1;transform:none}
   *{animation:none!important;transition:none!important}
 }
+.split-reverse{direction:rtl}.split-reverse .split-copy .inner,.split-reverse .split-media{direction:ltr}
+
+/* ── Framed showcase ── */
+.showcase{margin:44px auto 0;max-width:1080px}
+.showcase img{display:block;width:100%;height:auto;border:1px solid rgba(233,190,90,.28);box-shadow:0 0 0 10px rgba(6,5,4,.9),0 0 0 11px rgba(233,190,90,.14),0 34px 80px rgba(0,0,0,.6)}
+.showcase figcaption{margin-top:18px;text-align:center;font-size:.68rem;letter-spacing:.3em;text-transform:uppercase;color:var(--dim)}
+/* ── Stage grid ── */
+.stage-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:44px}
+.stage-card{border:1px solid rgba(233,190,90,.14);background:rgba(255,255,255,.015);overflow:hidden;transition:.5s}
+.stage-card:hover{border-color:rgba(233,190,90,.4);transform:translateY(-4px)}
+.stage-media{aspect-ratio:16/9;overflow:hidden}
+.stage-media img{width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.19,1,.22,1);filter:saturate(.85)}
+.stage-card:hover .stage-media img{transform:scale(1.06);filter:saturate(1)}
+.stage-body{padding:22px 24px 26px}
+.stage-body h3{font-family:'Marcellus',serif;font-size:1.05rem;letter-spacing:.14em;text-transform:uppercase;margin:10px 0 8px}
+.stage-body p{font-size:.88rem;color:var(--muted)}
+@media(max-width:960px){.stage-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.stage-grid{grid-template-columns:1fr}}
+
+.ingredient-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:36px;max-width:820px;margin-left:auto;margin-right:auto}
+.ingredient-strip figure{margin:0;text-align:center}
+.ingredient-strip img{width:100%;aspect-ratio:1;object-fit:cover;border:1px solid rgba(233,190,90,.18);transition:.5s}
+.ingredient-strip img:hover{border-color:rgba(233,190,90,.5);transform:translateY(-3px)}
+.ingredient-strip figcaption{margin-top:10px;font-size:.63rem;letter-spacing:.28em;text-transform:uppercase;color:var(--dim)}
+@media(max-width:760px){.ingredient-strip{grid-template-columns:repeat(3,1fr)}}
+/* ── Parfum Journey icons ── */
+.value-icon{width:44px;height:44px;margin:0 0 18px;display:block}
+
+/* Inspiration: gentle pulsing spark */
+.icon-inspiration{animation:iconPulse 3.2s ease-in-out infinite}
+@keyframes iconPulse{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
+
+/* Notes Selection: staggered rise */
+.note-bar{transform-origin:bottom;animation:noteRise 2.8s ease-in-out infinite}
+.note-bar-1{animation-delay:0s}
+.note-bar-2{animation-delay:.25s}
+.note-bar-3{animation-delay:.5s}
+@keyframes noteRise{0%,100%{transform:scaleY(1);opacity:.7}50%{transform:scaleY(1.15);opacity:1}}
+
+/* Accord Creation: circles drift together and apart */
+.accord-circle{animation:accordDrift 4s ease-in-out infinite}
+.accord-a{animation-delay:0s}
+.accord-b{animation-delay:0s;animation-name:accordDriftB}
+@keyframes accordDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(2.5px)}}
+@keyframes accordDriftB{0%,100%{transform:translateX(0)}50%{transform:translateX(-2.5px)}}
+
+/* Testing: rotating progress ring */
+.testing-ring{transform-origin:24px 24px;animation:testingSpin 2.6s linear infinite}
+@keyframes testingSpin{to{transform:rotate(360deg)}}
+
+/* Final Presentation: shine sweep */
+.icon-final{overflow:visible}
+.final-shine{animation:finalShine 3s ease-in-out infinite}
+@keyframes finalShine{0%,60%,100%{opacity:0;transform:translateX(-4px)}75%{opacity:.9;transform:translateX(4px)}}
+
 
 .ic.bump{animation:cartBump .45s cubic-bezier(.34,1.56,.64,1)}
 @keyframes cartBump{0%{transform:scale(1)}35%{transform:scale(1.3) rotate(-6deg)}60%{transform:scale(.95)}100%{transform:scale(1) rotate(0)}}
@@ -563,7 +620,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
 .promo-msg.err{color:#E08585}
 </style></head><body class=""><header class="site-header"><div class="container"><nav class="nav">
 <a class="brand" href="index"><img src="assets/brand/logo-new.png" alt="HEEZE 94" height="52"/></a>
-<div class="nav-links"><a href="index">Home</a><a href="collection">Attar</a><a href="parfums">Parfum</a><div class="nav-dropdown"><a href="#" class="nav-dropdown-trigger active">Explore HEEZE 94</a><div class="nav-dropdown-menu"><a href="house">The House</a><a href="craftsmanship">Craftsmanship</a><a href="films" class='active'>Films</a></div></div><a href="bespoke">Build Your Own</a><a href="journal">Journal</a><a href="contact">Contact</a></div>
+<div class="nav-links"><a href="index">Home</a><a href="collection">Attar</a><a href="parfums">Parfum</a><div class="nav-dropdown"><a href="#" class="nav-dropdown-trigger active">Explore HEEZE 94</a><div class="nav-dropdown-menu"><a href="house">The House</a><a href="craftsmanship" class='active'>Craftsmanship</a><a href="films">Films</a></div></div><a href="bespoke">Build Your Own</a><a href="journal">Journal</a><a href="contact">Contact</a></div>
 <div class="nav-actions">
   <button class="icon-btn" data-search-btn aria-label="Search">
     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -579,54 +636,93 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
 </div></nav></div></header>
 <div class="mobile-menu"><a href="index">Home</a><a href="house">The House</a><a href="collection">Attar</a><a href="parfums">Parfum</a><a href="craftsmanship">Craftsmanship</a><a href="films">Films</a><a href="bespoke">Build Your Own</a><a href="journal">Journal</a><a href="contact">Contact</a><a href="#" data-mobile-account>My Account</a><div class="mobile-meta">A Luxury Fragrance House · Crafted in UAE</div></div><main>
 <section class="page-hero">
-  <img src="assets/Parfum/parfum-hero.jpg" alt="HEEZE 94" fetchpriority="high"/>
+  <img src="assets/Attar/attar-hero-4.jpg" alt="HEEZE 94 atelier" fetchpriority="high"/>
   <div class="container page-hero-content reveal">
-    <div class="eyebrow">Campaign &amp; Film</div>
-    <h1>The Moving Image</h1>
-    <p>Moving media used only where it adds atmosphere — a selective portrait of the House.</p>
+    <div class="eyebrow">Craftsmanship</div>
+    <h1 id="craftHeroHeadline">The art of fragrance creation.</h1>
+    <p id="craftHeroSubtext">From raw oud, flowers and musk to the finished bottle — every HEEZE 94 creation follows a slow, deliberate journey at our UAE atelier.</p>
   </div>
 </section>
+
+<section class="section section-dark"><div class="container">
+  <div class="section-head reveal" style="justify-content:center;text-align:center">
+    <div style="margin:0 auto"><div class="eyebrow">The Complete Journey</div><h2 id="craftCompleteHeadline">Nature, expertise and patience — in one frame.</h2></div>
+  </div>
+  <figure class="showcase reveal">
+    <img src="assets/craftsmanship/craftsmanship.jpg" alt="The Art of Fragrance Creation — the complete HEEZE 94 process, from sourcing to bottling" loading="lazy"/>
+    <figcaption id="craftCompleteCaption">The Art of Fragrance Creation — nothing here is rushed, and nothing is left to chance.</figcaption>
+  </figure>
+</div></section>
+
+<section class="section section-panel"><div class="container">
+  <div class="section-head reveal">
+    <div><div class="eyebrow">The Journey of Craftsmanship</div><h2 id="craftStagesHeadline">Six stages. No shortcuts.</h2></div>
+    <p id="craftStagesBody">Whether destined to become an attar or a parfum, every fragrance passes through the same disciplined hands.</p>
+  </div>
+  <div class="stage-grid reveal">
+    <div class="stage-card" data-craft-stage-index="0"><div class="stage-media"><img src="assets/craftsmanship/stage-01-sourcing.jpg" alt="Sourcing rare raw materials" loading="lazy"/></div><div class="stage-body"><span class="value-num">01</span><h3>Sourcing</h3><p>The finest raw materials, sourced from around the world for their purity and exceptional quality.</p></div></div>
+    <div class="stage-card" data-craft-stage-index="1"><div class="stage-media"><img src="assets/craftsmanship/stage-02-preparation.jpg" alt="Preparing ingredients by hand" loading="lazy"/></div><div class="stage-body"><span class="value-num">02</span><h3>Preparation</h3><p>Ingredients are cleaned and prepared by hand, preserving their character before blending begins.</p></div></div>
+    <div class="stage-card" data-craft-stage-index="2"><div class="stage-media"><img src="assets/craftsmanship/stage-03-extraction.jpg" alt="Traditional extraction" loading="lazy"/></div><div class="stage-body"><span class="value-num">03</span><h3>Extraction</h3><p>Traditional and modern extraction methods capture the true essence of each rare ingredient.</p></div></div>
+    <div class="stage-card" data-craft-stage-index="3"><div class="stage-media"><img src="assets/craftsmanship/stage-04-blending.jpg" alt="Expert blending" loading="lazy"/></div><div class="stage-body"><span class="value-num">04</span><h3>Blending</h3><p>Our perfumers test each combination by hand until nothing in the blend overpowers another.</p></div></div>
+    <div class="stage-card" data-craft-stage-index="4"><div class="stage-media"><img src="assets/craftsmanship/stage-05-maturation.jpg" alt="Maturation of the blend" loading="lazy"/></div><div class="stage-body"><span class="value-num">05</span><h3>Maturation</h3><p>The blend is left to mature, allowing the notes to deepen and evolve beautifully over time.</p></div></div>
+    <div class="stage-card" data-craft-stage-index="5"><div class="stage-media"><img src="assets/craftsmanship/stage-06-bottling.jpg" alt="Bottling by hand" loading="lazy"/></div><div class="stage-body"><span class="value-num">06</span><h3>Bottling</h3><p>Bottled by hand, and finished — ready to wear.</p></div></div>
+  </div>
+</div></section>
+
 <section class="section section-dark"><div class="container">
   <div class="section-head reveal">
-    <div><div class="eyebrow">The Film Archive</div><h2>Shot with restraint and intention.</h2></div>
-    <p>The attar films carry the moving-image story. Parfum remains an obscured preview until the wider collection is revealed.</p>
+    <div><div class="eyebrow">Parfum · Coming Soon</div><h2 id="craftParfumHeadline">The Parfum Creation Journey.</h2></div>
+    <p id="craftParfumBody">A different discipline from attar — composed for spray, projection and a wider sillage, developed with the same patience.</p>
   </div>
-  <div class="video-grid" data-video-grid>
-    <div class="video-item reveal">
-      <video controls playsinline poster="assets/Attar/attar-hero-4.jpg" preload="none">
-        <source src="assets/video/attar-hero.mp4" type="video/mp4"/>
-      </video>
-      <div class="video-label"><span>Attar · Hero Film</span><strong>The Premium Line</strong></div>
+  <figure class="showcase" style="max-width:640px;margin:36px auto 0">
+    <img src="assets/Parfum/al-durrah-2.jpg" alt="HEEZE 94 parfum in development" loading="lazy" style="filter:saturate(.85)"/>
+    <figcaption id="craftParfumCaption">Al-Durrah, in progress — the House's first parfum composition.</figcaption>
+  </figure>
+  <div class="value-grid reveal" style="grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin-top:36px">
+    <div class="value" data-parfum-step-index="0">
+      <svg class="value-icon icon-inspiration" viewBox="0 0 48 48"><path d="M24 8v6M24 34v6M8 24h6M34 24h6M13 13l4 4M31 31l4 4M35 13l-4 4M17 31l-4 4" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round"/><circle cx="24" cy="24" r="7" fill="none" stroke="var(--gold)" stroke-width="1.6"/></svg>
+      <h3>Inspiration</h3><p>Every parfum begins with a single idea — a memory, a place, a feeling to be captured in scent.</p>
     </div>
-    <div class="video-item reveal">
-      <video controls playsinline poster="assets/images/poster-product-9.jpg" preload="none">
-        <source src="assets/video/product-9.mp4" type="video/mp4"/>
-      </video>
-      <div class="video-label"><span>Parfum · Product Study</span><strong>Rose Gold</strong></div>
+    <div class="value" data-parfum-step-index="1">
+      <svg class="value-icon icon-notes" viewBox="0 0 48 48"><rect class="note-bar note-bar-1" x="10" y="26" width="6" height="12" fill="none" stroke="var(--gold)" stroke-width="1.5"/><rect class="note-bar note-bar-2" x="21" y="18" width="6" height="20" fill="none" stroke="var(--gold)" stroke-width="1.5"/><rect class="note-bar note-bar-3" x="32" y="10" width="6" height="28" fill="none" stroke="var(--gold)" stroke-width="1.5"/></svg>
+      <h3>Notes Selection</h3><p>Top, heart and base notes are chosen to build a composition that unfolds in three acts.</p>
     </div>
-    <div class="video-item reveal">
-      <video controls playsinline poster="assets/images/poster-product-2.jpg" preload="none">
-        <source src="assets/video/product-2.mp4" type="video/mp4"/>
-      </video>
-      <div class="video-label"><span>Parfum · Product Study</span><strong>First Light</strong></div>
+    <div class="value" data-parfum-step-index="2">
+      <svg class="value-icon icon-accord" viewBox="0 0 48 48"><circle class="accord-circle accord-a" cx="19" cy="24" r="11" fill="none" stroke="var(--gold)" stroke-width="1.5"/><circle class="accord-circle accord-b" cx="29" cy="24" r="11" fill="none" stroke="var(--gold)" stroke-width="1.5"/></svg>
+      <h3>Accord Creation</h3><p>Individual notes are fused into accords — the signature chords that give a parfum its character.</p>
     </div>
-    <div class="video-item blur-preview reveal">
-      <video controls playsinline poster="assets/images/poster-product-10.jpg" preload="none">
-        <source src="assets/video/product-10.mp4" type="video/mp4"/>
-      </video>
-      <div class="video-label"><span>Attar · Product Study</span><strong>In the Forest</strong></div>
+    <div class="value" data-parfum-step-index="3">
+      <svg class="value-icon icon-testing" viewBox="0 0 48 48"><circle cx="24" cy="24" r="14" fill="none" stroke="var(--hairline)" stroke-width="1.5"/><circle class="testing-ring" cx="24" cy="24" r="14" fill="none" stroke="var(--gold)" stroke-width="1.8" stroke-dasharray="22 66" stroke-linecap="round"/><path d="M18 24l4 4 8-9" stroke="var(--gold)" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h3>Testing</h3><p>Each formula is worn, refined and worn again, until it holds true from first spray to final trace.</p>
     </div>
-    <div class="video-item reveal">
-      <video controls playsinline poster="assets/images/poster-unboxing.jpg" preload="none">
-        <source src="assets/video/unboxing.mp4" type="video/mp4"/>
-      </video>
-      <div class="video-label"><span>Experience</span><strong>The Unboxing</strong></div>
+    <div class="value" data-parfum-step-index="4">
+      <svg class="value-icon icon-final" viewBox="0 0 48 48"><rect x="17" y="16" width="14" height="24" rx="1.5" fill="none" stroke="var(--gold)" stroke-width="1.5"/><rect x="20" y="9" width="8" height="7" fill="none" stroke="var(--gold)" stroke-width="1.5"/><path class="final-shine" d="M14 24 L34 24" stroke="var(--gold)" stroke-width="1.2" stroke-linecap="round" opacity="0"/></svg>
+      <h3>Final Presentation</h3><p>Approved, bottled and finished — ready to join the HEEZE 94 parfum collection.</p>
     </div>
-<div class="video-item reveal"> <video controls playsinline poster="assets/images/poster-unboxing-parfum.jpg" preload="none"> <source src="assets/video/unboxing-parfum.mp4" type="video/mp4"/> </video> <div class="video-label"><span>Parfum · Experience</span><strong>The Unveiling</strong></div> </div>
-<div class="video-item reveal"> <video controls playsinline poster="assets/images/poster-product-12.jpg" preload="none"> <source src="assets/video/product-12.mp4" type="video/mp4"/> </video> <div class="video-label"><span>Parfum · Product Study</span><strong>Ember & Amber</strong></div> </div>
-<div class="video-item reveal"> <video controls playsinline poster="assets/images/poster-product-13.jpg" preload="none"> <source src="assets/video/product-13.mp4" type="video/mp4"/> </video> <div class="video-label"><span>Parfum · Product Study</span><strong>Warm Light</strong></div> </div>
   </div>
-</div></section></main><div class="cart-veil"></div><aside class="cart-drawer" aria-label="Shopping bag"><div class="cart-head"><h2>Your Bag</h2><button class="cart-close" data-close-cart>×</button></div><div class="cart-items" data-cart-items></div><div class="cart-foot"><div class="promo-row"><input type="text" placeholder="Promo code" data-promo-input><button class="promo-apply" data-promo-apply>Apply</button></div><div class="promo-msg" data-promo-msg></div><div class="cart-total"><span>Subtotal</span><strong data-cart-total>₹0</strong></div><button class="btn btn-gold" data-checkout style="width:100%">Continue to secure checkout</button><p class="cart-note">Razorpay · UPI · Cards · Netbanking</p></div></aside><div class="checkout-veil" data-checkout-veil></div>
+
+</div></section>
+
+<section class="section section-panel"><div class="container">
+  <div class="section-head reveal">
+    <div><div class="eyebrow">Precious Ingredients From Nature</div><h2 id="craftIngredientsHeadline">What goes into every bottle.</h2></div>
+  </div>
+  <div class="ingredient-strip reveal">
+    <figure><img src="assets/craftsmanship/ingredient-oud.jpg" alt="Oud wood"/><figcaption>Oud</figcaption></figure>
+    <figure><img src="assets/craftsmanship/ingredient-rose.jpg" alt="Rose petals"/><figcaption>Rose</figcaption></figure>
+    <figure><img src="assets/craftsmanship/ingredient-musk.jpg" alt="Musk"/><figcaption>Musk</figcaption></figure>
+    <figure><img src="assets/craftsmanship/ingredient-amber.jpg" alt="Amber"/><figcaption>Amber</figcaption></figure>
+  </div>
+</div></section>
+
+<section class="section section-dark"><div class="container" style="text-align:center">
+  <div class="reveal">
+    <div class="eyebrow">Bespoke</div>
+    <h2 style="font-size:clamp(1.5rem,3vw,2.2rem);letter-spacing:.1em;margin:14px 0 24px">Or let us craft one only for you.</h2>
+    <a class="btn btn-gold" href="bespoke">Build Your Own Perfume</a>
+  </div>
+</div></section>
+</main><div class="cart-veil"></div><aside class="cart-drawer" aria-label="Shopping bag"><div class="cart-head"><h2>Your Bag</h2><button class="cart-close" data-close-cart>×</button></div><div class="cart-items" data-cart-items></div><div class="cart-foot"><div class="promo-row"><input type="text" placeholder="Promo code" data-promo-input><button class="promo-apply" data-promo-apply>Apply</button></div><div class="promo-msg" data-promo-msg></div><div class="cart-total"><span>Subtotal</span><strong data-cart-total>₹0</strong></div><button class="btn btn-gold" data-checkout style="width:100%">Continue to secure checkout</button><p class="cart-note">Razorpay · UPI · Cards · Netbanking</p></div></aside><div class="checkout-veil" data-checkout-veil></div>
 <div class="checkout-modal" data-checkout-modal aria-label="Checkout details">
   <div class="checkout-modal-head"><h2 data-checkout-title>Checkout</h2><button class="cart-close" data-checkout-close>×</button></div>
 
@@ -754,45 +850,6 @@ async function syncSanityProductContent(){
   }
 }
 
-async function loadFilmsFromSanity(){
-  const grid=document.querySelector('[data-video-grid]');
-  if(!grid) return;
-  // Fallback posters for the site's original videos, in case a Film entry
-  // in Sanity doesn't have its own poster image uploaded yet.
-  const KNOWN_POSTERS={
-    'attar-hero.mp4':'assets/Attar/attar-hero-4.jpg',
-    'product-9.mp4':'assets/images/poster-product-9.jpg',
-    'product-2.mp4':'assets/images/poster-product-2.jpg',
-    'product-10.mp4':'assets/images/poster-product-10.jpg',
-    'unboxing.mp4':'assets/images/poster-unboxing.jpg',
-    'unboxing-parfum.mp4':'assets/images/poster-unboxing-parfum.jpg',
-    'product-12.mp4':'assets/images/poster-product-12.jpg',
-    'product-13.mp4':'assets/images/poster-product-13.jpg'
-  };
-  try{
-    const query=encodeURIComponent(`*[_type=="filmVideo"] | order(order asc){category,title,videoFileName,"posterUrl":posterImage.asset->url}`);
-    const url=`https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=${query}`;
-    const res=await fetch(url);
-    if(!res.ok) return;
-    const {result}=await res.json();
-    if(!Array.isArray(result) || !result.length) return; // keep the hardcoded videos if none exist yet
-
-    grid.innerHTML = result.map((f,i)=>{
-      if(!f.videoFileName) return '';
-      const poster = f.posterUrl || KNOWN_POSTERS[f.videoFileName] || 'assets/images/home-hero.jpg';
-      return `<div class="video-item reveal">
-        <video controls playsinline poster="${poster}" preload="none">
-          <source src="assets/video/${f.videoFileName}" type="video/mp4"/>
-        </video>
-        <div class="video-label"><span>${f.category||''}</span><strong>${f.title||''}</strong></div>
-      </div>`;
-    }).join('');
-  }catch(e){
-    console.error('Sanity films load error:',e);
-    // Keep the hardcoded videos if this fails entirely
-  }
-}
-
 async function loadProductsFromSupabase(){
   try{
     const res=await fetch('/api/products');
@@ -819,6 +876,55 @@ async function loadProductsFromSupabase(){
   }catch(e){
     console.error('Product load error:',e);
     // Keep the hardcoded fallback catalog if this fails entirely
+  }
+}
+
+async function loadCraftsmanshipPageFromSanity(){
+  try{
+    const query=encodeURIComponent(`*[_type=="craftsmanshipPage"][0]{heroHeadline,heroSubtext,completeJourney,stagesIntro,stages,parfumJourneyIntro,parfumSteps,ingredientsHeadline}`);
+    const url=`https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=${query}`;
+    const res=await fetch(url);
+    if(!res.ok) return;
+    const {result}=await res.json();
+    if(!result) return;
+
+    const setText=(id,val)=>{ if(val){ const el=document.getElementById(id); if(el) el.textContent=val; } };
+
+    setText('craftHeroHeadline', result.heroHeadline);
+    setText('craftHeroSubtext', result.heroSubtext);
+
+    if(result.completeJourney){
+      setText('craftCompleteHeadline', result.completeJourney.headline);
+      setText('craftCompleteCaption', result.completeJourney.caption);
+    }
+    if(result.stagesIntro){
+      setText('craftStagesHeadline', result.stagesIntro.headline);
+      setText('craftStagesBody', result.stagesIntro.body);
+    }
+    if(Array.isArray(result.stages)){
+      result.stages.forEach((stage,i)=>{
+        const card=document.querySelector(`[data-craft-stage-index="${i}"]`);
+        if(!card) return;
+        if(stage.name) card.querySelector('h3').textContent=stage.name;
+        if(stage.body) card.querySelector('p').textContent=stage.body;
+      });
+    }
+    if(result.parfumJourneyIntro){
+      setText('craftParfumHeadline', result.parfumJourneyIntro.headline);
+      setText('craftParfumBody', result.parfumJourneyIntro.body);
+      setText('craftParfumCaption', result.parfumJourneyIntro.imageCaption);
+    }
+    if(Array.isArray(result.parfumSteps)){
+      result.parfumSteps.forEach((step,i)=>{
+        const card=document.querySelector(`[data-parfum-step-index="${i}"]`);
+        if(!card) return;
+        if(step.name) card.querySelector('h3').textContent=step.name;
+        if(step.body) card.querySelector('p').textContent=step.body;
+      });
+    }
+    setText('craftIngredientsHeadline', result.ingredientsHeadline);
+  }catch(e){
+    console.error('Sanity craftsmanship page load error:',e);
   }
 }
 
@@ -970,13 +1076,6 @@ function initVideos(){
       else{heroVid.pause();if(span)span.textContent='Play';}
     });
   }
-  // Only one video plays at a time — starting any one pauses all the others
-  const allVideos=document.querySelectorAll('.video-item video');
-  allVideos.forEach(v=>{
-    v.addEventListener('play',()=>{
-      allVideos.forEach(other=>{ if(other!==v) other.pause(); });
-    });
-  });
 }
 
 /* ── Filters ── */
@@ -998,7 +1097,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   await initGeoCurrency();
   await loadProductsFromSupabase();
   await syncSanityProductContent();
-  await loadFilmsFromSanity();
+  loadCraftsmanshipPageFromSanity();
   initYear();initReveals();initMenu();initTicker();initFilters();initVideos();
   document.querySelectorAll('[data-product-grid]').forEach(el=>{
     renderGrid(el,{
@@ -1139,7 +1238,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     const el=document.querySelector('[data-order-history]');
     if(!el) return;
     try{
-      const {data,error}=await supa.from('orders').select('id,created_at,total,status,promo_code,discount_amount').eq('email',email).order('created_at',{ascending:false}).limit(20);
+      const {data,error}=await supa.from('orders').select('id,created_at,total,status,promo_code,discount_amount,tracking_number,tracking_url,courier_name').eq('email',email).order('created_at',{ascending:false}).limit(20);
       if(error||!data||data.length===0){el.innerHTML='<p style="font-size:.85rem;color:var(--muted)">No orders yet. Start shopping!</p>';return;}
       el.innerHTML=data.map(o=>{
         const d=new Date(o.created_at);
@@ -1148,7 +1247,8 @@ document.addEventListener('DOMContentLoaded',async()=>{
         const statusLabel=status.charAt(0).toUpperCase()+status.slice(1);
         let totalStr='\u20b9'+Number(o.total||0).toLocaleString('en-IN');
         if(o.discount_amount>0) totalStr+=' <span style="font-size:.75rem;color:var(--gold)">('+o.promo_code+' -\u20b9'+o.discount_amount+')</span>';
-        return '<div class="order-card"><div class="order-card-head"><span class="order-id">Order #'+o.id.slice(0,8).toUpperCase()+'</span><span class="order-status '+status+'">'+statusLabel+'</span></div><div class="order-details">'+dateStr+' &middot; '+totalStr+'</div></div>';
+        const trackBtn = o.tracking_number ? ('<a href="'+(o.tracking_url||'https://www.dtdc.com/track-your-shipment/')+'" target="_blank" rel="noopener noreferrer" class="order-track-link">Track Package \u2192</a>') : '';
+        return '<div class="order-card"><div class="order-card-head"><span class="order-id">Order #'+o.id.slice(0,8).toUpperCase()+'</span><span class="order-status '+status+'">'+statusLabel+'</span></div><div class="order-details">'+dateStr+' &middot; '+totalStr+'</div>'+trackBtn+'</div>';
       }).join('');
     }catch(e){el.innerHTML='<p style="font-size:.85rem;color:var(--muted)">Could not load orders.</p>';}
   }

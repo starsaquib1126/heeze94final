@@ -145,6 +145,8 @@ body.account-open .account-panel{transform:none}
 .order-status.delivered{background:rgba(34,197,94,.12);color:#22c55e}
 .order-status.created{background:rgba(255,255,255,.06);color:var(--muted)}
 .order-details{font-size:.82rem;color:var(--muted);line-height:1.6}
+.order-track-link{display:inline-block;margin-top:8px;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);text-decoration:none;border-bottom:1px solid var(--gold-deep);padding-bottom:1px}
+.order-track-link:hover{border-color:var(--gold)}
 
 /* ══════════════════════════════════════════════════════════
    GATEWAY — full screen, black velvet, two doors
@@ -1188,7 +1190,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     const el=document.querySelector('[data-order-history]');
     if(!el) return;
     try{
-      const {data,error}=await supa.from('orders').select('id,created_at,total,status,promo_code,discount_amount').eq('email',email).order('created_at',{ascending:false}).limit(20);
+      const {data,error}=await supa.from('orders').select('id,created_at,total,status,promo_code,discount_amount,tracking_number,tracking_url,courier_name').eq('email',email).order('created_at',{ascending:false}).limit(20);
       if(error||!data||data.length===0){el.innerHTML='<p style="font-size:.85rem;color:var(--muted)">No orders yet. Start shopping!</p>';return;}
       el.innerHTML=data.map(o=>{
         const d=new Date(o.created_at);
@@ -1197,7 +1199,8 @@ document.addEventListener('DOMContentLoaded',async()=>{
         const statusLabel=status.charAt(0).toUpperCase()+status.slice(1);
         let totalStr='\u20b9'+Number(o.total||0).toLocaleString('en-IN');
         if(o.discount_amount>0) totalStr+=' <span style="font-size:.75rem;color:var(--gold)">('+o.promo_code+' -\u20b9'+o.discount_amount+')</span>';
-        return '<div class="order-card"><div class="order-card-head"><span class="order-id">Order #'+o.id.slice(0,8).toUpperCase()+'</span><span class="order-status '+status+'">'+statusLabel+'</span></div><div class="order-details">'+dateStr+' &middot; '+totalStr+'</div></div>';
+        const trackBtn = o.tracking_number ? ('<a href="'+(o.tracking_url||'https://www.dtdc.com/track-your-shipment/')+'" target="_blank" rel="noopener noreferrer" class="order-track-link">Track Package \u2192</a>') : '';
+        return '<div class="order-card"><div class="order-card-head"><span class="order-id">Order #'+o.id.slice(0,8).toUpperCase()+'</span><span class="order-status '+status+'">'+statusLabel+'</span></div><div class="order-details">'+dateStr+' &middot; '+totalStr+'</div>'+trackBtn+'</div>';
       }).join('');
     }catch(e){el.innerHTML='<p style="font-size:.85rem;color:var(--muted)">Could not load orders.</p>';}
   }
