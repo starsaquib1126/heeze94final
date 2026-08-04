@@ -653,7 +653,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
       </div>
       <div class="ft-col"><h4>Client Care</h4>
         <a href="contact">Contact</a>
-        <a href="privacy">Privacy Policy</a>
+        <a href="privacy">Privacy Policy</a><a href="terms">Terms & Conditions</a>
         <a href="https://wa.me/910000000000" target="_blank">WhatsApp</a>
         
       </div>
@@ -702,7 +702,11 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
       <option value="US">United States</option>
     </select></label>
     <p class="promo-msg" style="margin-top:4px">Charged in Indian Rupees (INR) regardless of the currency shown while browsing.</p>
-    <button type="submit" class="btn btn-g" style="width:100%;margin-top:18px">Pay Now</button>
+    <label class="terms-check" style="display:flex;align-items:flex-start;gap:9px;margin-top:16px;cursor:pointer">
+      <input type="checkbox" name="agreeTerms" required style="margin-top:3px;width:15px;height:15px;flex-shrink:0;accent-color:var(--gold)"/>
+      <span style="font-size:.78rem;color:var(--muted);line-height:1.6">I agree to the <a href="terms" target="_blank" style="color:var(--gold);text-decoration:underline">Terms & Conditions</a> and <a href="privacy" target="_blank" style="color:var(--gold);text-decoration:underline">Privacy Policy</a>.</span>
+    </label>
+    <button type="submit" class="btn btn-g" style="width:100%;margin-top:18px" data-pay-btn disabled>Pay Now</button>
   </form>
 </div>
 <div class="account-veil" data-account-veil></div>
@@ -975,6 +979,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const authEl=document.querySelector('[data-auth-form]');
   const formEl=document.querySelector('[data-checkout-form]');
   const titleEl=document.querySelector('[data-checkout-title]');
+  formEl?.querySelector('input[name="agreeTerms"]')?.addEventListener('change', function(){ const payBtn=formEl.querySelector('[data-pay-btn]'); if(payBtn) payBtn.disabled=!this.checked; });
 
   function showDetailsForm(prefillEmail, prefillName, prefillPhone){
     gateEl.style.display='none'; authEl.style.display='none'; formEl.style.display='';

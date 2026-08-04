@@ -703,7 +703,11 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
       <option value="US">United States</option>
     </select></label>
     <p class="promo-msg" style="margin-top:4px">Charged in Indian Rupees (INR) regardless of the currency shown while browsing.</p>
-    <button type="submit" class="btn btn-gold" style="width:100%;margin-top:18px">Pay Now</button>
+    <label class="terms-check" style="display:flex;align-items:flex-start;gap:9px;margin-top:16px;cursor:pointer">
+      <input type="checkbox" name="agreeTerms" required style="margin-top:3px;width:15px;height:15px;flex-shrink:0;accent-color:var(--gold)"/>
+      <span style="font-size:.78rem;color:var(--muted);line-height:1.6">I agree to the <a href="terms" target="_blank" style="color:var(--gold);text-decoration:underline">Terms & Conditions</a> and <a href="privacy" target="_blank" style="color:var(--gold);text-decoration:underline">Privacy Policy</a>.</span>
+    </label>
+    <button type="submit" class="btn btn-gold" style="width:100%;margin-top:18px" data-pay-btn disabled>Pay Now</button>
   </form>
 </div>
 <div class="account-veil" data-account-veil></div>
@@ -754,7 +758,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
     <div class="search-results" data-search-results></div>
   </div>
 </div>
-<div class="toast" role="status"></div><footer class="footer"><div class="container"><div class="footer-top"><div class="footer-brand"><img src="assets/brand/logo-primary.png" alt="HEEZE 94"/><p>Premium attars — intimate, enduring, composed to become part of the wearer.</p></div><div class="footer-col"><h3>Explore</h3><a href="collection">Collection</a><a href="parfums">Parfums</a><a href="films">Films</a><a href="journal">Journal</a></div><div class="footer-col"><h3>The House</h3><a href="house">Our Story</a><a href="contact">Private Client</a><a href="contact">Wholesale</a></div><div class="footer-col"><h3>Client Care</h3><a href="contact">Contact</a><a href="privacy">Privacy Policy</a></div></div><div class="footer-bottom"><span>© <span data-year></span> HEEZE 94</span><span>Fragrance in its most intimate form</span></div></div></footer><script>/* ═══ HEEZE 94 · catalogue.js · v4 · Real Assets ════════════════════════════ */
+<div class="toast" role="status"></div><footer class="footer"><div class="container"><div class="footer-top"><div class="footer-brand"><img src="assets/brand/logo-primary.png" alt="HEEZE 94"/><p>Premium attars — intimate, enduring, composed to become part of the wearer.</p></div><div class="footer-col"><h3>Explore</h3><a href="collection">Collection</a><a href="parfums">Parfums</a><a href="films">Films</a><a href="journal">Journal</a></div><div class="footer-col"><h3>The House</h3><a href="house">Our Story</a><a href="contact">Private Client</a><a href="contact">Wholesale</a></div><div class="footer-col"><h3>Client Care</h3><a href="contact">Contact</a><a href="privacy">Privacy Policy</a><a href="terms">Terms & Conditions</a></div></div><div class="footer-bottom"><span>© <span data-year></span> HEEZE 94</span><span>Fragrance in its most intimate form</span></div></div></footer><script>/* ═══ HEEZE 94 · catalogue.js · v4 · Real Assets ════════════════════════════ */
 const H94 = (() => {
 
 const DEFAULT = [
@@ -1041,6 +1045,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const authEl=document.querySelector('[data-auth-form]');
   const formEl=document.querySelector('[data-checkout-form]');
   const titleEl=document.querySelector('[data-checkout-title]');
+  formEl?.querySelector('input[name="agreeTerms"]')?.addEventListener('change', function(){ const payBtn=formEl.querySelector('[data-pay-btn]'); if(payBtn) payBtn.disabled=!this.checked; });
 
   function showDetailsForm(prefillEmail, prefillName, prefillPhone){
     gateEl.style.display='none'; authEl.style.display='none'; formEl.style.display='';
