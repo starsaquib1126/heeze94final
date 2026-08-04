@@ -94,6 +94,8 @@ body.search-open .search-box{transform:translateY(0);opacity:1}
 .search-result-item{display:flex;align-items:center;gap:14px;padding:12px 4px;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;transition:.2s}
 .search-result-item:hover{background:rgba(233,190,90,.05)}
 .search-result-item img{width:46px;height:46px;object-fit:cover;border-radius:2px;flex-shrink:0}
+.search-result-item .sr-icon{width:46px;height:46px;flex-shrink:0;border:1px solid rgba(233,190,90,.25);
+  border-radius:2px;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:1.1rem}
 .search-result-item .sr-name{font-family:'Marcellus',serif;font-size:.95rem;color:var(--ivory)}
 .search-result-item .sr-fam{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
 .search-empty{color:var(--muted);font-size:.85rem;padding:14px 4px;text-align:center}
@@ -312,7 +314,7 @@ body:not(.gate-active) .gateway{display:none}
 ══════════════════════════════════════════════════════════ */
 .split{display:grid;grid-template-columns:1fr 1fr}
 @media(max-width:860px){.split{grid-template-columns:1fr}}
-.split-media{overflow:hidden;min-height:480px}
+.split-media{overflow:hidden;height:480px;min-height:480px}
 .split-media img{width:100%;height:100%;object-fit:cover;opacity:.65;filter:saturate(.55);
   transition:filter .6s,opacity .6s}
 .split-media:hover img{opacity:.8;filter:saturate(.8)}
@@ -1137,18 +1139,39 @@ document.addEventListener('DOMContentLoaded',async()=>{
   searchVeil?.addEventListener('click',(e)=>{if(e.target===searchVeil)closeSearch();});
   document.addEventListener('keydown',(e)=>{if(e.key==='Escape')closeSearch();if(e.key==='/'&&document.activeElement.tagName!=='INPUT'&&document.activeElement.tagName!=='TEXTAREA'){e.preventDefault();openSearch();}});
   searchInput?.addEventListener('input',(e)=>renderSearch(e.target.value));
+  const SITE_PAGES=[
+    {name:'The House',desc:'Our story and philosophy',url:'house'},
+    {name:'Craftsmanship',desc:'How our fragrances are made',url:'craftsmanship'},
+    {name:'Films',desc:'Cinematic stories from HEEZE 94',url:'films'},
+    {name:'Attar Collection',desc:'Shop our pure attar oils',url:'collection'},
+    {name:'Parfum',desc:'Our upcoming parfum collection',url:'parfums'},
+    {name:'Build Your Own',desc:'Create a bespoke fragrance',url:'bespoke'},
+    {name:'Journal',desc:'Stories and fragrance guides',url:'journal'},
+    {name:'Contact',desc:'Get in touch with us',url:'contact'},
+    {name:'Privacy Policy',desc:'Our privacy practices',url:'privacy'}
+  ];
   function renderSearch(q){
     if(!searchResults) return;
-    const all=(typeof H94!=='undefined'&&H94.cat)?H94.cat():[];
+    const allProducts=(typeof H94!=='undefined'&&H94.cat)?H94.cat():[];
     q=q.trim().toLowerCase();
-    let matches=all;
-    if(q) matches=all.filter(p=>(p.name+' '+(p.family||'')+' '+(p.desc||'')).toLowerCase().includes(q));
-    if(!matches.length){searchResults.innerHTML='<p class="search-empty">No fragrances found.</p>';return;}
-    searchResults.innerHTML=matches.slice(0,8).map(p=>`
+    let productMatches=allProducts, pageMatches=SITE_PAGES;
+    if(q){
+      productMatches=allProducts.filter(p=>(p.name+' '+(p.family||'')+' '+(p.desc||'')).toLowerCase().includes(q));
+      pageMatches=SITE_PAGES.filter(pg=>(pg.name+' '+pg.desc).toLowerCase().includes(q));
+    }
+    const pageResults=pageMatches.slice(0,4).map(pg=>`
+      <div class="search-result-item" onclick="location.href='${pg.url}'">
+        <div class="sr-icon">→</div>
+        <div><div class="sr-name">${pg.name}</div><div class="sr-fam">${pg.desc}</div></div>
+      </div>`);
+    const productResults=productMatches.slice(0,8).map(p=>`
       <div class="search-result-item" onclick="location.href='product?id=${p.id}'">
         <img src="${p.img}" alt="${p.name}"/>
         <div><div class="sr-name">${p.name}</div><div class="sr-fam">${p.family||''}</div></div>
-      </div>`).join('');
+      </div>`);
+    const combined=[...pageResults,...productResults];
+    if(!combined.length){searchResults.innerHTML='<p class="search-empty">No results found.</p>';return;}
+    searchResults.innerHTML=combined.join('');
   }
 
   /* Google OAuth sign-in */
