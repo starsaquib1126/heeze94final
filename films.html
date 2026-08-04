@@ -744,6 +744,18 @@ async function syncSanityProductContent(){
 async function loadFilmsFromSanity(){
   const grid=document.querySelector('[data-video-grid]');
   if(!grid) return;
+  // Fallback posters for the site's original videos, in case a Film entry
+  // in Sanity doesn't have its own poster image uploaded yet.
+  const KNOWN_POSTERS={
+    'attar-hero.mp4':'assets/Attar/attar-hero-4.jpg',
+    'product-9.mp4':'assets/images/poster-product-9.jpg',
+    'product-2.mp4':'assets/images/poster-product-2.jpg',
+    'product-10.mp4':'assets/images/poster-product-10.jpg',
+    'unboxing.mp4':'assets/images/poster-unboxing.jpg',
+    'unboxing-parfum.mp4':'assets/images/poster-unboxing-parfum.jpg',
+    'product-12.mp4':'assets/images/poster-product-12.jpg',
+    'product-13.mp4':'assets/images/poster-product-13.jpg'
+  };
   try{
     const query=encodeURIComponent(`*[_type=="filmVideo"] | order(order asc){category,title,videoFileName,"posterUrl":posterImage.asset->url}`);
     const url=`https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${SANITY_DATASET}?query=${query}`;
@@ -754,7 +766,7 @@ async function loadFilmsFromSanity(){
 
     grid.innerHTML = result.map((f,i)=>{
       if(!f.videoFileName) return '';
-      const poster = f.posterUrl || 'assets/images/home-hero.jpg';
+      const poster = f.posterUrl || KNOWN_POSTERS[f.videoFileName] || 'assets/images/home-hero.jpg';
       return `<div class="video-item reveal">
         <video controls playsinline poster="${poster}" preload="none">
           <source src="assets/video/${f.videoFileName}" type="video/mp4"/>
@@ -1272,7 +1284,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   });
 });
 
-return {addToCart,changeQty,openCart,closeCart,getCat,saveCat,fmt,showToast,renderGrid};
+return {addToCart,changeQty,openCart,closeCart,getCat,cat:getCat,saveCat,fmt,showToast,renderGrid};
 })();
 </script><script>/* HEEZE 94 · chat.js · Gemini AI Fragrance Advisor */
 (function(){
