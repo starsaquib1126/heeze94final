@@ -15,8 +15,13 @@
 //      means no data is returned, regardless of whether the order ID exists.
 
 import { createClient } from '@supabase/supabase-js';
+import Razorpay from 'razorpay';
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET
+});
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -46,6 +51,9 @@ export default async function handler(req, res) {
     }
     if (action === 'admin-update-order') {
       return await handleAdminUpdateOrder(req, res);
+    }
+    if (action === 'resume-payment') {
+      return await handleResumePayment(req, res);
     }
     return res.status(400).json({ error: 'Unknown action' });
   } catch (err) {
@@ -271,4 +279,52 @@ async function handleAdminUpdateOrder(req, res) {
   if (error) return res.status(500).json({ error: error.message });
 
   return res.status(200).json({ success: true });
+}
+
+async function handleResumePayment(req, res) {
+  // "Complete Payment" on a pending order. An abandoned Razorpay order can't be
+  // revived, so we create a FRESH Razorpay order for the SAME stored total, then
+  // point the existing pending order row at the new razorpay_order_id. Nothing
+  // about the items or price changes — verify-payment.js will mark it 'paid' on
+  // success exactly as it does for a normal checkout.
+  const { orderId, email } = req.body;
+  const cleanOrderId = (orderId || '').trim();
+  const cleanEmail = (email || '').trim().toLowerCase();
+  if (!cleanOrderId || !cleanEmail) {
+    return res.status(400).json({ error: 'Order ID and email are both required' });
+  }
+
+  const { data: order } = await supabase
+    .from('orders')
+    .select('id, email, status, total')
+    .eq('id', cleanOrderId)
+    .maybeSingle();
+
+  // Same privacy stance as track-order: no email match => reveal nothing.
+  if (!order || order.email.toLowerCase() !== cleanEmail) {
+    return res.status(404).json({ error: 'No matching order found.' });
+  }
+  // Only a still-pending order can be resumed. A paid/shipped/cancelled order must not be re-charged.
+  if (order.status !== 'pending') {
+    return res.status(400).json({ error: 'This order can no longer be paid for here.' });
+  }
+  if (!order.total || order.total <= 0) {
+    return res.status(400).json({ error: 'This order has no payable amount.' });
+  }
+
+  const razorpayOrder = await razorpay.orders.create({
+    amount: Math.round(order.total * 100),
+    currency: 'INR',
+    receipt: order.id
+  });
+
+  await supabase.from('orders').update({ razorpay_order_id: razorpayOrder.id }).eq('id', order.id);
+
+  return res.status(200).json({
+    orderId: order.id,
+    razorpayOrderId: razorpayOrder.id,
+    amount: razorpayOrder.amount,
+    currency: razorpayOrder.currency,
+    keyId: process.env.RAZORPAY_KEY_ID
+  });
 }

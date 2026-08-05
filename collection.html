@@ -159,6 +159,9 @@ body.wishlist-open .wishlist-panel{transform:none}
 .order-details{font-size:.82rem;color:var(--muted);line-height:1.6}
 .order-track-link{display:inline-block;margin-top:8px;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);text-decoration:none;border-bottom:1px solid var(--gold-deep);padding-bottom:1px}
 .order-action-link{display:inline-block;margin-top:8px;margin-right:14px;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:none;border:none;-webkit-appearance:none;appearance:none;border-bottom:1px solid var(--dim);padding:0 0 1px;cursor:pointer;font-family:inherit;outline:none;box-shadow:none}
+.order-pay-btn{display:block;width:100%;margin-top:12px;padding:11px;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:#0a0908;background:linear-gradient(90deg,var(--gold-deep,#b8912f),var(--gold,#e9be5a));border:none;border-radius:5px;cursor:pointer;font-family:inherit;font-weight:600;transition:transform .2s,opacity .2s}
+.order-pay-btn:hover{transform:translateY(-1px)}
+.order-pay-btn:disabled{opacity:.6;cursor:default;transform:none}
 .order-action-link:hover{color:var(--gold);border-color:var(--gold)}
 .order-track-link:hover{border-color:var(--gold)}
 
@@ -1289,17 +1292,49 @@ document.addEventListener('DOMContentLoaded',async()=>{
         let totalStr='\u20b9'+Number(o.total||0).toLocaleString('en-IN');
         if(o.discount_amount>0) totalStr+=' <span style="font-size:.75rem;color:var(--gold)">('+o.promo_code+' -\u20b9'+o.discount_amount+')</span>';
         const trackBtn = o.tracking_number ? ('<a href="'+(o.tracking_url||'https://www.dtdc.com/track-your-shipment/')+'" target="_blank" rel="noopener noreferrer" class="order-track-link">Track Package \u2192</a>') : '';
+        const payBtn = status==='pending' ? ('<button type="button" class="order-pay-btn" data-resume-payment="'+o.id+'" data-order-total="'+(o.total||0)+'">Complete Payment</button>') : '';
         const cancellable = ['pending','created','paid','processing'].includes(status);
         const cancelLabel = status==='pending' ? 'Cancel Incomplete Order' : 'Cancel Order'; const cancelBtn = cancellable ? ('<button type="button" class="order-action-link" data-cancel-order="'+o.id+'">'+cancelLabel+'</button>') : '';
         const returnBtn = status==='delivered' ? ('<button type="button" class="order-action-link" data-request-return="'+o.id+'">Request a Return</button>') : '';
-        return '<div class="order-card" data-order-card="'+o.id+'"><div class="order-card-head"><span class="order-id">Order #'+o.id.slice(0,8).toUpperCase()+'</span><span style="display:flex;align-items:center;gap:8px"><span class="order-status '+status+'">'+statusLabel+'</span><svg class="order-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span></div><div class="order-details">'+dateStr+' &middot; '+totalStr+'</div><div class="order-items" data-order-items></div>'+trackBtn+cancelBtn+returnBtn+'</div>';
+        return '<div class="order-card" data-order-card="'+o.id+'"><div class="order-card-head"><span class="order-id">Order #'+o.id.slice(0,8).toUpperCase()+'</span><span style="display:flex;align-items:center;gap:8px"><span class="order-status '+status+'">'+statusLabel+'</span><svg class="order-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span></div><div class="order-details">'+dateStr+' &middot; '+totalStr+'</div><div class="order-items" data-order-items></div>'+payBtn+trackBtn+cancelBtn+returnBtn+'</div>';
       }).join('');
     }catch(e){el.innerHTML='<p style="font-size:.85rem;color:var(--muted)">Could not load orders.</p>';}
   }
 
   /* ── Order card expand/collapse: shows itemized contents on click ── */
   document.querySelector('[data-order-history]')?.addEventListener('click', async(e)=>{
-    if(e.target.closest('[data-cancel-order]')||e.target.closest('[data-request-return]')||e.target.closest('.order-track-link')) return;
+    if(e.target.closest('[data-cancel-order]')||e.target.closest('[data-request-return]')||e.target.closest('.order-track-link')||e.target.closest('[data-resume-payment]')) return;
+
+    if(payBtn){
+      const orderId=payBtn.dataset.resumePayment;
+      payBtn.disabled=true; payBtn.textContent='Preparing\u2026';
+      try{
+        const order=await fetch('/api/customer-tools',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'resume-payment',orderId,email:currentUserEmail})}).then(r=>r.json());
+        if(order.error) throw new Error(order.error);
+        if(typeof Razorpay==='undefined') throw new Error('Payment system is still loading \u2014 please try again in a moment.');
+        const rzp=new Razorpay({
+          key: order.keyId,
+          amount: order.amount,
+          currency: order.currency,
+          order_id: order.razorpayOrderId,
+          name: 'HEEZE 94',
+          description: 'Completing order #'+orderId.slice(0,8).toUpperCase(),
+          prefill:{ email: currentUserEmail },
+          theme:{ color:'#E9BE5A' },
+          handler: async (response)=>{
+            const verify=await fetch('/api/verify-payment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(response)}).then(r=>r.json());
+            if(verify.success){ showToast('Payment successful \u2014 thank you!'); loadOrders(currentUserEmail); }
+            else{ showToast('Payment could not be verified. Please contact us.'); }
+          },
+          modal:{ ondismiss: ()=>{ payBtn.disabled=false; payBtn.textContent='Complete Payment'; } }
+        });
+        rzp.open();
+      }catch(err){
+        alert(err.message||'Could not start payment right now.');
+        payBtn.disabled=false; payBtn.textContent='Complete Payment';
+      }
+    }
+
     const card=e.target.closest('[data-order-card]');
     if(!card) return;
     const orderId=card.dataset.orderCard;
@@ -1329,23 +1364,60 @@ document.addEventListener('DOMContentLoaded',async()=>{
   });
 
   /* ── Cancel Order / Request Return (event delegation, since buttons are added dynamically) ── */
-  document.querySelector('[data-order-history]')?.addEventListener('click', async(e)=>{
+  document.querySelector('[data-order-history]')?.  document.querySelector('[data-order-history]')?.addEventListener('click', async(e)=>{
     const cancelBtn=e.target.closest('[data-cancel-order]');
     const returnBtn=e.target.closest('[data-request-return]');
+    const payBtn=e.target.closest('[data-resume-payment]');
 
     if(cancelBtn){
       const orderId=cancelBtn.dataset.cancelOrder;
-      if(!confirm('Cancel this order and refund it to your original payment method?')) return;
+      const card=cancelBtn.closest('[data-order-card]');
+      const isPending=card && card.querySelector('.order-status.pending');
+      const confirmMsg=isPending
+        ? 'Cancel this incomplete order? Nothing was charged, so there is no refund \u2014 it will just be removed.'
+        : 'Cancel this order and refund it to your original payment method?';
+      if(!confirm(confirmMsg)) return;
+      const origLabel=cancelBtn.textContent;
       cancelBtn.disabled=true; cancelBtn.textContent='Cancelling\u2026';
       try{
         const res=await fetch('/api/cancel-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId,email:currentUserEmail})});
         const data=await res.json();
         if(!res.ok) throw new Error(data.error||'Could not cancel this order');
-        showToast('Order cancelled \u2014 refund is on its way');
+        showToast(isPending?'Order cancelled':'Order cancelled \u2014 refund is on its way');
         loadOrders(currentUserEmail);
       }catch(err){
         alert(err.message||'Could not cancel this order right now.');
-        cancelBtn.disabled=false; cancelBtn.textContent='Cancel Order';
+        cancelBtn.disabled=false; cancelBtn.textContent=origLabel;
+      }
+    }
+
+    if(payBtn){
+      const orderId=payBtn.dataset.resumePayment;
+      payBtn.disabled=true; payBtn.textContent='Preparing\u2026';
+      try{
+        const order=await fetch('/api/customer-tools',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'resume-payment',orderId,email:currentUserEmail})}).then(r=>r.json());
+        if(order.error) throw new Error(order.error);
+        if(typeof Razorpay==='undefined') throw new Error('Payment system is still loading \u2014 please try again in a moment.');
+        const rzp=new Razorpay({
+          key: order.keyId,
+          amount: order.amount,
+          currency: order.currency,
+          order_id: order.razorpayOrderId,
+          name: 'HEEZE 94',
+          description: 'Completing order #'+orderId.slice(0,8).toUpperCase(),
+          prefill:{ email: currentUserEmail },
+          theme:{ color:'#E9BE5A' },
+          handler: async (response)=>{
+            const verify=await fetch('/api/verify-payment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(response)}).then(r=>r.json());
+            if(verify.success){ showToast('Payment successful \u2014 thank you!'); loadOrders(currentUserEmail); }
+            else{ showToast('Payment could not be verified. Please contact us.'); }
+          },
+          modal:{ ondismiss: ()=>{ payBtn.disabled=false; payBtn.textContent='Complete Payment'; } }
+        });
+        rzp.open();
+      }catch(err){
+        alert(err.message||'Could not start payment right now.');
+        payBtn.disabled=false; payBtn.textContent='Complete Payment';
       }
     }
 
