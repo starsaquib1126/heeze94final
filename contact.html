@@ -710,7 +710,7 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
       <div class="field"><label for="name">Name</label><input id="name" name="name" required/></div>
       <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required title="Enter a valid email address, e.g. name@example.com"/></div>
       <div class="field"><label for="interest">Enquiry</label>
-        <select id="interest"><option>Fragrance guidance</option><option>Wholesale</option><option>Gifting</option><option>Press &amp; collaboration</option></select></div>
+        <select id="interest" required><option value="">Select an option…</option><option>Fragrance guidance</option><option>Wholesale</option><option>Gifting</option><option>Press &amp; collaboration</option></select></div>
       <div class="field"><label for="phone">Phone / WhatsApp</label><input id="phone" name="phone" type="tel" required pattern="[+]?[0-9\s\-]{7,15}" title="Enter a valid phone number (7-15 digits, optional + country code)"/></div>
       <div class="field"><label for="message">Message</label><textarea id="message" name="message" required></textarea></div>
       <button class="btn btn-gold" type="submit" id="contactSubmitBtn" style="align-self:flex-start">Send enquiry</button>
@@ -1353,9 +1353,13 @@ document.addEventListener('DOMContentLoaded',async()=>{
       msgEl.textContent=error.message;msgEl.className='promo-msg err';return;
     }
     if(authMode==='signup' && data?.user && !data?.session){
+      document.querySelector('[data-auth-tab="signin"]').click();
+      // Set the message AFTER switching tabs -- the tab's own click handler
+      // clears this field as part of switching, so setting it before would
+      // get silently wiped out a moment later, making registration look
+      // like it did nothing at all.
       msgEl.textContent='Check your email to confirm your account, then sign in.';
       msgEl.className='promo-msg ok';
-      document.querySelector('[data-auth-tab="signin"]').click();
       return;
     }
     msgEl.textContent='';
@@ -1462,9 +1466,9 @@ document.addEventListener('DOMContentLoaded',async()=>{
         let totalStr='\u20b9'+Number(o.total||0).toLocaleString('en-IN');
         if(o.discount_amount>0) totalStr+=' <span style="font-size:.75rem;color:var(--gold)">('+o.promo_code+' -\u20b9'+o.discount_amount+')</span>';
         const trackBtn = o.tracking_number ? ('<a href="'+(o.tracking_url||'https://www.dtdc.com/track-your-shipment/')+'" target="_blank" rel="noopener noreferrer" class="order-track-link">Track Package \u2192</a>') : '';
-        const payBtn = status==='pending' ? ('<button type="button" class="order-pay-btn" data-resume-payment="'+o.id+'" data-order-total="'+(o.total||0)+'">Complete Payment</button>') : '';
-        const cancellable = ['pending','created','paid','processing'].includes(status);
-        const cancelLabel = status==='pending' ? 'Cancel Incomplete Order' : 'Cancel Order'; const cancelBtn = cancellable ? ('<button type="button" class="order-action-link" data-cancel-order="'+o.id+'">'+cancelLabel+'</button>') : '';
+        const payBtn = ['pending','payment_failed'].includes(status) ? ('<button type="button" class="order-pay-btn" data-resume-payment="'+o.id+'" data-order-total="'+(o.total||0)+'">Complete Payment</button>') : '';
+        const cancellable = ['pending','payment_failed','created','paid','processing'].includes(status);
+        const cancelLabel = ['pending','payment_failed'].includes(status) ? 'Cancel Incomplete Order' : 'Cancel Order'; const cancelBtn = cancellable ? ('<button type="button" class="order-action-link" data-cancel-order="'+o.id+'">'+cancelLabel+'</button>') : '';
         const returnBtn = status==='delivered' ? ('<button type="button" class="order-action-link" data-request-return="'+o.id+'">Request a Return</button>') : '';
         return '<div class="order-card" data-order-card="'+o.id+'"><div class="order-card-head"><span class="order-id">Order #'+o.id.slice(0,8).toUpperCase()+'</span><span style="display:flex;align-items:center;gap:8px"><span class="order-status '+status+'">'+statusLabel+'</span><svg class="order-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span></div><div class="order-details">'+dateStr+' &middot; '+totalStr+'</div><div class="order-items" data-order-items></div>'+payBtn+trackBtn+cancelBtn+returnBtn+'</div>';
       }).join('');

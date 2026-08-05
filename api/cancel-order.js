@@ -30,7 +30,7 @@ async function sendEmail(to, subject, html) {
 // Statuses that mean "hasn't shipped yet" — safe to cancel.
 // 'pending' = checkout started but payment never completed (no razorpay_payment_id,
 // so the refund block below is skipped — nothing was ever charged).
-const CANCELLABLE_STATUSES = ['pending', 'created', 'paid', 'processing'];
+const CANCELLABLE_STATUSES = ['pending', 'payment_failed', 'created', 'paid', 'processing'];
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -97,6 +97,10 @@ export default async function handler(req, res) {
   }
 
   const ownerEmail = process.env.OWNER_NOTIFICATION_EMAIL || 'heeze94official@gmail.com';
+  const wasActuallyPaid = !!order.razorpay_payment_id;
+  const bodyText = wasActuallyPaid
+    ? `Your order has been cancelled and a full refund of ₹${Number(order.total).toLocaleString('en-IN')} is on its way back to your original payment method — this usually takes 5-7 working days to reflect.`
+    : `Your order has been cancelled as requested. As this order was never charged, there's no refund needed on your end — we'd love to welcome you back whenever you're ready.`;
   const html = `
   <div style="max-width:560px;margin:0 auto;font-family:Georgia,serif;color:#1a1a1a">
     <div style="text-align:center;padding:24px 0;border-bottom:2px solid #c9a14a">
@@ -104,13 +108,13 @@ export default async function handler(req, res) {
       <p style="margin:6px 0 0;font-size:12px;letter-spacing:2px;color:#888">ORDER CANCELLED</p>
     </div>
     <div style="padding:28px 20px;font-size:14px;line-height:1.7;color:#333">
-      <p>Your order has been cancelled and a full refund of ₹${Number(order.total).toLocaleString('en-IN')} is on its way back to your original payment method — this usually takes 5-7 working days to reflect.</p>
+      <p>${bodyText}</p>
       <p style="margin-top:16px;font-size:12px;color:#999">Order ID: ${order.id.slice(0, 8).toUpperCase()}</p>
     </div>
   </div>`;
 
   sendEmail(order.email, `Your HEEZE 94 Order Has Been Cancelled — #${order.id.slice(0, 8).toUpperCase()}`, html);
-  sendEmail(ownerEmail, `Order Cancelled by Customer — #${order.id.slice(0, 8).toUpperCase()}`, html);
+  sendEmail(ownerEmail, `Order Cancelled by Customer — #${order.id.slice(0, 8).toUpperCase()}${wasActuallyPaid ? '' : ' (was never paid)'}`, html);
 
   return res.status(200).json({ success: true });
 }

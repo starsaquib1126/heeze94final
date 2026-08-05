@@ -55,6 +55,9 @@ export default async function handler(req, res) {
     if (action === 'resume-payment') {
       return await handleResumePayment(req, res);
     }
+    if (action === 'admin-export-orders') {
+      return await handleAdminExportOrders(req, res);
+    }
     return res.status(400).json({ error: 'Unknown action' });
   } catch (err) {
     return res.status(400).json({ error: err.message || 'Something went wrong' });
@@ -252,12 +255,14 @@ async function handleAdminListOrders(req, res) {
 
   const { data: orders, error } = await supabase
     .from('orders')
-    .select('id, email, status, created_at, total, tracking_number, gift_note, is_gift')
+    .select('id, email, status, created_at, total, tracking_number, gift_note, is_gift, customers(name, phone)')
     .order('created_at', { ascending: false })
     .limit(100);
   if (error) return res.status(500).json({ error: error.message });
 
-  return res.status(200).json({ orders: orders || [] });
+  return res.status(200).json({
+    orders: (orders || []).map(o => ({ ...o, customer_name: o.customers?.name || null, customer_phone: o.customers?.phone || null }))
+  });
 }
 
 async function handleAdminUpdateOrder(req, res) {
@@ -304,8 +309,8 @@ async function handleResumePayment(req, res) {
   if (!order || order.email.toLowerCase() !== cleanEmail) {
     return res.status(404).json({ error: 'No matching order found.' });
   }
-  // Only a still-pending order can be resumed. A paid/shipped/cancelled order must not be re-charged.
-  if (order.status !== 'pending') {
+  // Only a still-pending or failed-payment order can be resumed. A paid/shipped/cancelled order must not be re-charged.
+  if (!['pending', 'payment_failed'].includes(order.status)) {
     return res.status(400).json({ error: 'This order can no longer be paid for here.' });
   }
   if (!order.total || order.total <= 0) {
@@ -327,4 +332,68 @@ async function handleResumePayment(req, res) {
     currency: razorpayOrder.currency,
     keyId: process.env.RAZORPAY_KEY_ID
   });
+}
+
+async function handleAdminExportOrders(req, res) {
+  if (!checkAdminSecret(req)) return res.status(401).json({ error: 'Unauthorized' });
+
+  const { startDate, endDate, status, emailSearch } = req.body;
+
+  let query = supabase
+    .from('orders')
+    .select('id, email, status, created_at, total, subtotal, discount_amount, tracking_number, gift_note, is_gift, shipping_address, customers(name, phone)')
+    .order('created_at', { ascending: false })
+    .limit(2000); // generous cap so a wide export can't run away indefinitely
+
+  if (startDate) query = query.gte('created_at', startDate);
+  if (endDate) {
+    // Make the end date inclusive of the whole day, not just midnight.
+    const inclusiveEnd = new Date(endDate);
+    inclusiveEnd.setDate(inclusiveEnd.getDate() + 1);
+    query = query.lt('created_at', inclusiveEnd.toISOString());
+  }
+  if (status && status !== 'all') query = query.eq('status', status);
+  if (emailSearch) query = query.ilike('email', `%${emailSearch}%`);
+
+  const { data: orders, error } = await query;
+  if (error) return res.status(500).json({ error: error.message });
+
+  const orderIds = (orders || []).map(o => o.id);
+  let itemsByOrder = {};
+  if (orderIds.length) {
+    const { data: items } = await supabase
+      .from('order_items')
+      .select('order_id, quantity, price_at_purchase, product_variants(ml, products(name))')
+      .in('order_id', orderIds);
+    for (const it of items || []) {
+      const name = it.product_variants?.products?.name || 'Item';
+      const ml = it.product_variants?.ml;
+      const line = `${name}${ml ? ' (' + ml + 'ml)' : ''} x${it.quantity}`;
+      (itemsByOrder[it.order_id] = itemsByOrder[it.order_id] || []).push(line);
+    }
+  }
+
+  const rows = (orders || []).map(o => {
+    const addr = o.shipping_address || {};
+    return {
+      order_id: o.id,
+      date: o.created_at,
+      customer_name: o.customers?.name || '',
+      email: o.email,
+      phone: o.customers?.phone || '',
+      status: o.status,
+      items: (itemsByOrder[o.id] || []).join('; '),
+      subtotal: o.subtotal || '',
+      discount: o.discount_amount || '',
+      total: o.total,
+      is_gift: o.is_gift ? 'Yes' : 'No',
+      gift_note: o.gift_note || '',
+      tracking_number: o.tracking_number || '',
+      shipping_city: addr.city || '',
+      shipping_state: addr.state || '',
+      shipping_country: addr.country || ''
+    };
+  });
+
+  return res.status(200).json({ rows });
 }
