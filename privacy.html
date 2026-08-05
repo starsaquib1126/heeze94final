@@ -1319,8 +1319,8 @@ document.addEventListener('DOMContentLoaded',async()=>{
         let totalStr='\u20b9'+Number(o.total||0).toLocaleString('en-IN');
         if(o.discount_amount>0) totalStr+=' <span style="font-size:.75rem;color:var(--gold)">('+o.promo_code+' -\u20b9'+o.discount_amount+')</span>';
         const trackBtn = o.tracking_number ? ('<a href="'+(o.tracking_url||'https://www.dtdc.com/track-your-shipment/')+'" target="_blank" rel="noopener noreferrer" class="order-track-link">Track Package \u2192</a>') : '';
-        const cancellable = ['created','paid','processing'].includes(status);
-        const cancelBtn = cancellable ? ('<button type="button" class="order-action-link" data-cancel-order="'+o.id+'">Cancel Order</button>') : '';
+        const cancellable = ['pending','created','paid','processing'].includes(status);
+        const cancelLabel = status==='pending' ? 'Cancel Incomplete Order' : 'Cancel Order'; const cancelBtn = cancellable ? ('<button type="button" class="order-action-link" data-cancel-order="'+o.id+'">'+cancelLabel+'</button>') : '';
         const returnBtn = status==='delivered' ? ('<button type="button" class="order-action-link" data-request-return="'+o.id+'">Request a Return</button>') : '';
         return '<div class="order-card" data-order-card="'+o.id+'"><div class="order-card-head"><span class="order-id">Order #'+o.id.slice(0,8).toUpperCase()+'</span><span style="display:flex;align-items:center;gap:8px"><span class="order-status '+status+'">'+statusLabel+'</span><svg class="order-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span></div><div class="order-details">'+dateStr+' &middot; '+totalStr+'</div><div class="order-items" data-order-items></div>'+trackBtn+cancelBtn+returnBtn+'</div>';
       }).join('');
@@ -1340,15 +1340,17 @@ document.addEventListener('DOMContentLoaded',async()=>{
     if(!wasOpen && itemsEl && !itemsEl.dataset.loaded){
       itemsEl.innerHTML='<p style="font-size:.78rem;color:var(--muted);padding:8px 0">Loading items…</p>';
       try{
-        const {data,error}=await supa.from('order_items').select('*').eq('order_id',orderId);
+        // order_items stores product_variant_id + quantity + price_at_purchase.
+        // To show a real name we join through product_variants -> products.
+        const {data,error}=await supa.from('order_items').select('quantity, price_at_purchase, product_variants(ml, products(name))').eq('order_id',orderId);
         if(error||!data||!data.length){ itemsEl.innerHTML='<p style="font-size:.78rem;color:var(--muted);padding:8px 0">Itemized details unavailable for this order.</p>'; }
         else{
           itemsEl.innerHTML=data.map(it=>{
-            const name=it.product_name||it.name||it.product_id||'Item';
-            const size=it.variant_size||it.size||it.ml;
-            const qty=it.quantity||it.qty||1;
-            const price=it.price||it.unit_price||it.total_price||0;
-            return '<div class="order-item-row"><span>'+name+(size?' ('+size+'ml)':'')+' &times; '+qty+'</span><span>\u20b9'+Number(price).toLocaleString('en-IN')+'</span></div>';
+            const name=it.product_variants?.products?.name||'Item';
+            const size=it.product_variants?.ml;
+            const qty=it.quantity||1;
+            const lineTotal=(Number(it.price_at_purchase)||0)*qty;
+            return '<div class="order-item-row"><span>'+name+(size?' ('+size+'ml)':'')+' &times; '+qty+'</span><span>\u20b9'+lineTotal.toLocaleString('en-IN')+'</span></div>';
           }).join('');
         }
       }catch(err){ itemsEl.innerHTML='<p style="font-size:.78rem;color:var(--muted);padding:8px 0">Itemized details unavailable for this order.</p>'; }

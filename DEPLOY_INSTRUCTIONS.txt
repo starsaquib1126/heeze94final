@@ -24,6 +24,7 @@ DEPLOY IN THIS ORDER:
      journal-post.html, contact.html, privacy.html, terms.html
      api/create-order.js
      api/check-status-updates.js
+     api/cancel-order.js
 
 3) Commit -> Vercel auto-redeploys.
 

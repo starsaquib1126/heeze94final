@@ -27,8 +27,10 @@ async function sendEmail(to, subject, html) {
   }
 }
 
-// Statuses that mean "hasn't shipped yet" — safe to cancel
-const CANCELLABLE_STATUSES = ['created', 'paid', 'processing'];
+// Statuses that mean "hasn't shipped yet" — safe to cancel.
+// 'pending' = checkout started but payment never completed (no razorpay_payment_id,
+// so the refund block below is skipped — nothing was ever charged).
+const CANCELLABLE_STATUSES = ['pending', 'created', 'paid', 'processing'];
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
