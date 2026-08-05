@@ -1442,7 +1442,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   });
 
   /* ── Cancel Order / Request Return (event delegation, since buttons are added dynamically) ── */
-  document.querySelector('[data-order-history]')?.  document.querySelector('[data-order-history]')?.addEventListener('click', async(e)=>{
+  document.querySelector('[data-order-history]')?.addEventListener('click', async(e)=>{
     const cancelBtn=e.target.closest('[data-cancel-order]');
     const returnBtn=e.target.closest('[data-request-return]');
     const payBtn=e.target.closest('[data-resume-payment]');
