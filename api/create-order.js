@@ -19,7 +19,7 @@ export default async function handler(req, res) {
 
   try {
 
-  const { items, customer, promoCode } = req.body;
+  const { items, customer, promoCode, giftNote } = req.body;
   if (!items || !items.length) {
     return res.status(400).json({ error: 'No items in order' });
   }
@@ -94,10 +94,13 @@ export default async function handler(req, res) {
   }
   const total = Math.max(subtotal - discountAmount, 0);
 
+  // Gift note is optional, free text — trim and cap length defensively before storing
+  const cleanGiftNote = typeof giftNote === 'string' ? giftNote.trim().slice(0, 300) : '';
+
   // Create the order in Supabase (status: pending)
   const { data: order, error: orderError } = await supabase
     .from('orders')
-    .insert({ customer_id: customerRow.id, email: customer.email, status: 'pending', subtotal, total, shipping_address: customer.address, promo_code: appliedPromo?.code || null, discount_amount: discountAmount })
+    .insert({ customer_id: customerRow.id, email: customer.email, status: 'pending', subtotal, total, shipping_address: customer.address, promo_code: appliedPromo?.code || null, discount_amount: discountAmount, gift_note: cleanGiftNote || null, is_gift: !!cleanGiftNote })
     .select()
     .single();
 

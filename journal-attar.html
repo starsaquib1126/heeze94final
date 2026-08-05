@@ -140,6 +140,12 @@ body.account-open .account-veil{opacity:1;pointer-events:auto}
   border-left:1px solid rgba(255,255,255,.06);transform:translateX(100%);transition:.4s cubic-bezier(.19,1,.22,1);
   display:flex;flex-direction:column;overflow-y:auto}
 body.account-open .account-panel{transform:none}
+.wishlist-veil{z-index:240}
+.wishlist-panel{position:fixed;top:0;right:0;bottom:0;width:min(400px,90vw);z-index:241;background:var(--bg,#0a0908);
+  border-left:1px solid rgba(255,255,255,.06);transform:translateX(100%);transition:.4s cubic-bezier(.19,1,.22,1);
+  display:flex;flex-direction:column;overflow-y:auto}
+body.wishlist-open .wishlist-veil{opacity:1;pointer-events:auto}
+body.wishlist-open .wishlist-panel{transform:none}
 .account-section{margin-bottom:16px}
 .order-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:14px;margin-bottom:10px}
 .order-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
@@ -718,6 +724,10 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
   <button class="icon-btn" data-account-btn aria-label="My Account">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 12 0v1" transform="translate(1,0)"/></svg>
   </button>
+  <button class="icon-btn" data-wishlist-btn aria-label="Wishlist">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-6.7-4.35-9.33-8.02C.9 10.2 1.4 6.6 4.3 4.9 6.6 3.5 9.4 4 11 6c.4.5.7 1 1 1.5.3-.5.6-1 1-1.5 1.6-2 4.4-2.5 6.7-1.1 2.9 1.7 3.4 5.3 1.63 8.08C18.7 16.65 12 21 12 21z"/></svg>
+    <span class="bag-pill" data-wishlist-count>0</span>
+  </button>
   <button class="icon-btn" data-open-cart aria-label="Open bag">
     <svg viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
     <span class="bag-pill" data-bag-count>0</span>
@@ -823,6 +833,11 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
       <option value="AE">United Arab Emirates</option>
       <option value="US">United States</option>
     </select></label>
+    <label class="gift-check" style="display:flex;align-items:flex-start;gap:9px;margin-top:14px;cursor:pointer">
+      <input type="checkbox" name="isGift" data-gift-toggle style="margin-top:3px;width:15px;height:15px;flex-shrink:0;accent-color:var(--gold)"/>
+      <span style="font-size:.78rem;color:var(--muted);line-height:1.6">This is a gift</span>
+    </label>
+    <label data-gift-note-field style="display:none;margin-top:10px">Gift note (optional)<textarea name="giftNote" maxlength="300" rows="3" placeholder="Add a short message for the recipient…" style="width:100%;resize:vertical;font-family:inherit"></textarea></label>
     <p class="promo-msg" style="margin-top:4px">Charged in Indian Rupees (INR) regardless of the currency shown while browsing.</p>
     <label class="terms-check" style="display:flex;align-items:flex-start;gap:9px;margin-top:16px;cursor:pointer">
       <input type="checkbox" name="agreeTerms" required style="margin-top:3px;width:15px;height:15px;flex-shrink:0;accent-color:var(--gold)"/>
@@ -830,6 +845,11 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
     </label>
     <button type="submit" class="btn btn-gold" style="width:100%;margin-top:18px" data-pay-btn disabled>Pay Now</button>
   </form>
+</div>
+<div class="account-veil wishlist-veil" data-wishlist-veil></div>
+<div class="wishlist-panel" data-wishlist-panel>
+  <div class="checkout-modal-head"><h2>Your Wishlist</h2><button class="cart-close" data-wishlist-close>×</button></div>
+  <div data-wishlist-items style="padding:22px 24px"></div>
 </div>
 <div class="account-veil" data-account-veil></div>
 <div class="account-panel" data-account-panel>
@@ -843,6 +863,15 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
       <p style="font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:4px">Welcome back</p>
       <p style="font-family:'Marcellus',serif;font-size:1.2rem;color:var(--gold)" data-account-name></p>
       <p style="font-size:.85rem;color:var(--muted)" data-account-email></p>
+    </div>
+    <div class="account-section" style="border:1px solid rgba(233,190,90,.16);border-radius:6px;padding:16px">
+      <h3 style="font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:10px">Refer a Friend</h3>
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:10px">Share your code — they get 10% off their first order.</p>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <code data-referral-code style="flex:1;padding:9px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:4px;color:var(--gold);font-size:.9rem;letter-spacing:.05em">…</code>
+        <button class="btn btn-line" style="padding:9px 14px;white-space:nowrap" onclick="copyReferralCode()">Copy</button>
+      </div>
+      <p style="font-size:.75rem;color:var(--muted)" data-referral-stats></p>
     </div>
     <div class="account-section">
       <h3 style="font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:8px">Order History</h3>
@@ -879,7 +908,7 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
     <div class="search-results" data-search-results></div>
   </div>
 </div>
-<div class="toast" role="status"></div><footer class="footer"><div class="container"><div class="footer-top"><div class="footer-brand"><img src="assets/brand/logo-primary.png" alt="HEEZE 94"/><p>Premium attars — intimate, enduring, composed to become part of the wearer.</p></div><div class="footer-col"><h3>Explore</h3><a href="collection">Collection</a><a href="parfums">Parfums</a><a href="films">Films</a><a href="journal">Journal</a></div><div class="footer-col"><h3>The House</h3><a href="house">Our Story</a><a href="contact">Private Client</a><a href="contact">Wholesale</a></div><div class="footer-col"><h3>Client Care</h3><a href="contact">Contact</a><a href="privacy">Privacy Policy</a><a href="terms">Terms & Conditions</a></div></div><div class="footer-bottom"><span>© <span data-year></span> HEEZE 94</span><span>Fragrance in its most intimate form</span></div></div></footer><script>/* ═══ HEEZE 94 · catalogue.js · v4 · Real Assets ════════════════════════════ */
+<div class="toast" role="status"></div><footer class="footer"><div class="container"><div class="footer-top"><div class="footer-brand"><img src="assets/brand/logo-primary.png" alt="HEEZE 94"/><p>Premium attars — intimate, enduring, composed to become part of the wearer.</p></div><div class="footer-col"><h3>Explore</h3><a href="collection">Collection</a><a href="parfums">Parfums</a><a href="films">Films</a><a href="journal">Journal</a></div><div class="footer-col"><h3>The House</h3><a href="house">Our Story</a><a href="contact">Private Client</a><a href="contact">Wholesale</a></div><div class="footer-col"><h3>Client Care</h3><a href="contact">Contact</a><a href="track-order">Track Order</a><a href="privacy">Privacy Policy</a><a href="terms">Terms & Conditions</a></div></div><div class="footer-bottom"><span>© <span data-year></span> HEEZE 94</span><span>Fragrance in its most intimate form</span></div></div></footer><script>/* ═══ HEEZE 94 · catalogue.js · v4 · Real Assets ════════════════════════════ */
 const H94 = (() => {
 
 const DEFAULT = [
@@ -1046,6 +1075,9 @@ function renderGrid(container,opts={}){
     <article class="product-card" onclick="location.href='product?id=${p.id}'" tabindex="0">
       <div class="product-img-wrap">
         ${(()=>{const cheapest=Math.min(...p.sizes.map(s=>s.price));return p.compareAt && p.compareAt>cheapest ? `<div class="discount-ribbon">-${Math.round((1-cheapest/p.compareAt)*100)}% OFF</div>` : '';})()}
+        <button class="wishlist-heart${H94.isWishlisted(p.id)?' active':''}" onclick="event.stopPropagation();H94.toggleWishlist('${p.id}',this)" aria-label="${H94.isWishlisted(p.id)?'Remove from wishlist':'Add to wishlist'}" style="position:absolute;top:10px;right:10px;z-index:2;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .25s cubic-bezier(.34,1.56,.64,1),background .25s">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="${H94.isWishlisted(p.id)?'var(--gold)':'none'}" stroke="var(--gold)" stroke-width="2"><path d="M12 21s-6.7-4.35-9.33-8.02C.9 10.2 1.4 6.6 4.3 4.9 6.6 3.5 9.4 4 11 6c.4.5.7 1 1 1.5.3-.5.6-1 1-1.5 1.6-2 4.4-2.5 6.7-1.1 2.9 1.7 3.4 5.3 1.63 8.08C18.7 16.65 12 21 12 21z"/></svg>
+        </button>
         <img src="${p.img}" alt="${p.name} attar" loading="lazy"/>
       </div>
       <div class="product-info">
@@ -1167,6 +1199,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const formEl=document.querySelector('[data-checkout-form]');
   const titleEl=document.querySelector('[data-checkout-title]');
   formEl?.querySelector('input[name="agreeTerms"]')?.addEventListener('change', function(){ const payBtn=formEl.querySelector('[data-pay-btn]'); if(payBtn) payBtn.disabled=!this.checked; });
+  formEl?.querySelector('input[name="isGift"]')?.addEventListener('change', function(){ const nf=formEl.querySelector('[data-gift-note-field]'); if(nf) nf.style.display=this.checked?'':'none'; });
 
   function showDetailsForm(prefillEmail, prefillName, prefillPhone){
     gateEl.style.display='none'; authEl.style.display='none'; formEl.style.display='';
@@ -1252,6 +1285,12 @@ document.addEventListener('DOMContentLoaded',async()=>{
   document.querySelector('[data-mobile-account]')?.addEventListener('click',(e)=>{e.preventDefault();document.querySelector('.mobile-menu')?.classList.remove('open');openAccount();});
   document.querySelector('[data-account-close]')?.addEventListener('click',closeAccount);
   document.querySelector('[data-account-veil]')?.addEventListener('click',closeAccount);
+  function openWishlist(){document.body.classList.add('wishlist-open');renderWishlistPanel();}
+  function closeWishlist(){document.body.classList.remove('wishlist-open');}
+  document.querySelector('[data-wishlist-btn]')?.addEventListener('click',openWishlist);
+  document.querySelector('[data-wishlist-close]')?.addEventListener('click',closeWishlist);
+  document.querySelector('[data-wishlist-veil]')?.addEventListener('click',closeWishlist);
+  document.querySelectorAll('[data-wishlist-count]').forEach(el=>el.textContent=getWishlist().length);
   let cameFromAccount=false;
   document.querySelector('[data-account-signin]')?.addEventListener('click',()=>{
     cameFromAccount=true;
@@ -1290,9 +1329,29 @@ document.addEventListener('DOMContentLoaded',async()=>{
       document.querySelector('[data-account-name]').textContent=meta.full_name||meta.name||'Customer';
       document.querySelector('[data-account-email]').textContent=u.email||'';
       loadOrders(u.email);
+      loadReferralCode(u.email);
     } else {
       swapAccountView(false);
     }
+  }
+  async function loadReferralCode(email){
+    const codeEl=document.querySelector('[data-referral-code]');
+    const statsEl=document.querySelector('[data-referral-stats]');
+    if(!codeEl)return;
+    try{
+      const r=await fetch('/api/customer-tools',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'get-referral-code',email})}).then(r=>r.json());
+      if(r.error){ codeEl.textContent='Unavailable'; return; }
+      codeEl.textContent=r.code;
+      codeEl.dataset.code=r.code;
+      if(statsEl) statsEl.textContent=r.timesUsed>0 ? `${r.timesUsed} friend${r.timesUsed===1?'':'s'} have used your code` : 'No one has used your code yet — share it!';
+    }catch(e){ codeEl.textContent='Unavailable'; }
+  }
+  window.copyReferralCode=copyReferralCode;
+  function copyReferralCode(){
+    const codeEl=document.querySelector('[data-referral-code]');
+    const code=codeEl?.dataset.code;
+    if(!code)return;
+    navigator.clipboard?.writeText(code).then(()=>showToast('Code copied!')).catch(()=>{});
   }
   async function loadOrders(email){
     currentUserEmail=email;
@@ -1545,7 +1604,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
       };
 
       // 2. Create the order server-side
-      const order=await fetch('/api/create-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items,customer,promoCode:appliedPromo?.code})}).then(r=>r.json());
+      const order=await fetch('/api/create-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items,customer,promoCode:appliedPromo?.code,giftNote:fd.get('isGift')?fd.get('giftNote'):''})}).then(r=>r.json());
       if(order.error) throw new Error(order.error);
 
       // 3. Launch Razorpay's checkout widget
@@ -1588,7 +1647,36 @@ document.addEventListener('DOMContentLoaded',async()=>{
   });
 });
 
-return {addToCart,changeQty,openCart,closeCart,getCat,cat:getCat,saveCat,fmt,showToast,renderGrid};
+/* ── Wishlist (localStorage, no backend needed) ── */
+function getWishlist(){ try{ return JSON.parse(localStorage.getItem('h94_wishlist')||'[]'); }catch(e){ return []; } }
+function isWishlisted(id){ return getWishlist().includes(id); }
+function toggleWishlist(id,btnEl){
+  let list=getWishlist();
+  const idx=list.indexOf(id);
+  if(idx>-1){ list.splice(idx,1); showToast('Removed from wishlist'); }
+  else{ list.push(id); showToast('Added to wishlist'); }
+  try{ localStorage.setItem('h94_wishlist',JSON.stringify(list)); }catch(e){}
+  if(btnEl){ btnEl.classList.toggle('active', idx===-1); btnEl.setAttribute('aria-label', idx===-1?'Remove from wishlist':'Add to wishlist'); }
+  document.querySelectorAll('[data-wishlist-count]').forEach(el=>el.textContent=list.length);
+  const panel=document.querySelector('[data-wishlist-panel]');
+  if(panel && document.body.classList.contains('wishlist-open')) renderWishlistPanel();
+}
+function renderWishlistPanel(){
+  const wrap=document.querySelector('[data-wishlist-items]');
+  if(!wrap)return;
+  const ids=getWishlist();
+  const items=ids.map(id=>getCat().find(p=>p.id===id)).filter(Boolean);
+  if(!items.length){ wrap.innerHTML='<p class="cart-empty">Nothing saved yet — tap the heart on any fragrance.</p>'; return; }
+  wrap.innerHTML=items.map(p=>{
+    const cheapest=Math.min(...p.sizes.map(s=>s.price));
+    return `<div class="cart-line" style="cursor:pointer" onclick="location.href='product?id=${p.id}'">
+      <div class="cl-info"><strong>${p.name}</strong><span>From ${fmt(cheapest)}</span></div>
+      <button onclick="event.stopPropagation();H94.toggleWishlist('${p.id}');H94.renderWishlistPanel()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem">Remove</button>
+    </div>`;
+  }).join('');
+}
+
+return {addToCart,changeQty,openCart,closeCart,getCat,cat:getCat,saveCat,fmt,showToast,renderGrid,toggleWishlist,isWishlisted,getWishlist,renderWishlistPanel};
 })();
 </script><script>/* HEEZE 94 · chat.js · Gemini AI Fragrance Advisor */
 (function(){
@@ -1696,4 +1784,26 @@ Help customers find their perfect attar. Ask about their preferences, lifestyle,
 
   window._h94chat={toggle,send};
 })();
-</script><script src="https://checkout.razorpay.com/v1/checkout.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></body></html>
+</script><script src="https://checkout.razorpay.com/v1/checkout.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><div class="cookie-banner" data-cookie-banner style="position:fixed;left:16px;right:16px;bottom:16px;max-width:520px;margin:0 auto;background:#0d0c0a;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:18px 20px;z-index:300;box-shadow:0 12px 40px rgba(0,0,0,.5);transform:translateY(140%);transition:transform .5s cubic-bezier(.19,1,.22,1);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+  <p style="font-size:.8rem;color:var(--muted,#9a9a94);line-height:1.6;margin:0;flex:1;min-width:220px">We use cookies to remember your cart and improve your experience. See our <a href="privacy" style="color:var(--gold,#e9be5a)">Privacy Policy</a>.</p>
+  <div style="display:flex;gap:8px;flex-shrink:0">
+    <button data-cookie-accept class="btn btn-gold" style="padding:8px 18px;font-size:.72rem">Accept</button>
+  </div>
+</div>
+<script>
+(function(){
+  var KEY='h94_cookie_consent';
+  try{
+    if(!localStorage.getItem(KEY)){
+      var b=document.querySelector('[data-cookie-banner]');
+      if(b){ setTimeout(function(){ b.style.transform='none'; }, 900); }
+    }
+    document.querySelector('[data-cookie-accept]')?.addEventListener('click',function(){
+      try{ localStorage.setItem(KEY,'1'); }catch(e){}
+      var b=document.querySelector('[data-cookie-banner]');
+      if(b) b.style.transform='translateY(140%)';
+    });
+  }catch(e){ /* localStorage unavailable — banner simply won't show, no functionality breaks */ }
+})();
+</script>
+</body></html>

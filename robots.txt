@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://www.heeze94.com/sitemap.xml

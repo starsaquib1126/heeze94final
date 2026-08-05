@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url><loc>https://www.heeze94.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+<url><loc>https://www.heeze94.com/collection</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+<url><loc>https://www.heeze94.com/parfums</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>https://www.heeze94.com/house</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+<url><loc>https://www.heeze94.com/craftsmanship</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+<url><loc>https://www.heeze94.com/films</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://www.heeze94.com/bespoke</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+<url><loc>https://www.heeze94.com/journal</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+<url><loc>https://www.heeze94.com/journal-attar</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://www.heeze94.com/journal-perfume</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://www.heeze94.com/journal-structure</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<!-- Product pages: added using the standard slug pattern (kebab-case of product name).
+     Confirm these match your actual Supabase product IDs, and add any new products here as you launch them. -->
+<url><loc>https://www.heeze94.com/product?id=black-oud</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+<url><loc>https://www.heeze94.com/product?id=golden-oud</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+<url><loc>https://www.heeze94.com/product?id=rose-musk</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+<url><loc>https://www.heeze94.com/contact</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+<url><loc>https://www.heeze94.com/track-order</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
+<url><loc>https://www.heeze94.com/privacy</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
+<url><loc>https://www.heeze94.com/terms</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
+</urlset>
