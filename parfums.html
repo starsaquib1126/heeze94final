@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><script async src="https://www.googletagmanager.com/gtag/js?id=G-Z695114RVX"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z695114RVX');</script><script defer src="/_vercel/insights/script.js"></script><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#060504"/><title>Parfums — Coming Soon — HEEZE 94 [V4]</title><link rel="icon" href="assets/brand/logo-primary.png"/><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Mulish:wght@300;400;500;600&display=swap" rel="stylesheet"><style>/* ═══ HEEZE 94 · site.css · v4 — Real Assets Edition ═══════════════════════ */
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><script async src="https://www.googletagmanager.com/gtag/js?id=G-Z695114RVX"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z695114RVX');</script><script defer src="/_vercel/insights/script.js"></script><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#060504"/><title>Parfums — Coming Soon — HEEZE 94</title><link rel="icon" href="assets/brand/logo-primary.png"/><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Mulish:wght@300;400;500;600&display=swap" rel="stylesheet"><style>/* ═══ HEEZE 94 · site.css · v4 — Real Assets Edition ═══════════════════════ */
 @import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Mulish:wght@300;400;500;600&display=swap');
 
 :root{
@@ -610,6 +610,9 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
 
 [data-auth-form],[data-checkout-gate],[data-checkout-form]{animation:h94PanelIn .4s cubic-bezier(.19,1,.22,1) both}
 @keyframes h94PanelIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+[data-checkout-success]{animation:h94PanelIn .5s cubic-bezier(.19,1,.22,1) both}
+@keyframes h94CheckGlow{0%{box-shadow:0 0 0 0 rgba(233,190,90,.35)}70%{box-shadow:0 0 0 14px rgba(233,190,90,0)}100%{box-shadow:0 0 0 0 rgba(233,190,90,0)}}
+[data-checkout-success] > div:first-child{animation:h94CheckGlow 1.6s ease-out .3s}
 
 .checkout-modal,.account-panel,.cart-drawer{transition-timing-function:cubic-bezier(.22,1.12,.36,1)!important}
 
@@ -780,6 +783,18 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
     <p style="font-size:.72rem;color:var(--muted);text-align:center;margin-top:14px;margin-bottom:2px">All charges are billed in Indian Rupees (INR).</p>
     <button type="submit" class="btn btn-gold" style="width:100%;margin-top:6px" data-pay-btn>Pay Now</button>
   </form>
+
+  <div data-checkout-success style="display:none;padding:32px 24px;text-align:center">
+    <div style="width:56px;height:56px;margin:0 auto 18px;border-radius:50%;background:rgba(233,190,90,.12);display:flex;align-items:center;justify-content:center">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e9be5a" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+    </div>
+    <div class="ey" style="margin-bottom:6px">Order Confirmed</div>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;font-size:1.6rem;margin-bottom:10px">Thank you — with love, HEEZE 94.</h2>
+    <p style="color:var(--muted);font-size:.88rem;line-height:1.7;margin-bottom:6px">Your fragrance is being prepared with care.</p>
+    <p style="font-size:.78rem;color:var(--muted);margin-bottom:26px">Order ID: <strong data-success-order-id style="color:var(--ivory);font-family:monospace"></strong></p>
+    <a data-success-track-link href="track-order" class="btn btn-gold" style="width:100%;display:block;margin-bottom:10px">Track Your Order</a>
+    <button type="button" class="btn btn-line" style="width:100%" data-success-keep-shopping>Keep Shopping</button>
+  </div>
 </div>
 <div class="account-veil wishlist-veil" data-wishlist-veil></div>
 <div class="wishlist-panel" data-wishlist-panel>
@@ -1153,7 +1168,14 @@ document.addEventListener('DOMContentLoaded',async()=>{
     const gateEl2=document.querySelector('[data-checkout-gate]'), authEl2=document.querySelector('[data-auth-form]'), formEl2=document.querySelector('[data-checkout-form]'), titleEl2=document.querySelector('[data-checkout-title]');
     gateEl2.style.display=''; authEl2.style.display='none'; formEl2.style.display='none'; titleEl2.textContent='Checkout';
   });
-  document.querySelector('[data-checkout-close]')?.addEventListener('click',()=>document.body.classList.remove('checkout-open'));
+  function resetCheckoutModal(){
+    document.body.classList.remove('checkout-open');
+    const successEl=document.querySelector('[data-checkout-success]');
+    if(successEl && successEl.style.display!=='none'){
+      successEl.style.display='none'; gateEl.style.display=''; titleEl.textContent='Checkout';
+    }
+  }
+  document.querySelector('[data-checkout-close]')?.addEventListener('click',resetCheckoutModal);
 
   let supa=null;
   try{
@@ -1183,6 +1205,21 @@ document.addEventListener('DOMContentLoaded',async()=>{
       countrySelect.value=CURR.country;
     }
   }
+
+  function showOrderSuccess(orderId, email){
+    const successEl=document.querySelector('[data-checkout-success]');
+    gateEl.style.display='none'; authEl.style.display='none'; formEl.style.display='none';
+    successEl.style.display='';
+    titleEl.textContent='Order Confirmed';
+    const shortId=(orderId||'').slice(0,8).toUpperCase();
+    document.querySelector('[data-success-order-id]').textContent=shortId||'—';
+    const trackLink=document.querySelector('[data-success-track-link]');
+    if(orderId && email){
+      trackLink.href='track-order?orderId='+encodeURIComponent(orderId)+'&email='+encodeURIComponent(email);
+    }
+  }
+
+  document.querySelector('[data-success-keep-shopping]')?.addEventListener('click',resetCheckoutModal);
 
   document.querySelector('[data-guest-continue]')?.addEventListener('click',()=>showDetailsForm());
 
@@ -1601,7 +1638,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     }
   })();
 
-  document.querySelector('[data-checkout-veil]')?.addEventListener('click',()=>document.body.classList.remove('checkout-open'));
+  document.querySelector('[data-checkout-veil]')?.addEventListener('click',resetCheckoutModal);
   document.querySelector('[data-promo-apply]')?.addEventListener('click', async ()=>{
     const input=document.querySelector('[data-promo-input]');
     const msgEl=document.querySelector('[data-promo-msg]');
@@ -1674,8 +1711,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
           const verify=await fetch('/api/verify-payment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(response)}).then(r=>r.json());
           if(verify.success){
             cart={}; saveCart(); renderCart();
-            document.body.classList.remove('checkout-open');
-            showToast('Payment successful — thank you!');
+            showOrderSuccess(verify.orderId, customer.email);
           }else{
             showToast('Payment could not be verified. Please contact us.');
           }
