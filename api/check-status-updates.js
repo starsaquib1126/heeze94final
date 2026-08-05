@@ -163,6 +163,90 @@ async function processReturnUpdates() {
   return processed;
 }
 
+async function processAbandonedCarts() {
+  const cutoff = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(); // 2+ hours old
+  const { data: orders } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('status', 'pending')
+    .eq('abandoned_email_sent', false)
+    .lt('created_at', cutoff);
+
+  let processed = 0;
+  for (const order of orders || []) {
+    if (!order.email) {
+      await supabase.from('orders').update({ abandoned_email_sent: true }).eq('id', order.id);
+      continue;
+    }
+
+    const { data: items } = await supabase
+      .from('order_items')
+      .select('quantity, price_at_purchase, product_variants(ml, products(name))')
+      .eq('order_id', order.id);
+
+    const itemsHtml = (items || []).map(i =>
+      `<tr><td style="padding:6px 0">${escapeHtml(i.product_variants?.products?.name || 'Item')} · ${i.product_variants?.ml}ml × ${i.quantity}</td></tr>`
+    ).join('');
+
+    await sendEmail(order.email, `You left something in your bag — HEEZE 94`, `
+      <div style="max-width:560px;margin:0 auto;font-family:Georgia,serif;color:#1a1a1a">
+        <div style="text-align:center;padding:24px 0;border-bottom:2px solid #c9a14a">
+          <h1 style="margin:0;font-size:24px;letter-spacing:4px;color:#c9a14a">HEEZE 94</h1>
+          <p style="margin:6px 0 0;font-size:12px;letter-spacing:2px;color:#888">YOUR BAG IS WAITING</p>
+        </div>
+        <div style="padding:28px 20px;font-size:14px;line-height:1.7;color:#333">
+          <p>You left the following in your bag — it's still here whenever you're ready:</p>
+          <table style="width:100%;border-collapse:collapse;margin:16px 0">${itemsHtml}</table>
+          <p style="text-align:center;margin-top:24px">
+            <a href="https://www.heeze94.com/collection" style="background:#c9a14a;color:#fff;padding:12px 28px;text-decoration:none;border-radius:4px;font-size:13px;letter-spacing:1px">RETURN TO YOUR BAG</a>
+          </p>
+        </div>
+      </div>`);
+
+    await supabase.from('orders').update({ abandoned_email_sent: true }).eq('id', order.id);
+    processed++;
+  }
+  return processed;
+}
+
+async function processRefillReminders() {
+  const windowStart = new Date(Date.now() - 52 * 24 * 60 * 60 * 1000).toISOString();
+  const windowEnd = new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString();
+  const { data: orders } = await supabase
+    .from('orders')
+    .select('*')
+    .in('status', ['paid', 'shipped', 'delivered'])
+    .eq('refill_reminder_sent', false)
+    .gte('created_at', windowStart)
+    .lt('created_at', windowEnd);
+
+  let processed = 0;
+  for (const order of orders || []) {
+    if (!order.email) {
+      await supabase.from('orders').update({ refill_reminder_sent: true }).eq('id', order.id);
+      continue;
+    }
+
+    await sendEmail(order.email, `Time for a refill? — HEEZE 94`, `
+      <div style="max-width:560px;margin:0 auto;font-family:Georgia,serif;color:#1a1a1a">
+        <div style="text-align:center;padding:24px 0;border-bottom:2px solid #c9a14a">
+          <h1 style="margin:0;font-size:24px;letter-spacing:4px;color:#c9a14a">HEEZE 94</h1>
+          <p style="margin:6px 0 0;font-size:12px;letter-spacing:2px;color:#888">A GENTLE REMINDER</p>
+        </div>
+        <div style="padding:28px 20px;font-size:14px;line-height:1.7;color:#333">
+          <p>It's been about six weeks since your last HEEZE 94 order — most of our attars settle into a routine right around now. If you're running low, we'd love to have you back.</p>
+          <p style="text-align:center;margin-top:24px">
+            <a href="https://www.heeze94.com/collection" style="background:#c9a14a;color:#fff;padding:12px 28px;text-decoration:none;border-radius:4px;font-size:13px;letter-spacing:1px">SHOP AGAIN</a>
+          </p>
+        </div>
+      </div>`);
+
+    await supabase.from('orders').update({ refill_reminder_sent: true }).eq('id', order.id);
+    processed++;
+  }
+  return processed;
+}
+
 export default async function handler(req, res) {
   const secret = req.query.secret;
   if (!process.env.SUPABASE_WEBHOOK_SECRET || secret !== process.env.SUPABASE_WEBHOOK_SECRET) {
@@ -172,7 +256,9 @@ export default async function handler(req, res) {
   try {
     const ordersProcessed = await processOrderUpdates();
     const returnsProcessed = await processReturnUpdates();
-    return res.status(200).json({ success: true, ordersProcessed, returnsProcessed });
+    const abandonedCartsProcessed = await processAbandonedCarts();
+    const refillRemindersProcessed = await processRefillReminders();
+    return res.status(200).json({ success: true, ordersProcessed, returnsProcessed, abandonedCartsProcessed, refillRemindersProcessed });
   } catch (e) {
     console.error('Status check error:', e);
     return res.status(500).json({ error: 'Something went wrong checking for updates' });

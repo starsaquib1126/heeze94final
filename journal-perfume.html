@@ -256,7 +256,7 @@ body:not(.gate-active) .gateway{display:none}
 .section-head>p{color:var(--muted);max-width:440px;padding-top:6px;font-size:.95rem}
 
 /* ── Page heroes (sub-pages) ── */
-.page-hero{position:relative;min-height:70vh;display:flex;align-items:flex-end;overflow:hidden;padding-top:72px}
+.page-hero{position:relative;min-height:70vh;display:flex;align-items:flex-end;overflow:hidden;padding-top:var(--h94-hdr,72px)}
 .page-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.38;filter:saturate(.5)}
 .page-hero::after{content:'';position:absolute;inset:0;
   background:linear-gradient(180deg,rgba(6,5,4,.25) 0%,rgba(6,5,4,.78) 100%)}
@@ -714,9 +714,41 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
   body{animation:none!important;opacity:1!important}
   .btn:hover,.btn-line:hover,.auth-tab.on,[data-auth-form],[data-checkout-gate],[data-checkout-form],.promo-msg.ok,.promo-msg.err{animation:none!important;transform:none!important}
 }
-</style></head><body class=""><header class="site-header"><div class="container"><nav class="nav">
+</style></head><body class=""><header class="site-header"><div class="announce-bar" data-announce-bar data-announce-id="welcome10-v1" style="background:linear-gradient(90deg,var(--gold-deep,#b8912f),var(--gold,#e9be5a));color:#0a0908;text-align:center;font-size:.78rem;letter-spacing:.03em;padding:9px 40px 9px 16px;position:relative">
+  <span>✨ New here? Use code <strong>WELCOME10</strong> for 10% off your first order.</span>
+  <button data-announce-close aria-label="Dismiss" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#0a0908;font-size:1.1rem;line-height:1;cursor:pointer;padding:4px 8px;opacity:.7">×</button>
+</div><script>
+(function(){
+  var KEY_PREFIX='h94_announce_dismissed_';
+  var bar=document.querySelector('[data-announce-bar]');
+  // Runs immediately (synchronously) so a returning visitor who already dismissed
+  // this never sees a flash of it before it's removed.
+  if(bar){
+    var id=bar.dataset.announceId;
+    try{ if(localStorage.getItem(KEY_PREFIX+id)==='1'){ bar.remove(); } }catch(e){}
+  }
+  function setHdrVar(){
+    var header=document.querySelector('.site-header')||document.querySelector('.nav-bar');
+    if(header) document.documentElement.style.setProperty('--h94-hdr', header.offsetHeight+'px');
+  }
+  // Deferred: at this point in the HTML the header's LATER children (nav links,
+  // icons, etc.) haven't been parsed yet, so measuring now would only capture
+  // the banner's own height — wait for the full header to exist first.
+  document.addEventListener('DOMContentLoaded', setHdrVar);
+  document.querySelector('[data-announce-close]')?.addEventListener('click', function(){
+    var b=document.querySelector('[data-announce-bar]');
+    if(!b) return;
+    var bid=b.dataset.announceId;
+    try{ localStorage.setItem(KEY_PREFIX+bid,'1'); }catch(e){}
+    b.remove();
+    setHdrVar();
+  });
+  window.addEventListener('resize', setHdrVar);
+})();
+</script>
+<div class="container"><nav class="nav">
 <a class="brand" href="index"><img src="assets/brand/logo-new.png" alt="HEEZE 94" height="52"/></a>
-<div class="nav-links"><a href="index">Home</a><a href="collection">Attar</a><a href="parfums">Parfum</a><div class="nav-dropdown"><a href="#" class="nav-dropdown-trigger">Explore HEEZE 94</a><div class="nav-dropdown-menu"><a href="house">The House</a><a href="craftsmanship">Craftsmanship</a><a href="films">Films</a></div></div><a href="bespoke">Build Your Own</a><a href="journal" class='active'>Journal</a><a href="contact">Contact</a></div>
+<div class="nav-links"><a href="index">Home</a><a href="collection">Attar</a><a href="parfums">Parfum</a><div class="nav-dropdown"><a href="#" class="nav-dropdown-trigger">Explore HEEZE 94</a><div class="nav-dropdown-menu"><a href="house">The House</a><a href="craftsmanship">Craftsmanship</a><a href="films">Films</a><a href="quiz">Find Your Fragrance</a></div></div><a href="bespoke">Build Your Own</a><a href="journal" class='active'>Journal</a><a href="contact">Contact</a></div>
 <div class="nav-actions">
   <button class="icon-btn" data-search-btn aria-label="Search">
     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -734,7 +766,7 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
   </button>
   <button class="icon-btn menu-toggle" aria-label="Open menu"><svg viewBox="0 0 24 24"><path d="M4 8h16M4 16h16"/></svg></button>
 </div></nav></div></header>
-<div class="mobile-menu"><a href="index">Home</a><a href="house">The House</a><a href="collection">Attar</a><a href="parfums">Parfum</a><a href="craftsmanship">Craftsmanship</a><a href="films">Films</a><a href="bespoke">Build Your Own</a><a href="journal">Journal</a><a href="contact">Contact</a><a href="#" data-mobile-account>My Account</a><div class="mobile-meta">A Luxury Fragrance House · Crafted in UAE</div></div><main>
+<div class="mobile-menu"><a href="index">Home</a><a href="house">The House</a><a href="collection">Attar</a><a href="parfums">Parfum</a><a href="craftsmanship">Craftsmanship</a><a href="films">Films</a><a href="bespoke">Build Your Own</a><a href="quiz">Find Your Fragrance</a><a href="journal">Journal</a><a href="contact">Contact</a><a href="#" data-mobile-account>My Account</a><div class="mobile-meta">A Luxury Fragrance House · Crafted in UAE</div></div><main>
 <section class="page-hero" style="min-height:50vh">
   <img src="assets/Parfum/al-durrah.jpg" alt="Perfume" fetchpriority="high"/>
   <div class="container page-hero-content reveal">
@@ -1811,6 +1843,39 @@ Help customers find their perfect attar. Ask about their preferences, lifestyle,
       if(b) b.style.transform='translateY(140%)';
     });
   }catch(e){ /* localStorage unavailable — banner simply won't show, no functionality breaks */ }
+})();
+</script>
+<div class="welcome-popup-veil" data-welcome-popup-veil style="position:fixed;inset:0;z-index:280;background:rgba(0,0,0,.65);opacity:0;pointer-events:none;transition:opacity .4s ease"></div>
+<div class="welcome-popup" data-welcome-popup style="position:fixed;top:50%;left:50%;transform:translate(-50%,-42%) scale(.94);opacity:0;pointer-events:none;transition:.4s cubic-bezier(.19,1,.22,1);z-index:281;width:min(420px,90vw);background:linear-gradient(160deg,var(--panel,#100d09),#0a0806);border:1px solid rgba(233,190,90,.25);border-radius:10px;padding:36px 32px;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.6)">
+  <button data-welcome-popup-close aria-label="Close" style="position:absolute;top:14px;right:14px;background:none;border:none;color:var(--muted,#9a9a94);font-size:1.3rem;line-height:1;cursor:pointer;padding:6px">×</button>
+  <div style="font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold,#e9be5a);margin-bottom:10px">Welcome to HEEZE 94</div>
+  <h3 style="font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;font-size:1.7rem;margin-bottom:10px">Enjoy 10% off<br/>your first order.</h3>
+  <p style="color:var(--muted,#9a9a94);font-size:.85rem;line-height:1.6;margin-bottom:20px">Use the code below at checkout — no minimum order, applied instantly.</p>
+  <div style="background:rgba(233,190,90,.08);border:1px dashed rgba(233,190,90,.4);border-radius:6px;padding:12px;margin-bottom:18px;font-family:'Marcellus',serif;letter-spacing:.15em;color:var(--gold,#e9be5a);font-size:1.1rem">WELCOME10</div>
+  <button class="btn btn-gold" style="width:100%" data-welcome-popup-shop>Start Shopping</button>
+</div>
+<script>
+(function(){
+  var KEY='h94_welcome_popup_seen';
+  var popup=document.querySelector('[data-welcome-popup]');
+  var veil=document.querySelector('[data-welcome-popup-veil]');
+  if(!popup||!veil)return;
+  function closePopup(){
+    popup.style.opacity='0'; popup.style.transform='translate(-50%,-42%) scale(.94)'; popup.style.pointerEvents='none';
+    veil.style.opacity='0'; veil.style.pointerEvents='none';
+    try{ localStorage.setItem(KEY,'1'); }catch(e){}
+  }
+  function openPopup(){
+    popup.style.opacity='1'; popup.style.transform='translate(-50%,-50%) scale(1)'; popup.style.pointerEvents='auto';
+    veil.style.opacity='1'; veil.style.pointerEvents='auto';
+  }
+  try{
+    if(localStorage.getItem(KEY)==='1') return; // already seen — never schedule it
+  }catch(e){}
+  setTimeout(openPopup, 4000);
+  document.querySelector('[data-welcome-popup-close]')?.addEventListener('click', closePopup);
+  veil.addEventListener('click', closePopup);
+  document.querySelector('[data-welcome-popup-shop]')?.addEventListener('click', closePopup);
 })();
 </script>
 </body></html>

@@ -1,0 +1,48 @@
+HEEZE 94 — Feature Update (Batches 1-5)
+========================================
+
+DEPLOY IN THIS ORDER:
+
+1) SUPABASE — run these SQL migrations in the SQL Editor, IN ORDER:
+     016_gift_notes_and_stock_alerts.sql
+     017_referral_codes.sql
+     018_product_reviews.sql
+     019_cron_reminder_flags.sql
+
+2) GITHUB — NEW files (didn't exist before):
+     quiz.html
+     admin.html
+     track-order.html
+     sitemap.xml
+     robots.txt
+     api/customer-tools.js
+
+   GITHUB — UPDATED files (replace existing):
+     index.html, product.html, collection.html, parfums.html, house.html,
+     craftsmanship.html, films.html, bespoke.html, journal.html,
+     journal-attar.html, journal-perfume.html, journal-structure.html,
+     journal-post.html, contact.html, privacy.html, terms.html
+     api/create-order.js
+     api/check-status-updates.js
+
+3) Commit -> Vercel auto-redeploys.
+
+NOTE: /api stays at exactly 12 functions (the Vercel Hobby ceiling). Do not add
+new files to /api or the deploy will fail — customer-tools.js holds all the new
+backend actions instead.
+
+AFTER DEPLOY — quick manual checks (couldn't be fully tested in the build sandbox):
+  - Referral "Copy" button in the account panel copies the code
+  - Quiz gives a recommendation and links to the right product
+  - /admin loads with your real SUPABASE_WEBHOOK_SECRET as the key
+  - A test review submission appears on the product page
+
+WHAT'S IN THIS UPDATE:
+  Batch 1: sitemap + robots.txt, product SEO schema, cookie consent, wishlist
+  Batch 2: gift notes at checkout, notify-me-in-stock, order tracking page
+  Batch 3: referral/loyalty codes
+  Batch 4: announcement banner, welcome popup, product reviews
+  Batch 5: fragrance quiz, abandoned-cart emails, refill reminders, admin page
+
+DISCOVERY/SAMPLE SETS: no code needed — just add a product row in Supabase
+(e.g. "Discovery Set — 3x3ml") and it flows through the existing system.

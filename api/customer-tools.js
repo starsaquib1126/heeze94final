@@ -35,6 +35,18 @@ export default async function handler(req, res) {
     if (action === 'get-referral-code') {
       return await handleGetReferralCode(req, res);
     }
+    if (action === 'submit-review') {
+      return await handleSubmitReview(req, res);
+    }
+    if (action === 'get-reviews') {
+      return await handleGetReviews(req, res);
+    }
+    if (action === 'admin-list-orders') {
+      return await handleAdminListOrders(req, res);
+    }
+    if (action === 'admin-update-order') {
+      return await handleAdminUpdateOrder(req, res);
+    }
     return res.status(400).json({ error: 'Unknown action' });
   } catch (err) {
     return res.status(400).json({ error: err.message || 'Something went wrong' });
@@ -149,4 +161,114 @@ async function handleTrackOrder(req, res) {
       price: i.price_at_purchase
     }))
   });
+}
+
+async function handleSubmitReview(req, res) {
+  const { productId, email, name, rating, comment } = req.body;
+  const cleanEmail = (email || '').trim().toLowerCase();
+  const cleanName = (name || '').trim().slice(0, 80);
+  const cleanComment = (comment || '').trim().slice(0, 1000);
+  const numRating = Number(rating);
+
+  if (!productId) return res.status(400).json({ error: 'Missing product' });
+  if (!cleanEmail || !cleanEmail.includes('@')) return res.status(400).json({ error: 'A valid email is required' });
+  if (!numRating || numRating < 1 || numRating > 5) return res.status(400).json({ error: 'Rating must be between 1 and 5' });
+
+  // Verified purchase check: does this email have a paid/shipped/delivered order
+  // containing a variant of this product? Two simple queries rather than one
+  // complex embedded join, to stay robust against exact FK-relationship naming.
+  let verifiedPurchase = false;
+  const { data: variants } = await supabase.from('product_variants').select('id').eq('product_id', productId);
+  const variantIds = (variants || []).map(v => v.id);
+  if (variantIds.length) {
+    const { data: matchingItems } = await supabase
+      .from('order_items')
+      .select('order_id, orders!inner(email, status)')
+      .in('product_variant_id', variantIds)
+      .eq('orders.email', cleanEmail)
+      .in('orders.status', ['paid', 'shipped', 'delivered']);
+    verifiedPurchase = (matchingItems || []).length > 0;
+  }
+
+  const { error } = await supabase.from('product_reviews').insert({
+    product_id: productId,
+    customer_email: cleanEmail,
+    customer_name: cleanName || null,
+    rating: numRating,
+    comment: cleanComment || null,
+    verified_purchase: verifiedPurchase
+  });
+  if (error) return res.status(500).json({ error: error.message });
+
+  return res.status(200).json({ success: true, verifiedPurchase });
+}
+
+async function handleGetReviews(req, res) {
+  const { productId } = req.body;
+  if (!productId) return res.status(400).json({ error: 'Missing product' });
+
+  const { data: reviews, error } = await supabase
+    .from('product_reviews')
+    .select('customer_name, rating, comment, verified_purchase, created_at')
+    .eq('product_id', productId)
+    .eq('approved', true)
+    .order('created_at', { ascending: false })
+    .limit(50);
+  if (error) return res.status(500).json({ error: error.message });
+
+  const list = reviews || [];
+  const average = list.length ? list.reduce((s, r) => s + r.rating, 0) / list.length : 0;
+
+  return res.status(200).json({
+    count: list.length,
+    average: Math.round(average * 10) / 10,
+    reviews: list.map(r => ({
+      name: r.customer_name || 'Anonymous',
+      rating: r.rating,
+      comment: r.comment,
+      verified: r.verified_purchase,
+      date: r.created_at
+    }))
+  });
+}
+
+function checkAdminSecret(req) {
+  return !!process.env.SUPABASE_WEBHOOK_SECRET && req.body.secret === process.env.SUPABASE_WEBHOOK_SECRET;
+}
+
+async function handleAdminListOrders(req, res) {
+  // Reuses the SAME shared secret as the cron endpoint, rather than building
+  // separate admin auth infrastructure — good enough for a single-owner store,
+  // not intended as a multi-admin permission system.
+  if (!checkAdminSecret(req)) return res.status(401).json({ error: 'Unauthorized' });
+
+  const { data: orders, error } = await supabase
+    .from('orders')
+    .select('id, email, status, created_at, total, tracking_number, gift_note, is_gift')
+    .order('created_at', { ascending: false })
+    .limit(100);
+  if (error) return res.status(500).json({ error: error.message });
+
+  return res.status(200).json({ orders: orders || [] });
+}
+
+async function handleAdminUpdateOrder(req, res) {
+  if (!checkAdminSecret(req)) return res.status(401).json({ error: 'Unauthorized' });
+
+  const { orderId, status, trackingNumber } = req.body;
+  if (!orderId) return res.status(400).json({ error: 'Missing order ID' });
+
+  const update = {};
+  if (status) update.status = status;
+  if (trackingNumber !== undefined) update.tracking_number = trackingNumber || null;
+  if (Object.keys(update).length === 0) return res.status(400).json({ error: 'Nothing to update' });
+
+  // Setting status to shipped/delivered here will be picked up and emailed by
+  // the existing check-status-updates.js cron on its next run — this endpoint
+  // deliberately does NOT send email itself, to keep all customer-facing email
+  // logic in one place.
+  const { error } = await supabase.from('orders').update(update).eq('id', orderId);
+  if (error) return res.status(500).json({ error: error.message });
+
+  return res.status(200).json({ success: true });
 }
