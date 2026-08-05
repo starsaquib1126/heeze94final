@@ -847,12 +847,12 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
       <span style="font-size:.78rem;color:var(--muted);line-height:1.6">This is a gift</span>
     </label>
     <label data-gift-note-field style="display:none;margin-top:10px">Gift note (optional)<textarea name="giftNote" maxlength="300" rows="3" placeholder="Add a short message for the recipient…" style="width:100%;resize:vertical;font-family:inherit"></textarea></label>
-    <p class="promo-msg" style="margin-top:4px">Charged in Indian Rupees (INR) regardless of the currency shown while browsing.</p>
     <label class="terms-check" style="display:flex;align-items:flex-start;gap:9px;margin-top:16px;cursor:pointer">
-      <input type="checkbox" name="agreeTerms" required style="margin-top:3px;width:15px;height:15px;flex-shrink:0;accent-color:var(--gold)"/>
+      <input type="checkbox" name="agreeTerms" style="margin-top:3px;width:15px;height:15px;flex-shrink:0;accent-color:var(--gold)"/>
       <span style="font-size:.78rem;color:var(--muted);line-height:1.6">I agree to the <a href="terms" target="_blank" style="color:var(--gold);text-decoration:underline">Terms & Conditions</a> and <a href="privacy" target="_blank" style="color:var(--gold);text-decoration:underline">Privacy Policy</a>.</span>
     </label>
-    <button type="submit" class="btn btn-gold" style="width:100%;margin-top:18px" data-pay-btn disabled>Pay Now</button>
+    <p style="font-size:.72rem;color:var(--muted);text-align:center;margin-top:14px;margin-bottom:2px">All charges are billed in Indian Rupees (INR).</p>
+    <button type="submit" class="btn btn-gold" style="width:100%;margin-top:6px" data-pay-btn>Pay Now</button>
   </form>
 </div>
 <div class="account-veil wishlist-veil" data-wishlist-veil></div>
@@ -1003,6 +1003,13 @@ function saveCat(c){ /* no-op */ }
 /* ── Cart ── */
 let cart={};let appliedPromo=null;
 try{ cart=JSON.parse(localStorage.getItem('h94_cart')||'{}'); }catch(e){}
+// Paint the bag-count badge from localStorage immediately, before any other
+// page setup runs (auth checks, geo lookups, etc.) -- otherwise the badge
+// briefly shows its static "0" placeholder until the rest of the script
+// finishes, even though the real cart data was available from the start.
+document.querySelectorAll('[data-bag-count]').forEach(el=>{
+  el.textContent=Object.values(cart).reduce((s,q)=>s+q,0);
+});
 const saveCart=()=>localStorage.setItem('h94_cart',JSON.stringify(cart));
 let CURR={code:'INR',symbol:'₹',rate:1};
 async function initGeoCurrency(){
@@ -1096,7 +1103,7 @@ function renderGrid(container,opts={}){
         </div>
         <h3>${p.name}</h3>
         <p class="product-short">${(p.desc||'').substring(0,82)}…</p>
-        ${p.status==='coming_soon' ? '<div class="product-price" style="color:var(--gold)">Coming Soon</div>' : p.status==='sold_out' ? '<div class="product-price" style="color:var(--muted)">Sold Out</div>' : `<div class="product-price">From ${fmt(Math.min(...p.sizes.map(s=>s.price)))} <span>· 3 · 6 · 12 ml</span></div>`}
+        ${(()=>{const validPrices=(p.sizes||[]).map(s=>s.price).filter(v=>typeof v==='number'&&isFinite(v)&&v>0);if(p.status==='coming_soon'||!validPrices.length)return '<div class="product-price" style="color:var(--gold)">Coming Soon</div>';if(p.status==='sold_out')return '<div class="product-price" style="color:var(--muted)">Sold Out</div>';return `<div class="product-price">From ${fmt(Math.min(...validPrices))} <span>· 3 · 6 · 12 ml</span></div>`;})()}
       </div>
     </article>`).join('');
 }
@@ -1306,7 +1313,9 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const authEl=document.querySelector('[data-auth-form]');
   const formEl=document.querySelector('[data-checkout-form]');
   const titleEl=document.querySelector('[data-checkout-title]');
-  formEl?.querySelector('input[name="agreeTerms"]')?.addEventListener('change', function(){ const payBtn=formEl.querySelector('[data-pay-btn]'); if(payBtn) payBtn.disabled=!this.checked; });
+  // Terms agreement is now validated on submit (with clear feedback) rather
+  // than by silently disabling the Pay button — a disabled button with no
+  // explanation looked exactly like a frozen page to anyone who missed the checkbox.
   formEl?.querySelector('input[name="isGift"]')?.addEventListener('change', function(){ const nf=formEl.querySelector('[data-gift-note-field]'); if(nf) nf.style.display=this.checked?'':'none'; });
 
   function showDetailsForm(prefillEmail, prefillName, prefillPhone){
@@ -1763,6 +1772,13 @@ document.addEventListener('DOMContentLoaded',async()=>{
     e.preventDefault();
     const form=e.target;
     const submitBtn=form.querySelector('button[type="submit"]');
+    const termsBox=form.querySelector('input[name="agreeTerms"]');
+    if(termsBox && !termsBox.checked){
+      showToast('Please agree to the Terms & Conditions to continue');
+      termsBox.closest('label')?.scrollIntoView({behavior:'smooth',block:'center'});
+      termsBox.closest('label')?.animate([{outline:'2px solid var(--gold)'},{outline:'2px solid transparent'}],{duration:900});
+      return;
+    }
     submitBtn.disabled=true; submitBtn.textContent='Processing…';
     try{
       // 1. Get live product data so we can map cart keys (slug|ml) to real variant IDs

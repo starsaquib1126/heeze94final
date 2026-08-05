@@ -268,6 +268,8 @@ body:not(.gate-open) .gateway{display:none}
 .pcard:hover{transform:translateY(-8px);border-color:rgba(233,190,90,.42);
   box-shadow:0 28px 60px -20px rgba(0,0,0,.95),0 0 44px -18px rgba(233,190,90,.2)}
 .pcard-img{aspect-ratio:4/3;overflow:hidden;position:relative}
+.pcard-img.coming-soon img{filter:blur(6px) brightness(.6);transform:scale(1.08)}
+.pcard-coming-badge{position:absolute;top:10px;left:10px;z-index:2;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);border-radius:3px;padding:3px 8px;background:rgba(0,0,0,.55)}
 .discount-ribbon{position:absolute;top:12px;left:12px;z-index:2;background:var(--gold);color:#1a1208;
   font-size:.68rem;font-weight:700;letter-spacing:.06em;padding:5px 10px;border-radius:3px;
   text-transform:uppercase;box-shadow:0 2px 8px rgba(0,0,0,.35)}
@@ -848,12 +850,12 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
       <span style="font-size:.78rem;color:var(--muted);line-height:1.6">This is a gift</span>
     </label>
     <label data-gift-note-field style="display:none;margin-top:10px">Gift note (optional)<textarea name="giftNote" maxlength="300" rows="3" placeholder="Add a short message for the recipient…" style="width:100%;resize:vertical;font-family:inherit"></textarea></label>
-    <p class="promo-msg" style="margin-top:4px">Charged in Indian Rupees (INR) regardless of the currency shown while browsing.</p>
+    <p style="font-size:.72rem;color:var(--muted);text-align:center;margin-top:14px;margin-bottom:2px">All charges are billed in Indian Rupees (INR).</p>
     <label class="terms-check" style="display:flex;align-items:flex-start;gap:9px;margin-top:16px;cursor:pointer">
-      <input type="checkbox" name="agreeTerms" required style="margin-top:3px;width:15px;height:15px;flex-shrink:0;accent-color:var(--gold)"/>
+      <input type="checkbox" name="agreeTerms" style="margin-top:3px;width:15px;height:15px;flex-shrink:0;accent-color:var(--gold)"/>
       <span style="font-size:.78rem;color:var(--muted);line-height:1.6">I agree to the <a href="terms" target="_blank" style="color:var(--gold);text-decoration:underline">Terms & Conditions</a> and <a href="privacy" target="_blank" style="color:var(--gold);text-decoration:underline">Privacy Policy</a>.</span>
     </label>
-    <button type="submit" class="btn btn-g" style="width:100%;margin-top:18px" data-pay-btn disabled>Pay Now</button>
+    <button type="submit" class="btn btn-g" style="width:100%;margin-top:6px" data-pay-btn>Pay Now</button>
   </form>
 </div>
 <div class="account-veil wishlist-veil" data-wishlist-veil></div>
@@ -997,6 +999,7 @@ async function loadProductsFromSupabase(){
 }
 
 let cart={};let appliedPromo=null;try{cart=JSON.parse(localStorage.getItem('h94_cart')||'{}');}catch(e){}
+document.querySelectorAll('[data-bag-count]').forEach(el=>{ el.textContent=Object.values(cart).reduce((s,q)=>s+q,0); });
 const saveCart=()=>localStorage.setItem('h94_cart',JSON.stringify(cart));
 let CURR={code:'INR',symbol:'₹',rate:1};
 async function initGeoCurrency(){
@@ -1010,7 +1013,7 @@ const fmt=n=>{
   const v=Number(n)*CURR.rate;
   return CURR.code==='INR' ? CURR.symbol+Math.round(v).toLocaleString('en-IN') : CURR.symbol+v.toFixed(2);
 };
-const minPrice=p=>Math.min(...p.sizes.map(s=>s.price));
+const minPrice=p=>{const valid=(p.sizes||[]).map(s=>s.price).filter(v=>typeof v==='number'&&isFinite(v)&&v>0);return valid.length?Math.min(...valid):null;};
 const lineInfo=key=>{const[id,ml]=key.split('|');const p=cat().find(x=>x.id===id);const s=p&&p.sizes.find(x=>x.ml===+ml);return{p,s};};
 
 function addToCart(id,ml,qty=1){
@@ -1067,7 +1070,7 @@ function renderWishlistPanel(){
   const items=ids.map(id=>cat().find(p=>p.id===id)).filter(Boolean);
   if(!items.length){ wrap.innerHTML='<p style="color:var(--muted);font-size:.85rem">Nothing saved yet — tap the heart on any fragrance.</p>'; return; }
   wrap.innerHTML=items.map(p=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);cursor:pointer" onclick="location.href='product?id=${p.id}'">
-    <div><strong style="display:block;font-size:.85rem">${p.name}</strong><span style="font-size:.75rem;color:var(--muted)">From ${fmt(minPrice(p))}</span></div>
+    <div><strong style="display:block;font-size:.85rem">${p.name}</strong><span style="font-size:.75rem;color:var(--muted)">${minPrice(p)!==null?'From '+fmt(minPrice(p)):'Coming Soon'}</span></div>
     <button onclick="event.stopPropagation();H94.toggleWishlist('${p.id}');H94.renderWishlistPanel()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.8rem">Remove</button>
   </div>`).join('');
 }
@@ -1080,7 +1083,7 @@ function renderGrid(el,opts={}){
   if(!prods.length){el.innerHTML='<p style="color:var(--muted);padding:40px 0;text-align:center;font-style:italic">No fragrances found.</p>';return;}
   el.innerHTML=prods.map(p=>`
     <a class="pcard" href="product?id=${p.id}">
-      <div class="pcard-img">${(()=>{const cheapest=minPrice(p);return p.compareAt && p.compareAt>cheapest ? `<div class="discount-ribbon">-${Math.round((1-cheapest/p.compareAt)*100)}% OFF</div>` : '';})()}<button onclick="event.preventDefault();event.stopPropagation();H94.toggleWishlist('${p.id}',this)" class="wishlist-heart${H94.isWishlisted(p.id)?' active':''}" aria-label="Wishlist" style="position:absolute;top:10px;right:10px;z-index:2;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="${H94.isWishlisted(p.id)?'var(--gold)':'none'}" stroke="var(--gold)" stroke-width="2"><path d="M12 21s-6.7-4.35-9.33-8.02C.9 10.2 1.4 6.6 4.3 4.9 6.6 3.5 9.4 4 11 6c.4.5.7 1 1 1.5.3-.5.6-1 1-1.5 1.6-2 4.4-2.5 6.7-1.1 2.9 1.7 3.4 5.3 1.63 8.08C18.7 16.65 12 21 12 21z"/></svg></button><img src="${p.img}" alt="${p.name}" loading="lazy"/></div>
+      <div class="pcard-img${minPrice(p)===null?' coming-soon':''}">${minPrice(p)===null?'<span class="pcard-coming-badge">Coming Soon</span>':''}${(()=>{const cheapest=minPrice(p);return cheapest!==null && p.compareAt && p.compareAt>cheapest ? `<div class="discount-ribbon">-${Math.round((1-cheapest/p.compareAt)*100)}% OFF</div>` : '';})()}<button onclick="event.preventDefault();event.stopPropagation();H94.toggleWishlist('${p.id}',this)" class="wishlist-heart${H94.isWishlisted(p.id)?' active':''}" aria-label="Wishlist" style="position:absolute;top:10px;right:10px;z-index:2;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="${H94.isWishlisted(p.id)?'var(--gold)':'none'}" stroke="var(--gold)" stroke-width="2"><path d="M12 21s-6.7-4.35-9.33-8.02C.9 10.2 1.4 6.6 4.3 4.9 6.6 3.5 9.4 4 11 6c.4.5.7 1 1 1.5.3-.5.6-1 1-1.5 1.6-2 4.4-2.5 6.7-1.1 2.9 1.7 3.4 5.3 1.63 8.08C18.7 16.65 12 21 12 21z"/></svg></button><img src="${p.img}" alt="${p.name}" loading="lazy"/></div>
       <div class="pcard-body">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <div class="ey">${p.family}</div>
@@ -1088,7 +1091,7 @@ function renderGrid(el,opts={}){
         </div>
         <h3>${p.name}</h3>
         <p class="pcard-desc">${(p.desc||'').substring(0,80)}…</p>
-        <div class="pcard-price">From ${fmt(minPrice(p))} <span>· 3 · 6 · 12 ml</span></div>
+        <div class="pcard-price">${minPrice(p)!==null?'From '+fmt(minPrice(p))+' <span>· 3 · 6 · 12 ml</span>':'<span style="color:var(--gold)">Coming Soon</span>'}</div>
       </div>
     </a>`).join('');
 }
@@ -1166,7 +1169,9 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const authEl=document.querySelector('[data-auth-form]');
   const formEl=document.querySelector('[data-checkout-form]');
   const titleEl=document.querySelector('[data-checkout-title]');
-  formEl?.querySelector('input[name="agreeTerms"]')?.addEventListener('change', function(){ const payBtn=formEl.querySelector('[data-pay-btn]'); if(payBtn) payBtn.disabled=!this.checked; });
+  // Terms agreement is now validated on submit (with clear feedback) rather
+  // than by silently disabling the Pay button — a disabled button with no
+  // explanation looked exactly like a frozen page to anyone who missed the checkbox.
   formEl?.querySelector('input[name="isGift"]')?.addEventListener('change', function(){ const nf=formEl.querySelector('[data-gift-note-field]'); if(nf) nf.style.display=this.checked?'':'none'; });
 
   function showDetailsForm(prefillEmail, prefillName, prefillPhone){
@@ -1623,6 +1628,13 @@ document.addEventListener('DOMContentLoaded',async()=>{
     e.preventDefault();
     const form=e.target;
     const submitBtn=form.querySelector('button[type="submit"]');
+    const termsBox=form.querySelector('input[name="agreeTerms"]');
+    if(termsBox && !termsBox.checked){
+      showToast('Please agree to the Terms & Conditions to continue');
+      termsBox.closest('label')?.scrollIntoView({behavior:'smooth',block:'center'});
+      termsBox.closest('label')?.animate([{outline:'2px solid var(--gold)'},{outline:'2px solid transparent'}],{duration:900});
+      return;
+    }
     submitBtn.disabled=true; submitBtn.textContent='Processing…';
     try{
       const products=await fetch('/api/products').then(r=>r.json());
