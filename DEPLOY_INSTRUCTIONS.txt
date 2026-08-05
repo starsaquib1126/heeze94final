@@ -8,6 +8,7 @@ DEPLOY IN THIS ORDER:
      017_referral_codes.sql
      018_product_reviews.sql
      019_cron_reminder_flags.sql
+     020_stale_order_reminders.sql
 
 2) GITHUB — NEW files (didn't exist before):
      quiz.html
