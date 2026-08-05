@@ -752,7 +752,12 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
       if(q<3){
         document.getElementById('quizStep'+q).style.display='';
       } else {
-        var winner=Object.keys(scores).reduce((a,b)=>scores[a]>=scores[b]?a:b);
+        // Pick the highest-scoring family. On a tie, choose randomly among the
+        // tied leaders rather than always defaulting to the first key ('oud'),
+        // which would make mixed answers always land on Black Oud.
+        var max=Math.max(scores.oud,scores.musk,scores.amber);
+        var leaders=Object.keys(scores).filter(function(k){return scores[k]===max;});
+        var winner=leaders[Math.floor(Math.random()*leaders.length)];
         var p=PRODUCTS[winner];
         document.getElementById('quizResultName').textContent=p.name;
         document.getElementById('quizResultImg').src=p.img;
