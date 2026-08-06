@@ -765,6 +765,9 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
   <div class="dr-foot">
     <div class="promo-row"><input type="text" placeholder="Promo code" data-promo-input><button class="promo-apply" data-promo-apply>Apply</button></div><div class="promo-msg" data-promo-msg></div>
     <div class="dr-total"><span>Subtotal</span><strong data-ct>₹0</strong></div>
+    <div class="dr-total" data-ct-discount-row style="display:none"><span>Discount</span><strong data-ct-discount style="color:var(--gold)">-₹0</strong></div>
+    <div class="dr-total"><span>Shipping</span><strong data-ct-shipping style="font-size:.85rem;color:var(--muted)">Calculated at checkout</strong></div>
+    <div class="dr-total" style="border-top:1px solid rgba(255,255,255,.1);padding-top:12px;margin-top:2px"><span>Total</span><strong data-ct-grand>₹0</strong></div>
     <button class="btn btn-g" data-co style="width:100%">Continue to checkout</button>
     <p class="dr-note">Razorpay · UPI · Cards · Netbanking</p>
     <a class="dr-wa" href="https://wa.me/910000000000?text=Hello%20HEEZE%2094%2C%20I%20would%20like%20to%20order" target="_blank">
@@ -849,6 +852,13 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
       <option value="AE">United Arab Emirates</option>
       <option value="US">United States</option>
     </select></label>
+    <div class="order-price-summary" style="margin-top:14px;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:6px;font-size:.85rem">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="color:var(--muted)">Subtotal</span><strong data-summary-subtotal>₹0</strong></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px" data-summary-discount-row><span style="color:var(--muted)">Discount</span><strong data-summary-discount style="color:var(--gold)">-₹0</strong></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="color:var(--muted)">Shipping</span><strong data-summary-shipping>Free</strong></div>
+      <div style="display:flex;justify-content:space-between;padding-top:8px;margin-top:5px;border-top:1px solid rgba(255,255,255,.08)"><span>Total</span><strong data-summary-total style="color:var(--gold)">₹0</strong></div>
+      <div data-summary-gst-note style="display:none;font-size:.72rem;color:var(--muted);text-align:right;margin-top:4px">Inclusive of GST: <span data-summary-gst-amount>₹0</span></div>
+    </div>
     <label class="gift-check" style="display:flex;align-items:flex-start;gap:9px;margin-top:14px;cursor:pointer">
       <input type="checkbox" name="isGift" data-gift-toggle style="margin-top:3px;width:15px;height:15px;flex-shrink:0;accent-color:var(--gold)"/>
       <span style="font-size:.78rem;color:var(--muted);line-height:1.6">This is a gift</span>
@@ -1056,8 +1066,16 @@ function renderCart(){
     <div class="dl-price">${fmt(s.price*q)}</div></div>`;
   }).join('');}
   const rawTotal=items.reduce((s,[key,q])=>{const{s:sz}=lineInfo(key);return s+(sz?sz.price*q:0);},0);
-  const total=appliedPromo?Math.max(rawTotal-appliedPromo.discountAmount,0):rawTotal;
-  const el=document.querySelector('[data-ct]');if(el)el.textContent=fmt(total);
+  const discount=appliedPromo?appliedPromo.discountAmount:0;
+  const grandTotal=Math.max(rawTotal-discount,0);
+  const subtotalEl=document.querySelector('[data-ct]');if(subtotalEl)subtotalEl.textContent=fmt(rawTotal);
+  const discountRow=document.querySelector('[data-ct-discount-row]');
+  const discountEl=document.querySelector('[data-ct-discount]');
+  if(discountRow&&discountEl){
+    if(discount>0){ discountRow.style.display=''; discountEl.textContent='-'+fmt(discount); }
+    else{ discountRow.style.display='none'; }
+  }
+  const grandEl=document.querySelector('[data-ct-grand]');if(grandEl)grandEl.textContent=fmt(grandTotal);
 }
 function openCart(){window.closeWelcomePopupIfOpen?.();document.body.classList.add('cart-open');renderCart();}
 function closeCart(){document.body.classList.remove('cart-open');}
@@ -1202,6 +1220,36 @@ document.addEventListener('DOMContentLoaded',async()=>{
   // explanation looked exactly like a frozen page to anyone who missed the checkbox.
   formEl?.querySelector('input[name="isGift"]')?.addEventListener('change', function(){ const nf=formEl.querySelector('[data-gift-note-field]'); if(nf) nf.style.display=this.checked?'':'none'; });
 
+  const SHIPPING_FEES = { IN: 0, AE: 500, US: 500 };
+  function updateOrderSummary(){
+    const summaryEl=formEl.querySelector('.order-price-summary');
+    if(!summaryEl) return;
+    const rawSubtotal=Object.entries(cart).reduce((s,[key,q])=>{const{s:sz}=lineInfo(key);return s+(sz?sz.price*q:0);},0);
+    const countrySelect=formEl.querySelector('[data-country-select]');
+    const shippingFee=SHIPPING_FEES[countrySelect?.value] ?? 0;
+    const discount=appliedPromo?.discountAmount || 0;
+    const total=Math.max(rawSubtotal-discount,0)+shippingFee;
+    formEl.querySelector('[data-summary-subtotal]').textContent=fmt(rawSubtotal);
+    const discountRow=formEl.querySelector('[data-summary-discount-row]');
+    if(discountRow){
+      if(discount>0){ discountRow.style.display=''; formEl.querySelector('[data-summary-discount]').textContent='-'+fmt(discount); }
+      else{ discountRow.style.display='none'; }
+    }
+    formEl.querySelector('[data-summary-shipping]').textContent=shippingFee>0?fmt(shippingFee):'Free';
+    formEl.querySelector('[data-summary-total]').textContent=fmt(total);
+    // GST disclosure -- prices are already GST-inclusive, this just shows the
+    // tax portion for transparency (India only; doesn't change what's charged).
+    const gstNote=formEl.querySelector('[data-summary-gst-note]');
+    if(gstNote){
+      if(countrySelect?.value==='IN' && total>0){
+        const gstAmount=Math.round(total*18/118);
+        formEl.querySelector('[data-summary-gst-amount]').textContent=fmt(gstAmount);
+        gstNote.style.display='';
+      }else{
+        gstNote.style.display='none';
+      }
+    }
+  }
   function showDetailsForm(prefillEmail, prefillName, prefillPhone){
     gateEl.style.display='none'; authEl.style.display='none'; formEl.style.display='';
     titleEl.textContent='Your Details';
@@ -1212,6 +1260,8 @@ document.addEventListener('DOMContentLoaded',async()=>{
     if(countrySelect && CURR.country && [...countrySelect.options].some(o=>o.value===CURR.country)){
       countrySelect.value=CURR.country;
     }
+    updateOrderSummary();
+    countrySelect?.addEventListener('change',updateOrderSummary);
   }
 
   function showOrderSuccess(orderId, email){

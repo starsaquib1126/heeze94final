@@ -258,13 +258,28 @@ async function handleAdminListOrders(req, res) {
 
   const { data: orders, error } = await supabase
     .from('orders')
-    .select('id, email, status, created_at, total, tracking_number, gift_note, is_gift, is_delayed, delay_note, delayed_until, customers(name, phone)')
+    .select('id, email, status, created_at, total, tracking_number, gift_note, is_gift, is_delayed, delay_note, delayed_until, shipping_address, customers(name, phone)')
     .order('created_at', { ascending: false })
     .limit(100);
   if (error) return res.status(500).json({ error: error.message });
 
   return res.status(200).json({
-    orders: (orders || []).map(o => ({ ...o, customer_name: o.customers?.name || null, customer_phone: o.customers?.phone || null }))
+    orders: (orders || []).map(o => {
+      // Internal bookkeeping only -- never shown to customers, never added to
+      // what they're charged. 2% + 18% GST on that fee, India orders only
+      // (matches typical domestic payment-gateway cost); computed as a real
+      // rupee figure so it's actually useful for reconciling accounts.
+      const isIndia = (o.shipping_address?.country || '').toUpperCase() === 'IN';
+      const platformFeeBase = isIndia ? Math.round(o.total * 0.02) : null;
+      const platformFeeGst = isIndia ? Math.round(platformFeeBase * 0.18) : null;
+      const platformFeeTotal = isIndia ? platformFeeBase + platformFeeGst : null;
+      return {
+        ...o,
+        customer_name: o.customers?.name || null,
+        customer_phone: o.customers?.phone || null,
+        platform_fee_total: platformFeeTotal
+      };
+    })
   });
 }
 
@@ -381,6 +396,10 @@ async function handleAdminExportOrders(req, res) {
 
   const rows = (orders || []).map(o => {
     const addr = o.shipping_address || {};
+    const isIndia = (addr.country || '').toUpperCase() === 'IN';
+    const platformFeeBase = isIndia ? Math.round(o.total * 0.02) : '';
+    const platformFeeGst = isIndia ? Math.round(platformFeeBase * 0.18) : '';
+    const platformFeeTotal = isIndia ? platformFeeBase + platformFeeGst : '';
     return {
       order_id: o.id,
       date: o.created_at,
@@ -392,6 +411,9 @@ async function handleAdminExportOrders(req, res) {
       subtotal: o.subtotal || '',
       discount: o.discount_amount || '',
       total: o.total,
+      platform_fee_2pct: platformFeeBase,
+      platform_fee_gst_18pct: platformFeeGst,
+      platform_fee_total: platformFeeTotal,
       is_gift: o.is_gift ? 'Yes' : 'No',
       gift_note: o.gift_note || '',
       tracking_number: o.tracking_number || '',

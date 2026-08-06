@@ -749,7 +749,7 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
 
 <script>
 
-</script></main><div class="cart-veil"></div><aside class="cart-drawer" aria-label="Shopping bag"><div class="cart-head"><h2>Your Bag</h2><button class="cart-close" data-close-cart>×</button></div><div class="cart-items" data-cart-items></div><div class="cart-foot"><div class="promo-row"><input type="text" placeholder="Promo code" data-promo-input><button class="promo-apply" data-promo-apply>Apply</button></div><div class="promo-msg" data-promo-msg></div><div class="cart-total"><span>Subtotal</span><strong data-cart-total>₹0</strong></div><button class="btn btn-gold" data-checkout style="width:100%">Continue to secure checkout</button><p class="cart-note">Razorpay · UPI · Cards · Netbanking</p></div></aside>
+</script></main><div class="cart-veil"></div><aside class="cart-drawer" aria-label="Shopping bag"><div class="cart-head"><h2>Your Bag</h2><button class="cart-close" data-close-cart>×</button></div><div class="cart-items" data-cart-items></div><div class="cart-foot"><div class="promo-row"><input type="text" placeholder="Promo code" data-promo-input><button class="promo-apply" data-promo-apply>Apply</button></div><div class="promo-msg" data-promo-msg></div><div class="cart-total"><span>Subtotal</span><strong data-cart-total>₹0</strong></div><div class="cart-total" data-cart-discount-row style="display:none"><span>Discount</span><strong data-cart-discount style="color:var(--gold)">-₹0</strong></div><div class="cart-total"><span>Shipping</span><strong data-cart-shipping style="font-size:.85rem;color:var(--muted)">Calculated at checkout</strong></div><div class="cart-total" style="border-top:1px solid var(--hairline);padding-top:12px;margin-top:2px"><span>Total</span><strong data-cart-grand-total>₹0</strong></div><button class="btn btn-gold" data-checkout style="width:100%">Continue to secure checkout</button><p class="cart-note">Razorpay · UPI · Cards · Netbanking</p></div></aside>
 <div class="checkout-veil" data-checkout-veil></div>
 <div class="checkout-modal" data-checkout-modal aria-label="Checkout details">
   <div class="checkout-modal-head"><h2 data-checkout-title>Checkout</h2><button class="cart-close" data-checkout-close>×</button></div>
@@ -801,8 +801,10 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
     </select></label>
     <div class="order-price-summary" style="margin-top:14px;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:6px;font-size:.85rem">
       <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="color:var(--muted)">Subtotal</span><strong data-summary-subtotal>₹0</strong></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px" data-summary-discount-row><span style="color:var(--muted)">Discount</span><strong data-summary-discount style="color:var(--gold)">-₹0</strong></div>
       <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="color:var(--muted)">Shipping</span><strong data-summary-shipping>Free</strong></div>
       <div style="display:flex;justify-content:space-between;padding-top:8px;margin-top:5px;border-top:1px solid rgba(255,255,255,.08)"><span>Total</span><strong data-summary-total style="color:var(--gold)">₹0</strong></div>
+      <div data-summary-gst-note style="display:none;font-size:.72rem;color:var(--muted);text-align:right;margin-top:4px">Inclusive of GST: <span data-summary-gst-amount>₹0</span></div>
     </div>
     <label class="gift-check" style="display:flex;align-items:flex-start;gap:9px;margin-top:14px;cursor:pointer">
       <input type="checkbox" name="isGift" data-gift-toggle style="margin-top:3px;width:15px;height:15px;flex-shrink:0;accent-color:var(--gold)"/>
@@ -1046,9 +1048,19 @@ function renderCart(){
       </div>`;
     }).join('');
   }
-  const rawTotal=items.reduce((s,[key,q])=>{const{s:sz}=lineInfo(key);return s+(sz?sz.price*q:0);},0);const total=appliedPromo?Math.max(rawTotal-appliedPromo.discountAmount,0):rawTotal;
-  const el=document.querySelector('[data-cart-total]');
-  if(el)el.textContent=fmt(total);
+  const rawTotal=items.reduce((s,[key,q])=>{const{s:sz}=lineInfo(key);return s+(sz?sz.price*q:0);},0);
+  const discount=appliedPromo?appliedPromo.discountAmount:0;
+  const grandTotal=Math.max(rawTotal-discount,0);
+  const subtotalEl=document.querySelector('[data-cart-total]');
+  if(subtotalEl)subtotalEl.textContent=fmt(rawTotal);
+  const discountRow=document.querySelector('[data-cart-discount-row]');
+  const discountEl=document.querySelector('[data-cart-discount]');
+  if(discountRow&&discountEl){
+    if(discount>0){ discountRow.style.display=''; discountEl.textContent='-'+fmt(discount); }
+    else{ discountRow.style.display='none'; }
+  }
+  const grandTotalEl=document.querySelector('[data-cart-grand-total]');
+  if(grandTotalEl)grandTotalEl.textContent=fmt(grandTotal);
 }
 function openCart(){window.closeWelcomePopupIfOpen?.();document.body.classList.add('cart-open');renderCart();}
 function closeCart(){document.body.classList.remove('cart-open');}
@@ -1273,8 +1285,25 @@ document.addEventListener('DOMContentLoaded',async()=>{
     const discount=appliedPromo?.discountAmount || 0;
     const total=Math.max(rawSubtotal-discount,0)+shippingFee;
     formEl.querySelector('[data-summary-subtotal]').textContent=fmt(rawSubtotal);
+    const discountRow=formEl.querySelector('[data-summary-discount-row]');
+    if(discountRow){
+      if(discount>0){ discountRow.style.display=''; formEl.querySelector('[data-summary-discount]').textContent='-'+fmt(discount); }
+      else{ discountRow.style.display='none'; }
+    }
     formEl.querySelector('[data-summary-shipping]').textContent=shippingFee>0?fmt(shippingFee):'Free';
     formEl.querySelector('[data-summary-total]').textContent=fmt(total);
+    // GST disclosure -- prices are already GST-inclusive, this just shows the
+    // tax portion for transparency (India only; doesn't change what's charged).
+    const gstNote=formEl.querySelector('[data-summary-gst-note]');
+    if(gstNote){
+      if(countrySelect?.value==='IN' && total>0){
+        const gstAmount=Math.round(total*18/118);
+        formEl.querySelector('[data-summary-gst-amount]').textContent=fmt(gstAmount);
+        gstNote.style.display='';
+      }else{
+        gstNote.style.display='none';
+      }
+    }
   }
   function showDetailsForm(prefillEmail, prefillName, prefillPhone){
     gateEl.style.display='none'; authEl.style.display='none'; formEl.style.display='';
