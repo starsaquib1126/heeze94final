@@ -545,6 +545,7 @@ body.checkout-open .checkout-modal{opacity:1;pointer-events:auto;transform:trans
   padding:12px 28px;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;
   z-index:300;transition:.45s cubic-bezier(.19,1,.22,1);opacity:0;pointer-events:none;white-space:nowrap}
 .toast.show{transform:translateX(-50%);opacity:1}
+.toast.err{border-color:#c0685f;color:#f0d8d5;white-space:normal;text-align:center;letter-spacing:.04em;text-transform:none;max-width:90vw;width:max-content;max-width:min(420px,90vw)}
 
 @media(prefers-reduced-motion:reduce){
   .reveal{opacity:1;transform:none}
@@ -1048,11 +1049,13 @@ function openCart(){document.body.classList.add('cart-open');renderCart();}
 function closeCart(){document.body.classList.remove('cart-open');}
 
 /* ── Toast ── */
-function showToast(msg){
+function showToast(msg, isError){
   const t=document.querySelector('.toast');
   if(!t)return;
-  t.textContent=msg;t.classList.add('show');
-  clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2200);
+  t.textContent=msg;
+  t.classList.toggle('err', !!isError);
+  t.classList.add('show');
+  clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),isError?4200:2200);
 }
 
 /* ── Grids ── */
@@ -1499,7 +1502,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
         showToast(isPending?'Order cancelled':'Order cancelled — refund is on its way');
         loadOrders(currentUserEmail);
       }catch(err){
-        alert(err.message||'Could not cancel this order right now.');
+        showToast(err.message||'Could not cancel this order right now.', true);
         cancelBtn.disabled=false; cancelBtn.textContent=origLabel;
       }
     }
@@ -1530,7 +1533,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
         });
         rzp.open();
       }catch(err){
-        alert(err.message||'Could not start payment right now.');
+        showToast(err.message||'Could not start payment right now.', true);
         payBtn.disabled=false; payBtn.textContent='Complete Payment';
       }
     }

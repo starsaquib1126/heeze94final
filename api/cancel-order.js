@@ -61,8 +61,14 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'This order has already been dispatched and can no longer be cancelled here — please request a return instead.' });
   }
 
-  // Process the Razorpay refund (full amount, instant speed)
-  if (order.razorpay_payment_id) {
+  // Process the Razorpay refund (full amount, instant speed) -- but ONLY for
+  // an order that was genuinely completed. Checking razorpay_payment_id alone
+  // isn't safe: if that field is ever set on a pending/payment_failed order
+  // (e.g. a stray value from an abandoned "Complete Payment" retry), this
+  // guard stops a refund from being attempted for money that was never
+  // actually charged.
+  const genuinelyPaid = order.razorpay_payment_id && !['pending', 'payment_failed'].includes(order.status);
+  if (genuinelyPaid) {
     try {
       const auth = Buffer.from(`${process.env.RAZORPAY_KEY_ID}:${process.env.RAZORPAY_KEY_SECRET}`).toString('base64');
       const refundRes = await fetch(`https://api.razorpay.com/v1/payments/${order.razorpay_payment_id}/refund`, {
@@ -97,7 +103,7 @@ export default async function handler(req, res) {
   }
 
   const ownerEmail = process.env.OWNER_NOTIFICATION_EMAIL || 'heeze94official@gmail.com';
-  const wasActuallyPaid = !!order.razorpay_payment_id;
+  const wasActuallyPaid = genuinelyPaid;
   const bodyText = wasActuallyPaid
     ? `Your order has been cancelled and a full refund of ₹${Number(order.total).toLocaleString('en-IN')} is on its way back to your original payment method — this usually takes 5-7 working days to reflect.`
     : `Your order has been cancelled as requested. As this order was never charged, there's no refund needed on your end — we'd love to welcome you back whenever you're ready.`;

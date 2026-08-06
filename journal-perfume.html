@@ -541,6 +541,7 @@ body.cart-open .cart-drawer{transform:none}
   padding:12px 28px;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;
   z-index:300;transition:.45s cubic-bezier(.19,1,.22,1);opacity:0;pointer-events:none;white-space:nowrap}
 .toast.show{transform:translateX(-50%);opacity:1}
+.toast.err{border-color:#c0685f;color:#f0d8d5;white-space:normal;text-align:center;letter-spacing:.04em;text-transform:none;max-width:90vw;width:max-content;max-width:min(420px,90vw)}
 
 @media(prefers-reduced-motion:reduce){
   .reveal{opacity:1;transform:none}
@@ -1121,11 +1122,13 @@ function openCart(){document.body.classList.add('cart-open');renderCart();}
 function closeCart(){document.body.classList.remove('cart-open');}
 
 /* ── Toast ── */
-function showToast(msg){
+function showToast(msg, isError){
   const t=document.querySelector('.toast');
   if(!t)return;
-  t.textContent=msg;t.classList.add('show');
-  clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2200);
+  t.textContent=msg;
+  t.classList.toggle('err', !!isError);
+  t.classList.add('show');
+  clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),isError?4200:2200);
 }
 
 /* ── Grids ── */
@@ -1473,35 +1476,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   document.querySelector('[data-order-history]')?.addEventListener('click', async(e)=>{
     if(e.target.closest('[data-cancel-order]')||e.target.closest('[data-request-return]')||e.target.closest('.order-track-link')||e.target.closest('[data-resume-payment]')) return;
 
-    if(payBtn){
-      const orderId=payBtn.dataset.resumePayment;
-      payBtn.disabled=true; payBtn.textContent='Preparing\u2026';
-      try{
-        const order=await fetch('/api/customer-tools',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'resume-payment',orderId,email:currentUserEmail})}).then(r=>r.json());
-        if(order.error) throw new Error(order.error);
-        if(typeof Razorpay==='undefined') throw new Error('Payment system is still loading \u2014 please try again in a moment.');
-        const rzp=new Razorpay({
-          key: order.keyId,
-          amount: order.amount,
-          currency: order.currency,
-          order_id: order.razorpayOrderId,
-          name: 'HEEZE 94',
-          description: 'Completing order #'+orderId.slice(0,8).toUpperCase(),
-          prefill:{ email: currentUserEmail },
-          theme:{ color:'#E9BE5A' },
-          handler: async (response)=>{
-            const verify=await fetch('/api/verify-payment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(response)}).then(r=>r.json());
-            if(verify.success){ showToast('Payment successful \u2014 thank you!'); loadOrders(currentUserEmail); }
-            else{ showToast('Payment could not be verified. Please contact us.'); }
-          },
-          modal:{ ondismiss: ()=>{ payBtn.disabled=false; payBtn.textContent='Complete Payment'; } }
-        });
-        rzp.open();
-      }catch(err){
-        alert(err.message||'Could not start payment right now.');
-        payBtn.disabled=false; payBtn.textContent='Complete Payment';
-      }
-    }
+    
 
     const card=e.target.closest('[data-order-card]');
     if(!card) return;
@@ -1554,7 +1529,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
         showToast(isPending?'Order cancelled':'Order cancelled \u2014 refund is on its way');
         loadOrders(currentUserEmail);
       }catch(err){
-        alert(err.message||'Could not cancel this order right now.');
+        showToast(err.message||'Could not cancel this order right now.', true);
         cancelBtn.disabled=false; cancelBtn.textContent=origLabel;
       }
     }
@@ -1584,7 +1559,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
         });
         rzp.open();
       }catch(err){
-        alert(err.message||'Could not start payment right now.');
+        showToast(err.message||'Could not start payment right now.', true);
         payBtn.disabled=false; payBtn.textContent='Complete Payment';
       }
     }
