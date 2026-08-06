@@ -826,9 +826,16 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
   <div class="checkout-modal-head"><h2 data-checkout-title>Checkout</h2><button class="cart-close" data-checkout-close>×</button></div>
 
   <div data-checkout-gate style="padding:22px 24px">
-    <p style="color:var(--muted);font-size:.88rem;line-height:1.7;margin-bottom:20px">Sign in to unlock member offers like <strong style="color:var(--gold)">WELCOME10</strong> — 10% off your first order. Or continue without an account.</p>
-    <button class="btn btn-gold" style="width:100%;margin-bottom:10px" data-show-signin>Sign In — Enjoy Offers</button>
-    <button class="btn btn-line" style="width:100%" data-guest-continue>Continue as Guest</button>
+    <div data-checkout-blocked-msg style="display:none;text-align:center">
+      <div class="ey" style="margin-bottom:8px">Coming Soon</div>
+      <h3 style="font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;font-size:1.4rem;margin-bottom:12px">We'll be there soon!</h3>
+      <p style="color:var(--muted);font-size:.88rem;line-height:1.7">We're not yet taking orders in your location, but we're working on it — thank you for your patience. Feel free to keep browsing.</p>
+    </div>
+    <div data-checkout-gate-options>
+      <p style="color:var(--muted);font-size:.88rem;line-height:1.7;margin-bottom:20px">Sign in to unlock member offers like <strong style="color:var(--gold)">WELCOME10</strong> — 10% off your first order. Or continue without an account.</p>
+      <button class="btn btn-gold" style="width:100%;margin-bottom:10px" data-show-signin>Sign In — Enjoy Offers</button>
+      <button class="btn btn-line" style="width:100%" data-guest-continue>Continue as Guest</button>
+    </div>
   </div>
 
   <div data-auth-form style="display:none;padding:22px 24px">
@@ -870,6 +877,7 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
       <option value="AE">United Arab Emirates</option>
       <option value="US">United States</option>
     </select></label>
+    <p data-country-blocked-msg style="display:none;background:rgba(233,190,90,.08);border:1px solid rgba(233,190,90,.3);border-radius:6px;padding:10px 12px;font-size:.8rem;color:var(--ivory);line-height:1.6;margin-top:10px">We'll be there soon! We're not yet taking orders in this location, but we're working on it.</p>
     <div class="order-price-summary" style="margin-top:14px;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:6px;font-size:.85rem">
       <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="color:var(--muted)">Subtotal</span><strong data-summary-subtotal>₹0</strong></div>
       <div style="display:flex;justify-content:space-between;margin-bottom:5px" data-summary-discount-row><span style="color:var(--muted)">Discount</span><strong data-summary-discount style="color:var(--gold)">-₹0</strong></div>
@@ -1251,6 +1259,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   document.querySelector('[data-open-cart]')?.addEventListener('click',openCart);
   document.querySelector('[data-close-cart]')?.addEventListener('click',closeCart);
   document.querySelector('.cart-veil')?.addEventListener('click',closeCart);
+  const BLOCKED_CHECKOUT_COUNTRIES=['US','AE'];
   document.querySelector('[data-checkout]')?.addEventListener('click',()=>{
     const count=Object.values(cart).reduce((s,q)=>s+q,0);
     if(!count){showToast('Your bag is empty');return;}
@@ -1259,6 +1268,13 @@ document.addEventListener('DOMContentLoaded',async()=>{
     document.body.classList.add('checkout-open');
     const gateEl2=document.querySelector('[data-checkout-gate]'), authEl2=document.querySelector('[data-auth-form]'), formEl2=document.querySelector('[data-checkout-form]'), titleEl2=document.querySelector('[data-checkout-title]');
     gateEl2.style.display=''; authEl2.style.display='none'; formEl2.style.display='none'; titleEl2.textContent='Checkout';
+    const blockedMsgEl=document.querySelector('[data-checkout-blocked-msg]');
+    const gateOptionsEl=document.querySelector('[data-checkout-gate-options]');
+    if(BLOCKED_CHECKOUT_COUNTRIES.includes(CURR.country)){
+      blockedMsgEl.style.display=''; gateOptionsEl.style.display='none';
+    }else{
+      blockedMsgEl.style.display='none'; gateOptionsEl.style.display='';
+    }
   });
   function resetCheckoutModal(){
     document.body.classList.remove('checkout-open');
@@ -1291,11 +1307,19 @@ document.addEventListener('DOMContentLoaded',async()=>{
   formEl?.querySelector('input[name="isGift"]')?.addEventListener('change', function(){ const nf=formEl.querySelector('[data-gift-note-field]'); if(nf) nf.style.display=this.checked?'':'none'; });
 
   const SHIPPING_FEES = { IN: 0, AE: 500, US: 500 };
+  const BLOCKED_ORDER_COUNTRIES = ['US', 'AE'];
   function updateOrderSummary(){
     const summaryEl=formEl.querySelector('.order-price-summary');
     if(!summaryEl) return;
-    const rawSubtotal=Object.entries(cart).reduce((s,[key,q])=>{const{s:sz}=lineInfo(key);return s+(sz?sz.price*q:0);},0);
     const countrySelect=formEl.querySelector('[data-country-select]');
+    const blockedMsgEl=formEl.querySelector('[data-country-blocked-msg]');
+    const payBtnEl=formEl.querySelector('[data-pay-btn]');
+    const isBlockedCountry=BLOCKED_ORDER_COUNTRIES.includes(countrySelect?.value);
+    if(blockedMsgEl) blockedMsgEl.style.display=isBlockedCountry?'':'none';
+    if(payBtnEl) payBtnEl.style.display=isBlockedCountry?'none':'';
+    if(isBlockedCountry){ summaryEl.style.display='none'; return; }
+    summaryEl.style.display='';
+    const rawSubtotal=Object.entries(cart).reduce((s,[key,q])=>{const{s:sz}=lineInfo(key);return s+(sz?sz.price*q:0);},0);
     const shippingFee=SHIPPING_FEES[countrySelect?.value] ?? 0;
     const discount=appliedPromo?.discountAmount || 0;
     const total=Math.max(rawSubtotal-discount,0)+shippingFee;

@@ -32,7 +32,7 @@ export default async function handler(req, res) {
     .eq('country_code', shipCountry)
     .maybeSingle();
   if (!deliveryCheck || !deliveryCheck.active) {
-    return res.status(400).json({ error: 'We currently don\'t deliver to this location.' });
+    return res.status(400).json({ error: 'We\'ll be there soon! We\'re not yet taking orders in this location, but we\'re working on it.' });
   }
   const shippingFee = Number(deliveryCheck.shipping_fee) || 0;
 
