@@ -1160,7 +1160,7 @@ function renderCart(){
   const el=document.querySelector('[data-cart-total]');
   if(el)el.textContent=fmt(total);
 }
-function openCart(){document.body.classList.add('cart-open');renderCart();}
+function openCart(){window.closeWelcomePopupIfOpen?.();document.body.classList.add('cart-open');renderCart();}
 function closeCart(){document.body.classList.remove('cart-open');}
 
 /* ── Toast ── */
@@ -1288,6 +1288,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   document.querySelector('[data-checkout]')?.addEventListener('click',()=>{
     const count=Object.values(cart).reduce((s,q)=>s+q,0);
     if(!count){showToast('Your bag is empty');return;}
+    window.closeWelcomePopupIfOpen?.();
     document.body.classList.remove('cart-open');
     document.body.classList.add('checkout-open');
     const gateEl2=document.querySelector('[data-checkout-gate]'), authEl2=document.querySelector('[data-auth-form]'), formEl2=document.querySelector('[data-checkout-form]'), titleEl2=document.querySelector('[data-checkout-title]');
@@ -1306,6 +1307,10 @@ document.addEventListener('DOMContentLoaded',async()=>{
   try{
     if(window.supabase) supa=window.supabase.createClient('https://amxrksxppagiqqzfjzyh.supabase.co', 'sb_publishable_ztVqFR3XkpOQk9usO_TQUA_PaAixVgi');
   }catch(e){ /* sign-in unavailable, guest checkout still works fine */ }
+  checkAccountState(); // restore an existing signed-in session immediately, without
+                       // waiting for the user to manually open the account panel --
+                       // otherwise currentUserEmail stays null (and things like the
+                       // promo code check) until they happen to click My Account.
   if(!supa){
     const signinBtn=document.querySelector('[data-show-signin]');
     if(signinBtn) signinBtn.style.display='none';
@@ -1416,13 +1421,13 @@ document.addEventListener('DOMContentLoaded',async()=>{
 
   /* ── Account Panel ── */
   const acctPanel=document.querySelector('[data-account-panel]');
-  function openAccount(){document.body.classList.add('account-open');checkAccountState();}
+  function openAccount(){window.closeWelcomePopupIfOpen?.();document.body.classList.add('account-open');checkAccountState();}
   function closeAccount(){document.body.classList.remove('account-open');}
   document.querySelector('[data-account-btn]')?.addEventListener('click',openAccount);
   document.querySelector('[data-mobile-account]')?.addEventListener('click',(e)=>{e.preventDefault();document.querySelector('.mobile-menu')?.classList.remove('open');openAccount();});
   document.querySelector('[data-account-close]')?.addEventListener('click',closeAccount);
   document.querySelector('[data-account-veil]')?.addEventListener('click',closeAccount);
-  function openWishlist(){document.body.classList.add('wishlist-open');renderWishlistPanel();}
+  function openWishlist(){window.closeWelcomePopupIfOpen?.();document.body.classList.add('wishlist-open');renderWishlistPanel();}
   function closeWishlist(){document.body.classList.remove('wishlist-open');}
   document.querySelector('[data-wishlist-btn]')?.addEventListener('click',openWishlist);
   document.querySelector('[data-wishlist-close]')?.addEventListener('click',closeWishlist);
@@ -1488,7 +1493,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     const codeEl=document.querySelector('[data-referral-code]');
     const code=codeEl?.dataset.code;
     if(!code)return;
-    navigator.clipboard?.writeText(code).then(()=>showToast('Code copied!')).catch(()=>{});
+    navigator.clipboard?.writeText(code).then(()=>showConfirmPopup('Your referral code has been copied. Share it with a friend — they get 10% off their first order.')).catch(()=>{});
   }
   async function loadOrders(email){
     currentUserEmail=email;
@@ -1568,7 +1573,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
         const res=await fetch('/api/cancel-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId,email:currentUserEmail})});
         const data=await res.json();
         if(!res.ok) throw new Error(data.error||'Could not cancel this order');
-        showToast(isPending?'Order cancelled':'Order cancelled \u2014 refund is on its way');
+        showConfirmPopup(isPending?'Your order has been cancelled.':'Your order has been cancelled \u2014 a full refund is on its way and should reflect within 5-7 working days.');
         loadOrders(currentUserEmail);
       }catch(err){
         showToast(err.message||'Could not cancel this order right now.', true);
@@ -1594,7 +1599,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
           theme:{ color:'#E9BE5A' },
           handler: async (response)=>{
             const verify=await fetch('/api/verify-payment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(response)}).then(r=>r.json());
-            if(verify.success){ showToast('Payment successful \u2014 thank you!'); loadOrders(currentUserEmail); }
+            if(verify.success){ showConfirmPopup('Payment successful \u2014 thank you! Your order is now confirmed and being prepared.'); loadOrders(currentUserEmail); }
             else{ showToast('Payment could not be verified. Please contact us.'); }
           },
           modal:{ ondismiss: ()=>{ payBtn.disabled=false; payBtn.textContent='Complete Payment'; } }
@@ -1743,7 +1748,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     if(!code){return;}
     const rawTotal=Object.entries(cart).reduce((s,[key,q])=>{const{s:sz}=lineInfo(key);return s+(sz?sz.price*q:0);},0);
     try{
-      const result=await fetch('/api/validate-promo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,subtotal:rawTotal})}).then(r=>r.json());
+      const result=await fetch('/api/validate-promo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,subtotal:rawTotal,email:currentUserEmail||null})}).then(r=>r.json());
       if(result.valid){
         appliedPromo=result;
         msgEl.textContent=`Code applied — ${fmt(result.discountAmount)} off`;
@@ -2013,6 +2018,17 @@ Help customers find their perfect attar. Ask about their preferences, lifestyle,
     try{ localStorage.setItem(KEY,'1'); }catch(e){}
   }
   function openPopup(){
+    // Never interrupt someone already mid-checkout (or any other open modal) --
+    // showing a first-time-visitor discount pitch on top of an in-progress
+    // purchase is bad UX, and since this popup sits at a higher z-index than
+    // the checkout modal, it would otherwise silently block all further clicks.
+    if(document.body.classList.contains('checkout-open')
+      || document.body.classList.contains('account-open')
+      || document.body.classList.contains('wishlist-open')
+      || document.body.classList.contains('cart-open')){
+      try{ localStorage.setItem(KEY,'1'); }catch(e){}
+      return;
+    }
     popup.style.opacity='1'; popup.style.transform='translate(-50%,-50%) scale(1)'; popup.style.pointerEvents='auto';
     veil.style.opacity='1'; veil.style.pointerEvents='auto';
   }
@@ -2023,6 +2039,42 @@ Help customers find their perfect attar. Ask about their preferences, lifestyle,
   document.querySelector('[data-welcome-popup-close]')?.addEventListener('click', closePopup);
   veil.addEventListener('click', closePopup);
   document.querySelector('[data-welcome-popup-shop]')?.addEventListener('click', closePopup);
+  window.closeWelcomePopupIfOpen=closePopup;
 })();
+</script>
+
+<div class="h94-confirm-veil" data-confirm-veil></div>
+<div class="h94-confirm-modal" data-confirm-modal role="alertdialog" aria-live="polite">
+  <div class="h94-confirm-icon">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e9be5a" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+  </div>
+  <p class="h94-confirm-msg" data-confirm-msg></p>
+  <button type="button" class="h94-confirm-btn" data-confirm-close>Continue</button>
+</div>
+<style>
+.h94-confirm-veil{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400;opacity:0;pointer-events:none;transition:opacity .35s ease}
+.h94-confirm-veil.show{opacity:1;pointer-events:auto}
+.h94-confirm-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-46%) scale(.96);width:min(360px,88vw);
+  background:#0d0a06;border:1px solid var(--gold-deep);border-radius:10px;padding:32px 28px;text-align:center;
+  z-index:401;opacity:0;pointer-events:none;transition:opacity .35s cubic-bezier(.19,1,.22,1),transform .35s cubic-bezier(.19,1,.22,1)}
+.h94-confirm-modal.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.h94-confirm-icon{width:48px;height:48px;margin:0 auto 16px;border-radius:50%;background:rgba(233,190,90,.12);display:flex;align-items:center;justify-content:center}
+.h94-confirm-msg{color:var(--ivory);font-size:.95rem;line-height:1.7;margin-bottom:22px}
+.h94-confirm-btn{background:var(--gold);color:#0d0a06;border:none;padding:11px 30px;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;border-radius:5px;cursor:pointer;font-family:inherit;font-weight:600}
+.h94-confirm-btn:hover{background:var(--champagne)}
+</style>
+<script>
+function showConfirmPopup(msg){
+  const veil=document.querySelector('[data-confirm-veil]');
+  const modal=document.querySelector('[data-confirm-modal]');
+  document.querySelector('[data-confirm-msg]').textContent=msg;
+  veil.classList.add('show'); modal.classList.add('show');
+}
+function closeConfirmPopup(){
+  document.querySelector('[data-confirm-veil]')?.classList.remove('show');
+  document.querySelector('[data-confirm-modal]')?.classList.remove('show');
+}
+document.querySelector('[data-confirm-close]')?.addEventListener('click', closeConfirmPopup);
+document.querySelector('[data-confirm-veil]')?.addEventListener('click', closeConfirmPopup);
 </script>
 </body></html>

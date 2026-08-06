@@ -28,12 +28,13 @@ export default async function handler(req, res) {
   const shipCountry = (customer?.address?.country || '').toUpperCase();
   const { data: deliveryCheck } = await supabase
     .from('delivery_countries')
-    .select('active')
+    .select('active, shipping_fee')
     .eq('country_code', shipCountry)
     .maybeSingle();
   if (!deliveryCheck || !deliveryCheck.active) {
     return res.status(400).json({ error: 'We currently don\'t deliver to this location.' });
   }
+  const shippingFee = Number(deliveryCheck.shipping_fee) || 0;
 
   // Look up real prices from Supabase — never trust prices sent from the browser
   const variantIds = items.map(i => i.variantId);
@@ -92,7 +93,7 @@ export default async function handler(req, res) {
         : Math.min(promo.discount_value, subtotal);
     }
   }
-  const total = Math.max(subtotal - discountAmount, 0);
+  const total = Math.max(subtotal - discountAmount, 0) + shippingFee;
 
   // Gift note is optional, free text — trim and cap length defensively before storing
   const cleanGiftNote = typeof giftNote === 'string' ? giftNote.trim().slice(0, 300) : '';
@@ -100,7 +101,7 @@ export default async function handler(req, res) {
   // Create the order in Supabase (status: pending)
   const { data: order, error: orderError } = await supabase
     .from('orders')
-    .insert({ customer_id: customerRow.id, email: customer.email, status: 'pending', subtotal, total, shipping_address: customer.address, promo_code: appliedPromo?.code || null, discount_amount: discountAmount, gift_note: cleanGiftNote || null, is_gift: !!cleanGiftNote })
+    .insert({ customer_id: customerRow.id, email: customer.email, status: 'pending', subtotal, total, shipping_address: customer.address, promo_code: appliedPromo?.code || null, discount_amount: discountAmount, shipping_fee: shippingFee, gift_note: cleanGiftNote || null, is_gift: !!cleanGiftNote })
     .select()
     .single();
 
