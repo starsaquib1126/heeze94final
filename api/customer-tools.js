@@ -143,7 +143,7 @@ async function handleTrackOrder(req, res) {
 
   const { data: order } = await supabase
     .from('orders')
-    .select('id, status, created_at, total, tracking_number, email')
+    .select('id, status, created_at, total, tracking_number, email, is_delayed, delay_note, delayed_until')
     .eq('id', cleanOrderId)
     .maybeSingle();
 
@@ -165,6 +165,9 @@ async function handleTrackOrder(req, res) {
     total: order.total,
     trackingNumber: order.tracking_number || null,
     dtdcTrackingUrl: order.tracking_number ? 'https://www.dtdc.com/track-your-shipment/' : null,
+    isDelayed: !!order.is_delayed,
+    delayNote: order.delay_note || null,
+    delayedUntil: order.delayed_until || null,
     items: (items || []).map(i => ({
       name: i.product_variants?.products?.name || 'Item',
       ml: i.product_variants?.ml,
@@ -255,7 +258,7 @@ async function handleAdminListOrders(req, res) {
 
   const { data: orders, error } = await supabase
     .from('orders')
-    .select('id, email, status, created_at, total, tracking_number, gift_note, is_gift, customers(name, phone)')
+    .select('id, email, status, created_at, total, tracking_number, gift_note, is_gift, is_delayed, delay_note, delayed_until, customers(name, phone)')
     .order('created_at', { ascending: false })
     .limit(100);
   if (error) return res.status(500).json({ error: error.message });
@@ -268,12 +271,15 @@ async function handleAdminListOrders(req, res) {
 async function handleAdminUpdateOrder(req, res) {
   if (!checkAdminSecret(req)) return res.status(401).json({ error: 'Unauthorized' });
 
-  const { orderId, status, trackingNumber } = req.body;
+  const { orderId, status, trackingNumber, isDelayed, delayNote, delayedUntil } = req.body;
   if (!orderId) return res.status(400).json({ error: 'Missing order ID' });
 
   const update = {};
   if (status) update.status = status;
   if (trackingNumber !== undefined) update.tracking_number = trackingNumber || null;
+  if (isDelayed !== undefined) update.is_delayed = !!isDelayed;
+  if (delayNote !== undefined) update.delay_note = delayNote || null;
+  if (delayedUntil !== undefined) update.delayed_until = delayedUntil || null;
   if (Object.keys(update).length === 0) return res.status(400).json({ error: 'Nothing to update' });
 
   // Setting status to shipped/delivered here will be picked up and emailed by

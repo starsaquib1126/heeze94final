@@ -794,6 +794,11 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
           +'<button class="btn btn-line" style="padding:8px 14px" onclick="saveAdminOrder(&apos;'+o.id+'&apos;)">Save</button>'
           +'<span data-order-msg="'+o.id+'" style="font-size:.78rem"></span>'
           +'</div>'
+          +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)">'
+          +'<label style="display:flex;align-items:center;gap:5px;font-size:.78rem;color:var(--muted)"><input type="checkbox" data-order-delayed data-id="'+o.id+'"'+(o.is_delayed?' checked':'')+' style="accent-color:var(--gold)"> Delayed</label>'
+          +'<input type="text" data-order-delay-note data-id="'+o.id+'" placeholder="Delay reason (shown to customer)" value="'+(o.delay_note||'').replace(/"/g,'&quot;')+'" style="padding:8px 10px;flex:1;min-width:160px">'
+          +'<input type="date" data-order-delayed-until data-id="'+o.id+'" value="'+(o.delayed_until||'')+'" style="padding:8px 10px">'
+          +'</div>'
           +(o.gift_note?'<p style="font-size:.8rem;color:var(--gold);margin-top:8px">Gift note: '+o.gift_note.replace(/</g,'&lt;')+'</p>':'')
           +'</div>';
       }).join('');
@@ -803,10 +808,17 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
   window.saveAdminOrder=async function(orderId){
     var statusEl=document.querySelector('[data-order-status][data-id="'+orderId+'"]');
     var trackingEl=document.querySelector('[data-order-tracking][data-id="'+orderId+'"]');
+    var delayedEl=document.querySelector('[data-order-delayed][data-id="'+orderId+'"]');
+    var delayNoteEl=document.querySelector('[data-order-delay-note][data-id="'+orderId+'"]');
+    var delayedUntilEl=document.querySelector('[data-order-delayed-until][data-id="'+orderId+'"]');
     var msgEl=document.querySelector('[data-order-msg="'+orderId+'"]');
     msgEl.textContent='Saving…'; msgEl.style.color='var(--muted)';
     try{
-      var r=await fetch('/api/customer-tools',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'admin-update-order',secret:secret,orderId:orderId,status:statusEl.value,trackingNumber:trackingEl.value.trim()})}).then(function(res){return res.json();});
+      var r=await fetch('/api/customer-tools',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+        action:'admin-update-order',secret:secret,orderId:orderId,
+        status:statusEl.value,trackingNumber:trackingEl.value.trim(),
+        isDelayed:delayedEl.checked,delayNote:delayNoteEl.value.trim(),delayedUntil:delayedUntilEl.value||null
+      })}).then(function(res){return res.json();});
       if(r.error){ msgEl.textContent=r.error; msgEl.style.color='#e08a8a'; return; }
       msgEl.textContent='Saved ✓'; msgEl.style.color='var(--gold)';
     }catch(e){ msgEl.textContent='Failed'; msgEl.style.color='#e08a8a'; }
