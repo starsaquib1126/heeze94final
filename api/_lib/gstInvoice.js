@@ -16,7 +16,8 @@ import PDFDocument from 'pdfkit';
 const SELLER = {
   name: 'CLASSIC ENTERPRISES',
   gstin: '27ASBPP0295M1ZC',
-  address: '212, Raas Leela, Ambadi Road, Diwanman Manikpur, Vasai, Palghar, Maharashtra 401202'
+  address: '212, Raas Leela, Ambadi Road, Diwanman Manikpur, Vasai, Palghar, Maharashtra 401202',
+  state: 'Maharashtra'
 };
 const HSN_CODE = '3303'; // perfumes, attars, toilet waters
 
@@ -46,105 +47,149 @@ async function sendEmail(to, subject, html, attachments) {
   }
 }
 
-function computeTax(order) {
-  const addr = order.shipping_address || {};
-  const isMaharashtra = (addr.state || '').trim().toLowerCase() === 'maharashtra';
-  const total = Number(order.total) || 0;
-  const taxableValue = Math.round((total / 1.18) * 100) / 100;
-  const totalTax = Math.round((total - taxableValue) * 100) / 100;
-  const cgst = isMaharashtra ? Math.round((totalTax / 2) * 100) / 100 : 0;
-  const sgst = isMaharashtra ? Math.round((totalTax / 2) * 100) / 100 : 0;
-  const igst = isMaharashtra ? 0 : totalTax;
-  return { isMaharashtra, total, taxableValue, cgst, sgst, igst };
-}
-
-// Renders the actual tax invoice as a real PDF (via pdfkit -- a pure-JS
-// library with no native binaries, so it runs cleanly in a Vercel serverless
-// function without a headless browser). Returns a Buffer.
 function buildInvoicePdf(order, items, invoiceNumber, customerName) {
   return new Promise((resolve, reject) => {
     const addr = order.shipping_address || {};
-    const tax = computeTax(order);
-    const doc = new PDFDocument({ size: 'A4', margin: 50 });
+    const isMaharashtra = (addr.state || '').trim().toLowerCase() === 'maharashtra';
+    const doc = new PDFDocument({ size: 'A4', margin: 45 });
     const chunks = [];
     doc.on('data', c => chunks.push(c));
     doc.on('end', () => resolve(Buffer.concat(chunks)));
     doc.on('error', reject);
 
-    doc.fillColor('#c9a14a').fontSize(22).font('Helvetica-Bold').text('HEEZE 94', { align: 'center' });
-    doc.fillColor('#888').fontSize(10).font('Helvetica').text('TAX INVOICE', { align: 'center', characterSpacing: 2 });
-    doc.moveDown(1.2);
-    doc.strokeColor('#c9a14a').lineWidth(1.5).moveTo(50, doc.y).lineTo(545, doc.y).stroke();
-    doc.moveDown(1);
+    const PAGE_LEFT = 45, PAGE_RIGHT = 550;
 
-    const topY = doc.y;
-    doc.fillColor('#1a1a1a').fontSize(11).font('Helvetica-Bold').text(SELLER.name, 50, topY);
-    doc.font('Helvetica').fontSize(9).fillColor('#333')
-      .text(SELLER.address, 50, doc.y, { width: 260 })
-      .text('GSTIN: ' + SELLER.gstin, 50, doc.y);
+    // ── Header ──────────────────────────────────────────────
+    doc.fillColor('#c9a14a').fontSize(24).font('Helvetica-Bold').text('HEEZE 94', { align: 'center' });
+    doc.fillColor('#888').fontSize(9.5).font('Helvetica').text('LUXURY FRAGRANCE HOUSE', { align: 'center', characterSpacing: 2.5 });
+    doc.moveDown(0.6);
+    doc.fillColor('#1a1a1a').fontSize(13).font('Helvetica-Bold').text('TAX INVOICE', { align: 'center', characterSpacing: 1 });
+    doc.moveDown(0.8);
+    doc.strokeColor('#c9a14a').lineWidth(1.5).moveTo(PAGE_LEFT, doc.y).lineTo(PAGE_RIGHT, doc.y).stroke();
+    doc.moveDown(0.9);
 
-    doc.font('Helvetica').fontSize(9).fillColor('#333')
-      .text('Invoice No: ' + invoiceNumber, 300, topY, { width: 245, align: 'right' })
-      .text('Invoice Date: ' + new Date().toLocaleDateString('en-IN'), 300, doc.y, { width: 245, align: 'right' })
-      .text('Order ID: ' + order.id.slice(0, 8).toUpperCase(), 300, doc.y, { width: 245, align: 'right' });
+    // ── Seller / Invoice meta / Bill-To / Ship-To — three columns ──
+    const blockTop = doc.y;
+    const colW = 165;
 
-    doc.moveDown(1.5);
+    doc.fillColor('#888').fontSize(8).font('Helvetica-Bold').text('SOLD BY', PAGE_LEFT, blockTop, { characterSpacing: 1 });
+    doc.fillColor('#1a1a1a').fontSize(10).font('Helvetica-Bold').text(SELLER.name, PAGE_LEFT, doc.y + 2, { width: colW });
+    doc.font('Helvetica').fontSize(8.5).fillColor('#333')
+      .text(SELLER.address, PAGE_LEFT, doc.y, { width: colW })
+      .text('GSTIN: ' + SELLER.gstin, PAGE_LEFT, doc.y, { width: colW })
+      .text('State: ' + SELLER.state, PAGE_LEFT, doc.y, { width: colW });
+    const sellerBottom = doc.y;
 
-    doc.fontSize(9).fillColor('#888').text('BILL TO', 50, doc.y, { characterSpacing: 1 });
-    doc.fontSize(10).fillColor('#1a1a1a').font('Helvetica-Bold').text(customerName || addr.name || order.email, 50, doc.y + 2);
-    doc.font('Helvetica').fontSize(9).fillColor('#333')
-      .text([addr.line1, addr.city, addr.state].filter(Boolean).join(', ') + (addr.pincode ? ' ' + addr.pincode : ''), 50, doc.y)
-      .text(order.email, 50, doc.y);
+    const billX = PAGE_LEFT + colW + 20;
+    doc.fillColor('#888').fontSize(8).font('Helvetica-Bold').text('BILLED TO / SHIPPED TO', billX, blockTop, { characterSpacing: 1 });
+    doc.fillColor('#1a1a1a').fontSize(10).font('Helvetica-Bold').text(customerName || addr.name || order.email, billX, doc.y + 2, { width: colW });
+    doc.font('Helvetica').fontSize(8.5).fillColor('#333')
+      .text([addr.line1, addr.city].filter(Boolean).join(', '), billX, doc.y, { width: colW })
+      .text([addr.state, addr.pincode].filter(Boolean).join(' '), billX, doc.y, { width: colW })
+      .text(order.email, billX, doc.y, { width: colW });
+    const billBottom = doc.y;
 
-    doc.moveDown(1.5);
+    const metaX = PAGE_LEFT + (colW + 20) * 2;
+    const metaW = PAGE_RIGHT - metaX;
+    doc.fillColor('#888').fontSize(8).font('Helvetica-Bold').text('INVOICE DETAILS', metaX, blockTop, { width: metaW, characterSpacing: 1 });
+    doc.font('Helvetica').fontSize(8.5).fillColor('#333')
+      .text('Invoice No: ' + invoiceNumber, metaX, doc.y + 4, { width: metaW })
+      .text('Invoice Date: ' + new Date().toLocaleDateString('en-IN'), metaX, doc.y, { width: metaW })
+      .text('Order No: ' + order.id.slice(0, 8).toUpperCase(), metaX, doc.y, { width: metaW })
+      .text('Order Date: ' + new Date(order.created_at || Date.now()).toLocaleDateString('en-IN'), metaX, doc.y, { width: metaW })
+      .text('Place of Supply: ' + (addr.state || SELLER.state), metaX, doc.y, { width: metaW });
+    const metaBottom = doc.y;
 
-    const tableTop = doc.y;
-    const col = { item: 50, hsn: 300, qty: 370, amt: 430 };
-    doc.rect(50, tableTop, 495, 20).fill('#faf6ee');
-    doc.fillColor('#1a1a1a').fontSize(9).font('Helvetica-Bold')
-      .text('Item', col.item + 6, tableTop + 6)
-      .text('HSN', col.hsn, tableTop + 6, { width: 60, align: 'center' })
-      .text('Qty', col.qty, tableTop + 6, { width: 50, align: 'center' })
-      .text('Amount', col.amt, tableTop + 6, { width: 105, align: 'right' });
+    doc.y = Math.max(sellerBottom, billBottom, metaBottom) + 14;
+    doc.strokeColor('#eee').lineWidth(0.5).moveTo(PAGE_LEFT, doc.y).lineTo(PAGE_RIGHT, doc.y).stroke();
+    doc.moveDown(0.9);
 
-    let rowY = tableTop + 20;
-    doc.font('Helvetica').fontSize(9);
+    // ── Item table ──────────────────────────────────────────
+    const col = { desc: PAGE_LEFT, hsn: 320, rate: 380, qty: 440, amt: 475 };
+    const rowH = 15;
+
+    function tableHeader(y) {
+      doc.rect(PAGE_LEFT, y, PAGE_RIGHT - PAGE_LEFT, 20).fill('#1a1408');
+      doc.fillColor('#e9be5a').fontSize(7.5).font('Helvetica-Bold')
+        .text('DESCRIPTION', col.desc + 6, y + 6, { width: col.hsn - col.desc - 10 })
+        .text('HSN', col.hsn, y + 6, { width: col.rate - col.hsn, align: 'center' })
+        .text('RATE', col.rate, y + 6, { width: col.qty - col.rate, align: 'center' })
+        .text('QTY', col.qty, y + 6, { width: col.amt - col.qty, align: 'center' })
+        .text('AMOUNT', col.amt, y + 6, { width: PAGE_RIGHT - col.amt - 6, align: 'right' });
+      return y + 20;
+    }
+
+    let y = tableHeader(doc.y);
+    let itemsSubtotal = 0;
+
     for (const i of (items || [])) {
       const name = i.product_variants?.products?.name || 'Item';
+      const desc = i.product_variants?.products?.desc || '';
       const ml = i.product_variants?.ml;
-      const label = name + (ml ? ' (' + ml + 'ml)' : '');
-      doc.fillColor('#1a1a1a')
-        .text(label, col.item + 6, rowY + 6, { width: 240 })
-        .text(HSN_CODE, col.hsn, rowY + 6, { width: 60, align: 'center' })
-        .text(String(i.quantity), col.qty, rowY + 6, { width: 50, align: 'center' })
-        .text(money(i.price_at_purchase), col.amt, rowY + 6, { width: 105, align: 'right' });
-      rowY += 22;
-      doc.strokeColor('#eee').lineWidth(0.5).moveTo(50, rowY).lineTo(545, rowY).stroke();
+      const lineTotal = Number(i.price_at_purchase) * Number(i.quantity);
+      itemsSubtotal += lineTotal;
+
+      const descText = desc ? desc.slice(0, 85) + (desc.length > 85 ? '…' : '') : '';
+      const nameLine = name + (ml ? ' (' + ml + 'ml)' : '');
+      const lineHeight = descText ? rowH * 2 + 4 : rowH + 6;
+
+      doc.fillColor('#1a1a1a').fontSize(8.5).font('Helvetica-Bold').text(nameLine, col.desc + 6, y + 5, { width: col.hsn - col.desc - 10 });
+      if (descText) doc.fillColor('#888').fontSize(7).font('Helvetica').text(descText, col.desc + 6, y + 5 + 11, { width: col.hsn - col.desc - 10 });
+
+      doc.fillColor('#333').fontSize(8).font('Helvetica')
+        .text(HSN_CODE, col.hsn, y + 5, { width: col.rate - col.hsn, align: 'center' })
+        .text(money(i.price_at_purchase), col.rate, y + 5, { width: col.qty - col.rate, align: 'center' })
+        .text(String(i.quantity), col.qty, y + 5, { width: col.amt - col.qty, align: 'center' })
+        .text(money(lineTotal), col.amt, y + 5, { width: PAGE_RIGHT - col.amt - 6, align: 'right' });
+
+      y += lineHeight;
+      doc.strokeColor('#eee').lineWidth(0.5).moveTo(PAGE_LEFT, y).lineTo(PAGE_RIGHT, y).stroke();
     }
-    doc.rect(50, tableTop, 495, rowY - tableTop).stroke('#ddd');
+    doc.y = y + 12;
 
-    doc.y = rowY + 14;
+    // ── Summary — shows the full path from items to what was actually
+    // charged, so every figure here reconciles exactly with order.total.
+    // Tax is computed on the FINAL total (post-discount, post-shipping),
+    // not per line item, since discounts and shipping apply at the order
+    // level and can't be correctly allocated per line without arbitrary
+    // proportional splitting. ──
+    const total = Number(order.total) || 0;
+    const discount = Number(order.discount_amount) || 0;
+    const shippingFee = Number(order.shipping_fee) || 0;
+    const taxableValue = Math.round((total / 1.18) * 100) / 100;
+    const totalTax = Math.round((total - taxableValue) * 100) / 100;
+    const cgst = isMaharashtra ? Math.round((totalTax / 2) * 100) / 100 : 0;
+    const sgst = isMaharashtra ? Math.round((totalTax / 2) * 100) / 100 : 0;
+    const igst = isMaharashtra ? 0 : totalTax;
 
-    const summaryX = 350;
-    const line = (label, value, bold) => {
-      doc.font(bold ? 'Helvetica-Bold' : 'Helvetica').fontSize(9.5).fillColor('#1a1a1a')
-        .text(label, summaryX, doc.y, { width: 100, continued: false })
-        .text(value, summaryX, doc.y - doc.currentLineHeight(), { width: 195, align: 'right' });
-      doc.moveDown(0.3);
+    const summaryLabelX = 370, summaryValX = 470;
+    const sumLine = (label, value, bold) => {
+      doc.font(bold ? 'Helvetica-Bold' : 'Helvetica').fontSize(9).fillColor('#1a1a1a')
+        .text(label, summaryLabelX, doc.y, { width: 95 });
+      doc.font(bold ? 'Helvetica-Bold' : 'Helvetica').fontSize(9).fillColor('#1a1a1a')
+        .text(value, summaryValX, doc.y - doc.currentLineHeight(), { width: PAGE_RIGHT - summaryValX, align: 'right' });
+      doc.moveDown(0.35);
     };
-    line('Taxable Value', money(tax.taxableValue));
-    if (tax.isMaharashtra) {
-      line('CGST @ 9%', money(tax.cgst));
-      line('SGST @ 9%', money(tax.sgst));
-    } else {
-      line('IGST @ 18%', money(tax.igst));
-    }
-    doc.strokeColor('#ccc').lineWidth(0.5).moveTo(summaryX, doc.y).lineTo(545, doc.y).stroke();
+    sumLine('Items Subtotal', money(itemsSubtotal));
+    if (discount > 0) sumLine('Discount', '-' + money(discount));
+    if (shippingFee > 0) sumLine('Shipping', money(shippingFee));
+    doc.strokeColor('#eee').lineWidth(0.5).moveTo(summaryLabelX, doc.y).lineTo(PAGE_RIGHT, doc.y).stroke();
     doc.moveDown(0.3);
-    line('Total', money(tax.total), true);
+    sumLine('Taxable Value', money(taxableValue));
+    if (isMaharashtra) {
+      sumLine('CGST', money(cgst));
+      sumLine('SGST', money(sgst));
+    } else {
+      sumLine('IGST', money(igst));
+    }
+    doc.strokeColor('#ccc').lineWidth(0.5).moveTo(summaryLabelX, doc.y).lineTo(PAGE_RIGHT, doc.y).stroke();
+    doc.moveDown(0.3);
+    sumLine('Total Amount', money(total), true);
 
-    doc.moveDown(2);
-    doc.fontSize(8).fillColor('#999').text('This is a computer-generated invoice.', 50, doc.y);
+    doc.moveDown(1.2);
+    doc.fontSize(7.5).fillColor('#999').font('Helvetica')
+      .text('Whether tax is payable under reverse charge: No', PAGE_LEFT, doc.y)
+      .text('This is a computer-generated invoice and does not require a physical signature.', PAGE_LEFT, doc.y + 12);
 
     doc.end();
   });
@@ -152,7 +197,7 @@ function buildInvoicePdf(order, items, invoiceNumber, customerName) {
 
 // supabase: an already-configured @supabase/supabase-js client from the caller.
 // order: the full order row (must include shipping_address, total, email, id,
-// customer_id, invoice_number if already generated).
+// customer_id, created_at, invoice_number if already generated).
 // Returns the invoice number on success.
 export async function generateAndSendGstInvoice(supabase, order) {
   const ownerEmail = process.env.OWNER_NOTIFICATION_EMAIL || 'heeze94official@gmail.com';
@@ -165,7 +210,7 @@ export async function generateAndSendGstInvoice(supabase, order) {
 
   const { data: items } = await supabase
     .from('order_items')
-    .select('quantity, price_at_purchase, product_variants(ml, products(name))')
+    .select('quantity, price_at_purchase, product_variants(ml, products(name, desc))')
     .eq('order_id', order.id);
 
   let customerName = null;

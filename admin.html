@@ -706,10 +706,11 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
   </div>
 
   <div id="adminPanel" style="display:none">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
       <p style="color:var(--muted);font-size:.85rem">Most recent 100 orders</p>
       <button class="text-link" onclick="loadAdminOrders()">Refresh</button>
     </div>
+    <input type="text" id="adminOrderSearch" placeholder="Search by name, email, order ID, or tracking number…" style="width:100%;padding:10px 14px;margin-bottom:18px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:5px;color:var(--ivory);font-family:inherit" oninput="filterAdminOrders()">
     <div id="adminOrderList"></div>
 
     <div style="border-top:1px solid rgba(255,255,255,.08);margin-top:32px;padding-top:24px">
@@ -767,6 +768,53 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
     showPanel();
   };
 
+  var allAdminOrders=[];
+
+  function renderAdminOrderList(orders){
+    var listEl=document.getElementById('adminOrderList');
+    if(!orders.length){ listEl.innerHTML='<p style="color:var(--muted);font-size:.85rem">No matching orders.</p>'; return; }
+    listEl.innerHTML=orders.map(function(o){
+      return '<div style="border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:16px;margin-bottom:10px">'
+        +'<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">'
+        +'<div><strong style="font-size:.85rem">#'+o.id.slice(0,8)+'</strong> <span style="color:var(--muted);font-size:.8rem">'+(o.customer_name?o.customer_name+' &middot; ':'')+o.email+'</span></div>'
+        +'<div style="font-size:.8rem;color:var(--muted)">'+new Date(o.created_at).toLocaleDateString('en-IN')+' · ₹'+o.total+(o.is_gift?' · 🎁 Gift':'')+'</div>'
+        +'</div>'
+        +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
+        +'<select data-order-status data-id="'+o.id+'" style="padding:8px 10px">'
+        +['pending','payment_failed','paid','shipped','delivered','cancelled','refunded'].map(function(s){return '<option value="'+s+'"'+(s===o.status?' selected':'')+'>'+s+'</option>';}).join('')
+        +'</select>'
+        +'<input type="text" data-order-tracking data-id="'+o.id+'" placeholder="Tracking number" value="'+(o.tracking_number||'')+'" style="padding:8px 10px;flex:1;min-width:140px">'
+        +'<button class="btn btn-line" style="padding:8px 14px" onclick="saveAdminOrder(&apos;'+o.id+'&apos;)">Save</button>'
+        +'<span data-order-msg="'+o.id+'" style="font-size:.78rem"></span>'
+        +'</div>'
+        +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)">'
+        +'<label style="display:flex;align-items:center;gap:5px;font-size:.78rem;color:var(--muted)"><input type="checkbox" data-order-delayed data-id="'+o.id+'"'+(o.is_delayed?' checked':'')+' style="accent-color:var(--gold)"> Delayed</label>'
+        +'<input type="text" data-order-delay-note data-id="'+o.id+'" placeholder="Delay reason (shown to customer)" value="'+(o.delay_note||'').replace(/"/g,'&quot;')+'" style="padding:8px 10px;flex:1;min-width:160px">'
+        +'<input type="date" data-order-delayed-until data-id="'+o.id+'" value="'+(o.delayed_until||'')+'" style="padding:8px 10px">'
+        +'</div>'
+        +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)">'
+        +'<button class="btn btn-line" style="padding:8px 14px" onclick="generateInvoice(&apos;'+o.id+'&apos;)">'+(o.invoice_number?'Resend Invoice':'Generate Invoice')+'</button>'
+        +(o.invoice_number?'<span style="font-size:.75rem;color:var(--muted)">'+o.invoice_number+'</span>':'')
+        +'<span data-invoice-msg="'+o.id+'" style="font-size:.78rem"></span>'
+        +'</div>'
+        +(o.gift_note?'<p style="font-size:.8rem;color:var(--gold);margin-top:8px">Gift note: '+o.gift_note.replace(/</g,'&lt;')+'</p>':'')
+        +(o.platform_fee_total!==null&&o.platform_fee_total!==undefined?'<p style="font-size:.72rem;color:var(--muted);margin-top:6px">Platform fee (2%+GST, internal): ₹'+o.platform_fee_total+'</p>':'')
+        +'</div>';
+    }).join('');
+  }
+
+  window.filterAdminOrders=function(){
+    var q=document.getElementById('adminOrderSearch').value.trim().toLowerCase();
+    if(!q){ renderAdminOrderList(allAdminOrders); return; }
+    var filtered=allAdminOrders.filter(function(o){
+      return (o.customer_name||'').toLowerCase().includes(q)
+        || (o.email||'').toLowerCase().includes(q)
+        || o.id.toLowerCase().includes(q)
+        || (o.tracking_number||'').toLowerCase().includes(q);
+    });
+    renderAdminOrderList(filtered);
+  };
+
   window.loadAdminOrders=async function(){
     var listEl=document.getElementById('adminOrderList');
     listEl.innerHTML='<p style="color:var(--muted);font-size:.85rem">Loading…</p>';
@@ -780,35 +828,10 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
         try{ sessionStorage.removeItem(SECRET_KEY); }catch(e){}
         return;
       }
-      if(!r.orders.length){ listEl.innerHTML='<p style="color:var(--muted);font-size:.85rem">No orders yet.</p>'; return; }
-      listEl.innerHTML=r.orders.map(function(o){
-        return '<div style="border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:16px;margin-bottom:10px">'
-          +'<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">'
-          +'<div><strong style="font-size:.85rem">#'+o.id.slice(0,8)+'</strong> <span style="color:var(--muted);font-size:.8rem">'+(o.customer_name?o.customer_name+' &middot; ':'')+o.email+'</span></div>'
-          +'<div style="font-size:.8rem;color:var(--muted)">'+new Date(o.created_at).toLocaleDateString('en-IN')+' · ₹'+o.total+(o.is_gift?' · 🎁 Gift':'')+'</div>'
-          +'</div>'
-          +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
-          +'<select data-order-status data-id="'+o.id+'" style="padding:8px 10px">'
-          +['pending','payment_failed','paid','shipped','delivered','cancelled','refunded'].map(function(s){return '<option value="'+s+'"'+(s===o.status?' selected':'')+'>'+s+'</option>';}).join('')
-          +'</select>'
-          +'<input type="text" data-order-tracking data-id="'+o.id+'" placeholder="Tracking number" value="'+(o.tracking_number||'')+'" style="padding:8px 10px;flex:1;min-width:140px">'
-          +'<button class="btn btn-line" style="padding:8px 14px" onclick="saveAdminOrder(&apos;'+o.id+'&apos;)">Save</button>'
-          +'<span data-order-msg="'+o.id+'" style="font-size:.78rem"></span>'
-          +'</div>'
-          +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)">'
-          +'<label style="display:flex;align-items:center;gap:5px;font-size:.78rem;color:var(--muted)"><input type="checkbox" data-order-delayed data-id="'+o.id+'"'+(o.is_delayed?' checked':'')+' style="accent-color:var(--gold)"> Delayed</label>'
-          +'<input type="text" data-order-delay-note data-id="'+o.id+'" placeholder="Delay reason (shown to customer)" value="'+(o.delay_note||'').replace(/"/g,'&quot;')+'" style="padding:8px 10px;flex:1;min-width:160px">'
-          +'<input type="date" data-order-delayed-until data-id="'+o.id+'" value="'+(o.delayed_until||'')+'" style="padding:8px 10px">'
-          +'</div>'
-          +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)">'
-          +'<button class="btn btn-line" style="padding:8px 14px" onclick="generateInvoice(&apos;'+o.id+'&apos;)">'+(o.invoice_number?'Resend Invoice':'Generate Invoice')+'</button>'
-          +(o.invoice_number?'<span style="font-size:.75rem;color:var(--muted)">'+o.invoice_number+'</span>':'')
-          +'<span data-invoice-msg="'+o.id+'" style="font-size:.78rem"></span>'
-          +'</div>'
-          +(o.gift_note?'<p style="font-size:.8rem;color:var(--gold);margin-top:8px">Gift note: '+o.gift_note.replace(/</g,'&lt;')+'</p>':'')
-          +(o.platform_fee_total!==null&&o.platform_fee_total!==undefined?'<p style="font-size:.72rem;color:var(--muted);margin-top:6px">Platform fee (2%+GST, internal): ₹'+o.platform_fee_total+'</p>':'')
-          +'</div>';
-      }).join('');
+      allAdminOrders=r.orders||[];
+      var searchEl=document.getElementById('adminOrderSearch');
+      if(searchEl && searchEl.value.trim()){ filterAdminOrders(); }
+      else{ renderAdminOrderList(allAdminOrders); }
     }catch(e){ listEl.innerHTML='<p style="color:#e08a8a;font-size:.85rem">Could not load orders.</p>'; }
   };
 

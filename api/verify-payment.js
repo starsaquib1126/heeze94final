@@ -106,7 +106,7 @@ export default async function handler(req, res) {
     .from('orders')
     .update({ status: 'paid', razorpay_payment_id })
     .eq('razorpay_order_id', razorpay_order_id)
-    .select('id, total, subtotal, shipping_address, promo_code, discount_amount, customer_id, email')
+    .select('id, total, subtotal, shipping_address, promo_code, discount_amount, shipping_fee, created_at, customer_id, email')
     .single();
 
   if (orderError) return res.status(500).json({ error: orderError.message });
