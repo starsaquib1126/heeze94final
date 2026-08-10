@@ -12,6 +12,7 @@ DEPLOY IN THIS ORDER:
      021_order_delay_flag.sql
      022_shipping_fees.sql
      023_pause_us_uae_delivery.sql
+     024_gst_invoice_numbering.sql
 
 2) GITHUB — NEW files (didn't exist before):
      quiz.html
