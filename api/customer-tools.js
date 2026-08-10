@@ -438,7 +438,7 @@ async function handleAdminGenerateInvoice(req, res) {
 
   const { data: order, error } = await supabase
     .from('orders')
-    .select('id, email, total, shipping_address, invoice_number')
+    .select('id, email, total, shipping_address, invoice_number, customer_id')
     .eq('id', orderId)
     .maybeSingle();
   if (error) return res.status(500).json({ error: error.message });

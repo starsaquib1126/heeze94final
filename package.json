@@ -5,6 +5,7 @@
   "type": "module",
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
-    "razorpay": "^2.9.4"
+    "razorpay": "^2.9.4",
+    "pdfkit": "^0.19.1"
   }
 }

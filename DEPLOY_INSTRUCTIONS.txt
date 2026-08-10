@@ -52,3 +52,8 @@ WHAT'S IN THIS UPDATE:
 
 DISCOVERY/SAMPLE SETS: no code needed — just add a product row in Supabase
 (e.g. "Discovery Set — 3x3ml") and it flows through the existing system.
+
+
+NEW DEPENDENCY: package.json now includes "pdfkit" (for generating real PDF invoices).
+Upload the updated package.json to GitHub -- Vercel will install it automatically
+on the next deploy. No manual npm install needed on your end.
