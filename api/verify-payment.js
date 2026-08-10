@@ -6,6 +6,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
+import { generateAndSendGstInvoice } from './_lib/gstInvoice.js';
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
@@ -172,6 +173,16 @@ export default async function handler(req, res) {
       `Your HEEZE 94 Order Confirmation — #${order.id.slice(0, 8).toUpperCase()}`,
       orderEmailHTML(emailOrder, emailCustomer, enrichedItems, false)
     );
+  }
+
+  // GST tax invoice -- generated and emailed to both the customer and the
+  // owner right now, at payment confirmation. This is the legally correct
+  // timing (invoices must be issued at or before dispatch, not after
+  // delivery) and doesn't depend on remembering to mark orders "delivered".
+  try {
+    await generateAndSendGstInvoice(supabase, { ...order, email: customerEmail });
+  } catch (e) {
+    console.error('GST invoice generation failed for order', order.id, e);
   }
 
   return res.status(200).json({ success: true, orderId: order.id });

@@ -800,6 +800,11 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
           +'<input type="text" data-order-delay-note data-id="'+o.id+'" placeholder="Delay reason (shown to customer)" value="'+(o.delay_note||'').replace(/"/g,'&quot;')+'" style="padding:8px 10px;flex:1;min-width:160px">'
           +'<input type="date" data-order-delayed-until data-id="'+o.id+'" value="'+(o.delayed_until||'')+'" style="padding:8px 10px">'
           +'</div>'
+          +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)">'
+          +'<button class="btn btn-line" style="padding:8px 14px" onclick="generateInvoice(&apos;'+o.id+'&apos;)">'+(o.invoice_number?'Resend Invoice':'Generate Invoice')+'</button>'
+          +(o.invoice_number?'<span style="font-size:.75rem;color:var(--muted)">'+o.invoice_number+'</span>':'')
+          +'<span data-invoice-msg="'+o.id+'" style="font-size:.78rem"></span>'
+          +'</div>'
           +(o.gift_note?'<p style="font-size:.8rem;color:var(--gold);margin-top:8px">Gift note: '+o.gift_note.replace(/</g,'&lt;')+'</p>':'')
           +(o.platform_fee_total!==null&&o.platform_fee_total!==undefined?'<p style="font-size:.72rem;color:var(--muted);margin-top:6px">Platform fee (2%+GST, internal): ₹'+o.platform_fee_total+'</p>':'')
           +'</div>';
@@ -823,6 +828,16 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
       })}).then(function(res){return res.json();});
       if(r.error){ msgEl.textContent=r.error; msgEl.style.color='#e08a8a'; return; }
       msgEl.textContent='Saved ✓'; msgEl.style.color='var(--gold)';
+    }catch(e){ msgEl.textContent='Failed'; msgEl.style.color='#e08a8a'; }
+  };
+
+  window.generateInvoice=async function(orderId){
+    var msgEl=document.querySelector('[data-invoice-msg="'+orderId+'"]');
+    msgEl.textContent='Generating…'; msgEl.style.color='var(--muted)';
+    try{
+      var r=await fetch('/api/customer-tools',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'admin-generate-invoice',secret:secret,orderId:orderId})}).then(function(res){return res.json();});
+      if(r.error){ msgEl.textContent=r.error; msgEl.style.color='#e08a8a'; return; }
+      msgEl.textContent='Sent \u2713 ('+r.invoiceNumber+')'; msgEl.style.color='var(--gold)';
     }catch(e){ msgEl.textContent='Failed'; msgEl.style.color='#e08a8a'; }
   };
 

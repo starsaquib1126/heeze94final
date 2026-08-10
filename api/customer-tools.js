@@ -16,6 +16,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import Razorpay from 'razorpay';
+import { generateAndSendGstInvoice } from './_lib/gstInvoice.js';
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 const razorpay = new Razorpay({
@@ -57,6 +58,9 @@ export default async function handler(req, res) {
     }
     if (action === 'admin-export-orders') {
       return await handleAdminExportOrders(req, res);
+    }
+    if (action === 'admin-generate-invoice') {
+      return await handleAdminGenerateInvoice(req, res);
     }
     return res.status(400).json({ error: 'Unknown action' });
   } catch (err) {
@@ -258,7 +262,7 @@ async function handleAdminListOrders(req, res) {
 
   const { data: orders, error } = await supabase
     .from('orders')
-    .select('id, email, status, created_at, total, tracking_number, gift_note, is_gift, is_delayed, delay_note, delayed_until, shipping_address, customers(name, phone)')
+    .select('id, email, status, created_at, total, tracking_number, gift_note, is_gift, is_delayed, delay_note, delayed_until, shipping_address, invoice_number, customers(name, phone)')
     .order('created_at', { ascending: false })
     .limit(100);
   if (error) return res.status(500).json({ error: error.message });
@@ -424,4 +428,28 @@ async function handleAdminExportOrders(req, res) {
   });
 
   return res.status(200).json({ rows });
+}
+
+async function handleAdminGenerateInvoice(req, res) {
+  if (!checkAdminSecret(req)) return res.status(401).json({ error: 'Unauthorized' });
+
+  const { orderId } = req.body;
+  if (!orderId) return res.status(400).json({ error: 'Missing order ID' });
+
+  const { data: order, error } = await supabase
+    .from('orders')
+    .select('id, email, total, shipping_address, invoice_number')
+    .eq('id', orderId)
+    .maybeSingle();
+  if (error) return res.status(500).json({ error: error.message });
+  if (!order) return res.status(404).json({ error: 'Order not found' });
+  if (!order.email) return res.status(400).json({ error: 'This order has no email on file to send the invoice to.' });
+
+  try {
+    const invoiceNumber = await generateAndSendGstInvoice(supabase, order);
+    return res.status(200).json({ success: true, invoiceNumber });
+  } catch (e) {
+    console.error('Manual invoice generation failed for order', orderId, e);
+    return res.status(500).json({ error: 'Could not generate the invoice right now.' });
+  }
 }
