@@ -267,6 +267,23 @@ async function handleAdminListOrders(req, res) {
     .limit(100);
   if (error) return res.status(500).json({ error: error.message });
 
+  // Fetch items for all orders in one query and group them, rather than one
+  // query per order -- keeps this fast even at 100 orders.
+  const orderIds = (orders || []).map(o => o.id);
+  let itemsByOrder = {};
+  if (orderIds.length) {
+    const { data: items } = await supabase
+      .from('order_items')
+      .select('order_id, quantity, product_variants(ml, products(name))')
+      .in('order_id', orderIds);
+    for (const it of items || []) {
+      const name = it.product_variants?.products?.name || 'Item';
+      const ml = it.product_variants?.ml;
+      const line = `${name}${ml ? ' (' + ml + 'ml)' : ''} \u00d7${it.quantity}`;
+      (itemsByOrder[it.order_id] = itemsByOrder[it.order_id] || []).push(line);
+    }
+  }
+
   return res.status(200).json({
     orders: (orders || []).map(o => {
       // Internal bookkeeping only -- never shown to customers, never added to
@@ -281,7 +298,8 @@ async function handleAdminListOrders(req, res) {
         ...o,
         customer_name: o.customers?.name || null,
         customer_phone: o.customers?.phone || null,
-        platform_fee_total: platformFeeTotal
+        platform_fee_total: platformFeeTotal,
+        items_summary: (itemsByOrder[o.id] || []).join(', ')
       };
     })
   });

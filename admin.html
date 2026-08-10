@@ -710,7 +710,17 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
       <p style="color:var(--muted);font-size:.85rem">Most recent 100 orders</p>
       <button class="text-link" onclick="loadAdminOrders()">Refresh</button>
     </div>
-    <input type="text" id="adminOrderSearch" placeholder="Search by name, email, order ID, or tracking number…" style="width:100%;padding:10px 14px;margin-bottom:18px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:5px;color:var(--ivory);font-family:inherit" oninput="filterAdminOrders()">
+    <input type="text" id="adminOrderSearch" placeholder="Search by name, email, order ID, or tracking number…" style="width:100%;padding:10px 14px;margin-bottom:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:5px;color:var(--ivory);font-family:inherit" oninput="filterAdminOrders()">
+    <select id="adminStatusFilter" style="padding:10px 14px;margin-bottom:18px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:5px;color:var(--ivory);font-family:inherit" onchange="filterAdminOrders()">
+      <option value="">All statuses</option>
+      <option value="pending">Pending</option>
+      <option value="payment_failed">Payment Failed</option>
+      <option value="paid">Paid</option>
+      <option value="shipped">Shipped</option>
+      <option value="delivered">Delivered</option>
+      <option value="cancelled">Cancelled</option>
+      <option value="refunded">Refunded</option>
+    </select>
     <div id="adminOrderList"></div>
 
     <div style="border-top:1px solid rgba(255,255,255,.08);margin-top:32px;padding-top:24px">
@@ -779,6 +789,7 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
         +'<div><strong style="font-size:.85rem">#'+o.id.slice(0,8)+'</strong> <span style="color:var(--muted);font-size:.8rem">'+(o.customer_name?o.customer_name+' &middot; ':'')+o.email+'</span></div>'
         +'<div style="font-size:.8rem;color:var(--muted)">'+new Date(o.created_at).toLocaleDateString('en-IN')+' · ₹'+o.total+(o.is_gift?' · 🎁 Gift':'')+'</div>'
         +'</div>'
+        +(o.items_summary?'<p style="font-size:.8rem;color:var(--ivory);margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.05)">'+o.items_summary.replace(/</g,'&lt;')+'</p>':'')
         +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
         +'<select data-order-status data-id="'+o.id+'" style="padding:8px 10px">'
         +['pending','payment_failed','paid','shipped','delivered','cancelled','refunded'].map(function(s){return '<option value="'+s+'"'+(s===o.status?' selected':'')+'>'+s+'</option>';}).join('')
@@ -805,12 +816,15 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
 
   window.filterAdminOrders=function(){
     var q=document.getElementById('adminOrderSearch').value.trim().toLowerCase();
-    if(!q){ renderAdminOrderList(allAdminOrders); return; }
+    var statusFilter=document.getElementById('adminStatusFilter').value;
     var filtered=allAdminOrders.filter(function(o){
-      return (o.customer_name||'').toLowerCase().includes(q)
+      var matchesSearch=!q
+        || (o.customer_name||'').toLowerCase().includes(q)
         || (o.email||'').toLowerCase().includes(q)
         || o.id.toLowerCase().includes(q)
         || (o.tracking_number||'').toLowerCase().includes(q);
+      var matchesStatus=!statusFilter || o.status===statusFilter;
+      return matchesSearch && matchesStatus;
     });
     renderAdminOrderList(filtered);
   };
@@ -829,9 +843,7 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
         return;
       }
       allAdminOrders=r.orders||[];
-      var searchEl=document.getElementById('adminOrderSearch');
-      if(searchEl && searchEl.value.trim()){ filterAdminOrders(); }
-      else{ renderAdminOrderList(allAdminOrders); }
+      filterAdminOrders();
     }catch(e){ listEl.innerHTML='<p style="color:#e08a8a;font-size:.85rem">Could not load orders.</p>'; }
   };
 
