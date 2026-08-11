@@ -181,11 +181,11 @@ async function processAbandonedCarts() {
 
     const { data: items } = await supabase
       .from('order_items')
-      .select('quantity, price_at_purchase, product_variants(ml, products(name))')
+      .select('quantity, price_at_purchase, product_variants(size_ml, products(name))')
       .eq('order_id', order.id);
 
     const itemsHtml = (items || []).map(i =>
-      `<tr><td style="padding:6px 0">${escapeHtml(i.product_variants?.products?.name || 'Item')} · ${i.product_variants?.ml}ml × ${i.quantity}</td></tr>`
+      `<tr><td style="padding:6px 0">${escapeHtml(i.product_variants?.products?.name || 'Item')} · ${i.product_variants?.size_ml}ml × ${i.quantity}</td></tr>`
     ).join('');
 
     await sendEmail(order.email, `You left something in your bag — HEEZE 94`, `

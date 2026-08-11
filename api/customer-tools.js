@@ -159,7 +159,7 @@ async function handleTrackOrder(req, res) {
 
   const { data: items } = await supabase
     .from('order_items')
-    .select('quantity, price_at_purchase, product_variants(ml, products(name))')
+    .select('quantity, price_at_purchase, product_variants(size_ml, products(name))')
     .eq('order_id', order.id);
 
   return res.status(200).json({
@@ -174,7 +174,7 @@ async function handleTrackOrder(req, res) {
     delayedUntil: order.delayed_until || null,
     items: (items || []).map(i => ({
       name: i.product_variants?.products?.name || 'Item',
-      ml: i.product_variants?.ml,
+      ml: i.product_variants?.size_ml,
       quantity: i.quantity,
       price: i.price_at_purchase
     }))
@@ -274,11 +274,11 @@ async function handleAdminListOrders(req, res) {
   if (orderIds.length) {
     const { data: items } = await supabase
       .from('order_items')
-      .select('order_id, quantity, product_variants(ml, products(name))')
+      .select('order_id, quantity, product_variants(size_ml, products(name))')
       .in('order_id', orderIds);
     for (const it of items || []) {
       const name = it.product_variants?.products?.name || 'Item';
-      const ml = it.product_variants?.ml;
+      const ml = it.product_variants?.size_ml;
       const line = `${name}${ml ? ' (' + ml + 'ml)' : ''} \u00d7${it.quantity}`;
       (itemsByOrder[it.order_id] = itemsByOrder[it.order_id] || []).push(line);
     }
@@ -406,11 +406,11 @@ async function handleAdminExportOrders(req, res) {
   if (orderIds.length) {
     const { data: items } = await supabase
       .from('order_items')
-      .select('order_id, quantity, price_at_purchase, product_variants(ml, products(name))')
+      .select('order_id, quantity, price_at_purchase, product_variants(size_ml, products(name))')
       .in('order_id', orderIds);
     for (const it of items || []) {
       const name = it.product_variants?.products?.name || 'Item';
-      const ml = it.product_variants?.ml;
+      const ml = it.product_variants?.size_ml;
       const line = `${name}${ml ? ' (' + ml + 'ml)' : ''} x${it.quantity}`;
       (itemsByOrder[it.order_id] = itemsByOrder[it.order_id] || []).push(line);
     }

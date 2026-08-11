@@ -22,7 +22,11 @@ const SELLER = {
 const HSN_CODE = '3303'; // perfumes, attars, toilet waters
 
 function money(n) {
-  return '\u20b9' + Number(n).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  // pdfkit's built-in fonts (Helvetica etc.) only support a limited Latin
+  // character set and cannot render the ₹ glyph at all -- it comes out
+  // completely blank. "Rs." is the standard, universally-safe convention
+  // used on countless real Indian invoices for exactly this reason.
+  return 'Rs. ' + Number(n).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 async function sendEmail(to, subject, html, attachments) {
@@ -125,7 +129,7 @@ function buildInvoicePdf(order, items, invoiceNumber, customerName) {
     for (const i of (items || [])) {
       const name = i.product_variants?.products?.name || 'Item';
       const desc = i.product_variants?.products?.description || '';
-      const ml = i.product_variants?.ml;
+      const ml = i.product_variants?.size_ml;
       const lineTotal = Number(i.price_at_purchase) * Number(i.quantity);
       itemsSubtotal += lineTotal;
 
@@ -210,7 +214,7 @@ export async function generateAndSendGstInvoice(supabase, order) {
 
   const { data: items } = await supabase
     .from('order_items')
-    .select('quantity, price_at_purchase, product_variants(ml, products(name, description))')
+    .select('quantity, price_at_purchase, product_variants(size_ml, products(name, description))')
     .eq('order_id', order.id);
 
   let customerName = null;
