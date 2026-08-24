@@ -11,7 +11,7 @@
   --champagne:#F4E3BC;
   --ivory:#EDE3D0;
   --muted:#9A8B6F;
-  --dim:#5A4E36;
+  --dim:#8A7857;
   --hairline:rgba(233,190,90,.18);
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -433,7 +433,8 @@ body:not(.gate-active) .gateway{display:none}
   font-size:.9rem;padding:12px 14px;outline:none;transition:.3s}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold-deep)}
 .field select{-webkit-appearance:none;appearance:none}
-select{color-scheme:dark}
+select{color-scheme:dark;transition:.25s ease}
+select:hover{border-color:var(--gold-deep)}
 select option{background:#1a1512;color:#f0e6d8}
 .field textarea{min-height:110px;resize:vertical}
 .form-ok{font-size:.8rem;color:var(--gold);margin-top:4px;min-height:1.2em}
@@ -818,7 +819,8 @@ body{opacity:0;animation:h94BodyIn .55s cubic-bezier(.19,1,.22,1) .04s forwards}
     <div class="ey" style="margin-bottom:6px">Order Confirmed</div>
     <h2 style="font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;font-size:1.6rem;margin-bottom:10px">Thank you — with love, HEEZE 94.</h2>
     <p style="color:var(--muted);font-size:.88rem;line-height:1.7;margin-bottom:6px">Your fragrance is being prepared with care.</p>
-    <p style="font-size:.78rem;color:var(--muted);margin-bottom:26px">Order ID: <strong data-success-order-id style="color:var(--ivory);font-family:monospace"></strong></p>
+    <p style="font-size:.78rem;color:var(--muted);margin-bottom:4px">Order ID: <strong data-success-order-id style="color:var(--ivory);font-family:monospace"></strong></p>
+    <p style="font-size:.78rem;color:var(--muted);margin-bottom:26px">Order Date: <strong data-success-order-date style="color:var(--ivory)"></strong></p>
     <a data-success-track-link href="track-order" class="btn btn-gold" style="width:100%;display:block;margin-bottom:10px">Track Your Order</a>
     <button type="button" class="btn btn-line" style="width:100%" data-success-keep-shopping>Keep Shopping</button>
   </div>
@@ -1325,6 +1327,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     titleEl.textContent='Order Confirmed';
     const shortId=(orderId||'').slice(0,8).toUpperCase();
     document.querySelector('[data-success-order-id]').textContent=shortId||'—';
+    document.querySelector('[data-success-order-date]').textContent=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
     const trackLink=document.querySelector('[data-success-track-link]');
     if(orderId && email){
       trackLink.href='track-order?orderId='+encodeURIComponent(orderId)+'&email='+encodeURIComponent(email);
